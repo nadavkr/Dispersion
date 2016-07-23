@@ -178,6 +178,27 @@ $d(u,x)=d(x,r)+d(r,u)<\lambda\Rightarrow(\text{by 1) }d(x,r)\le\frac{\lambda}{2}
 \end{case}
 \end{proof}
 Lemma \ref{greenNodesLemma} implies the correctness of the algorithm.
+%TODO extend proof of correctness
+
+\subsection{Sublinear feasibility test for the MMDP}
+%TODO
+
+\subsection{Linear time solution for the MMDP}
+The general idea of the algorithm is using the heavy path decomposition 
+
+To find the smallest "good" $\lambda$, we proceed in log(n) phases. The phases are guided with the heavy path decomposition of the tree. In the i-th phase we process all heavy paths at level i (i.e., whose heads have subtrees of size $[2^i,2^{i+1})$). We maintain the current interval $[\lambda_1,\lambda_2)$ with the property that $\lambda^* \in [\lambda_1,\lambda_2)$, and furthermore for any $\lambda \in [\lambda_1,\lambda_2)$ there is a largest cardinality solution for the whole tree which is consistent with decision made in every subtree of size $<2^{i+1}$. "Consistent" here means that in every subtree we have a partial solution, i.e., a subset of nodes, and only one of these nodes we are not fully sure about. From the remaining nodes only the nearest to the root of the subtree matters, so again we keep a blue and a green node. The distance between the blue and green (if both exist) is $\geq \lambda$ for any $\lambda$ in the current interval, and we for sure take the blue and possibly also the green.
+
+Increase i by one. Then, because we have determined $\lambda^*$ with sufficient accuracy, each subtree hanging off a heavy path at level i can be replaced by its blue and green node attached by single edges to the heavy path. Hence each such heavy path is a caterpillar.
+
+Consider a single caterpillar on k nodes. Let the i-th leaf be connected with an edge of length $y_i$ to a node at distance $x_i$ from the root of the caterpillar. Order the leaves so that $x_1 < x_2 < ... < x_k$. I want to claim that we can first prune the caterpillar so that $y_i < \lambda/2$ for each $\lambda$ in the current interval. This should be clear (check), but I don't really know the value of $\lambda/2$ exactly, hence I need to further narrow down the current interval.
+
+For this, choose the median of all $y_i$s, run the feasibility test, repeat on the remaining medians. This is $O(logk)$ feasibility tests and $O(k)$ time for the bookkeeping, and now the current interval is sufficiently small so that we know if $y_i < \lambda/2$.
+
+I want to further prune the caterpillar so that $x_i+y_i$ is nondecreasing. Consider $i$ and choose $j < i$ such that $x_j+y_j$ is maximized, see the figure. Assume that $x_j+y_j > x_i+y_i$. Then, by $y_j \leq \lambda/2$, the distance between the i-th and the j-th leaf is $\leq \lambda$ (check). So optimal solution contains at most one of them, assume that it is the i-th. Replace it with the j-th there. The solution is still valid (check), so in fact we can remove the i-th leaf from the caterpillar.
+
+Such pruning can be done in O(k) time by scanning the caterpillar bottom-up and maintaining a stack of "alive" leaves. Now it seems to me that I can repeat the reasoning in the other direction: prune the caterpillar so that $x_i-y_i$ is non-decreasing (imagine flipping the legs in the other direction) also in O(k) and without breaking the optimal solution. 
+
+I have obtained a very structured caterpillar. In particular, now I can create a row- and column-sorted matrix storing all pairwise distance between the leaves, because for j<i the distance between the leaves is $y_i+y_j+x_i-x_j = (x_i+y_i) - (x_j-y_i)$, so arranging the matrix in the natural order gives monotone rows and columns. I can also create a sorted list containing the distances from every leaf to the head of the caterpillar. Then I run Frederickson's searching algorithm on such sorted matrices, in each of the log(n) steps (check if he is really using only that many steps) calling the feasibility test. This allows me to to run the blue-green reduction on the whole caterpillar I think (because other way to view it is: find the largest cardinality solution, and if there is a tie maximize the distance to the nearest chosen node).
 
 
 
