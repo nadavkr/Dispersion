@@ -85,6 +85,7 @@
 \newtheorem{example}[theorem]{Example}
 \newtheorem*{claim}{Claim}
 \newtheorem{case}{Case}
+\newtheorem{step}{Step}
 
 \newtheorem{property}[theorem]{Property}
 \newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
@@ -176,7 +177,9 @@ We have that $d(u,x)=d(u,r)+d(r,u')+d(u',x)<\lambda\Rightarrow d(x,u')<\lambda$ 
 $d(u,x)=d(x,r)+d(r,u)<\lambda\Rightarrow(\text{by 1) }d(x,r)\le\frac{\lambda}{2}$ and similarly we get that $d(u',r)\le\frac{\lambda}{2}\,\,\,\Rightarrow\,\,\,d(u',x)\le\lambda$. 
 \end{case}
 \end{case}
+%TODO fix case nesting
 \end{proof}
+%TODO add a drawing for each case
 Lemma \ref{greenNodesLemma} implies the correctness of the algorithm.
 %TODO extend proof of correctness
 
@@ -184,11 +187,35 @@ Lemma \ref{greenNodesLemma} implies the correctness of the algorithm.
 %TODO
 
 \subsection{Linear time solution for the MMDP}
-The general idea of the algorithm is using the heavy path decomposition 
+The general idea of the algorithm is using the heavy path decomposition. We are searching for $\lambda^*$, which is the distance between some two nodes in the tree, and the largest number for which the MMDP feasibility test would return true.
+We go through the heavy path tree bottom-up, and process each heavy path so that we are left with a green and blue node, similarly to what we did in the linear MMDP feasibility test algorithm. We maintain an interval $[\lambda_1,\lambda_2)$ s.t $\lambda^*$ is in the interval, that gets smaller and smaller throughout the run.
+
+We now describe the processing of a heavy path. Notice that we are doing this bottom-up, and so we have already processed all of its children in the heavy path tree. Because we have determined $\lambda^*$ with sufficient accuracy (i.e. reduced the size of the maintained interval), each subtree hanging off a heavy path can be replaced by its blue and green node attached by single edges to the heavy path. Hence each such heavy path is a caterpillar, with one or two children for each spine node. The situation is illustrated in figure %TODO add a figure
+Assume that the caterpillar has k nodes. Let the i-th leaf be connected by an edge of length $y_i$ to a node at distance $x_i$ from the root of the caterpillar. Order the leaves so that $x_1 < x_2 < ... < x_k$.
+
+\begin{step}
+\textbf{Find the blue nodes that will certainly not be taken:}
+Some of the blue nodes can be ignored as they "collide" with green nodes
+\end{step}
+\begin{step}
+\textbf{Prune the caterpillar so that $\pmb{\forall\lambda\in [\lambda_1,\lambda_2)  y_i < \lambda/2}$ :}
+
+\end{step}
+\begin{step}
+\textbf{Prune the caterpillar so that $\pmb{x_i+y_i}$  is non-decreasing:}
+Traverse the caterpillar from bottom to top. Observe the $i$-th leaf, $u$. Denote by $v$ the leaf above $u$, and let  $j=i-1$. Assume $x_j+y_j > x_i+y_i$ (i.e $v$ is farther from the root than $u$). We get that $x_i-x_j+y_i < y_j$. $d(u,v) = x_i-x_j+y_i+y_j < 2y_j < \lambda$. So an optimal solution cannot contain both $u$ and $v$. If $u$ is in the solution we can replace it with $v$. This is because $v$ is farther away from any node above it than $u$, and $u$ is closer to any node below it than $v$. Let $v'$ be a leaf node above $v$, then $d(v,v') - d(v',u) = y_j-(x_i-x_j)-y_i = x_j+y_j-(x_i+y_i) > 0$, and the reasoning for the second case is similar.
+So in fact, we can remove the i-th leaf from the caterpillar.
+\end{step}
+\begin{step}
+\textbf{Construct a row and column sorted matrix storing all pairwise distance in the caterpillar}
+\end{step}
+\begin{step}
+\textbf{Run a searching algorithm on the sorted matrices of all the heavy paths}
+\end{step}
 
 To find the smallest "good" $\lambda$, we proceed in log(n) phases. The phases are guided with the heavy path decomposition of the tree. In the i-th phase we process all heavy paths at level i (i.e., whose heads have subtrees of size $[2^i,2^{i+1})$). We maintain the current interval $[\lambda_1,\lambda_2)$ with the property that $\lambda^* \in [\lambda_1,\lambda_2)$, and furthermore for any $\lambda \in [\lambda_1,\lambda_2)$ there is a largest cardinality solution for the whole tree which is consistent with decision made in every subtree of size $<2^{i+1}$. "Consistent" here means that in every subtree we have a partial solution, i.e., a subset of nodes, and only one of these nodes we are not fully sure about. From the remaining nodes only the nearest to the root of the subtree matters, so again we keep a blue and a green node. The distance between the blue and green (if both exist) is $\geq \lambda$ for any $\lambda$ in the current interval, and we for sure take the blue and possibly also the green.
 
-Increase i by one. Then, because we have determined $\lambda^*$ with sufficient accuracy, each subtree hanging off a heavy path at level i can be replaced by its blue and green node attached by single edges to the heavy path. Hence each such heavy path is a caterpillar.
+Increase i by one. Then, because we have determined $\lambda^*$ with sufficient accuracy, each subtree hanging off a heavy path at level i can be replaced by its blue and green nodes attached by single edges to the heavy path. Hence each such heavy path is a caterpillar.
 
 Consider a single caterpillar on k nodes. Let the i-th leaf be connected with an edge of length $y_i$ to a node at distance $x_i$ from the root of the caterpillar. Order the leaves so that $x_1 < x_2 < ... < x_k$. I want to claim that we can first prune the caterpillar so that $y_i < \lambda/2$ for each $\lambda$ in the current interval. This should be clear (check), but I don't really know the value of $\lambda/2$ exactly, hence I need to further narrow down the current interval.
 
