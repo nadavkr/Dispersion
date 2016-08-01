@@ -137,10 +137,6 @@ Note that each $P_{i}$ contains at most one blue vertex and one green vertex.
 \item Take $u'$, the blue node farthest from $v$ s.t $d(u',v)\leq \frac{\lambda}{2}$, if it exists, and if $d(u',x)\leq \lambda$, where $x$ is the closest node to the root $v$ we have chosen so far.
 \item Decide weather to take $v$ (the root) to the solution by looking at the closest vertex to it we have already put in $P$.
 \end{enumerate}
-
-We start by putting in $P$ all the vertices in $P_{1},...,P_{k}$, except for the blue vertices.
-Now we need to decide which blue nodes we should put in $P$ and if we take $v$. We would like to take as many blue nodes as we can, and still maintain a dispersion of $\lambda$.
-Take all blue nodes $u$ s.t $d(u,v)> \frac{\lambda}{2}$, and also take $u'$, the blue node farthest from $v$ that does not maintain this, i.e $d(u',v)\leq \frac{\lambda}{2}$, if it exists. We can decide if we take $v$ to the solution in constant time by looking at the closest vertex to it we have already put in $P$.
 %\end{algo}
 
 \begin{definition}
@@ -188,18 +184,15 @@ Lemma \ref{greenNodesLemma} implies the correctness of the algorithm.
 
 \subsection{Linear time solution for the MMDP}
 The general idea of the algorithm is using the heavy path decomposition. We are searching for $\lambda^*$, which is the distance between some two nodes in the tree, and the largest number for which the MMDP feasibility test would return true.
-We go through the heavy path tree bottom-up, and process each heavy path so that we are left with a green and blue node, similarly to what we did in the linear MMDP feasibility test algorithm. We maintain an interval $[\lambda_1,\lambda_2)$ s.t $\lambda^*$ is in the interval, that gets smaller and smaller throughout the run.
+We go through the heavy path tree bottom-up, and process all heavy paths at a specific level in parallel, until we are left with a green and blue node for each of them. We maintain an interval $[\lambda_1,\lambda_2)$ s.t $\lambda^*$ is in the interval, that gets smaller and smaller throughout the run.
 
-We now describe the processing of a heavy path. Notice that we are doing this bottom-up, and so we have already processed all of its children in the heavy path tree. Because we have determined $\lambda^*$ with sufficient accuracy (i.e. reduced the size of the maintained interval), each subtree hanging off a heavy path can be replaced by its blue and green node attached by single edges to the heavy path. Hence each such heavy path is a caterpillar, with one or two children for each spine node. The situation is illustrated in figure %TODO add a figure
-Assume that the caterpillar has k nodes. Let the i-th leaf be connected by an edge of length $y_i$ to a node at distance $x_i$ from the root of the caterpillar. Order the leaves so that $x_1 < x_2 < ... < x_k$.
+We now describe the processing of a heavy path. Notice that the traversal is bottom-up, so we have already processed all of its children in the heavy path tree. Because we have determined $\lambda^*$ with sufficient accuracy (i.e. reduced the size of the maintained interval), each subtree hanging off a heavy path can be replaced by its blue and green node attached by single edges to the heavy path. Hence each such heavy path is a caterpillar, with one or two children for each spine node. We would like to be able to find the green and blue nodes for this heavy path. The situation is illustrated in figure %TODO add a figure
+Assume that the caterpillar has k nodes. Let the $i$-th leaf be connected by an edge of length $y_i$ to a spine node at distance $x_i$ from the root of the caterpillar. Order the leaves so that $x_1 < x_2 < ... < x_k$.
 
 \begin{step}
 \textbf{Find the blue nodes that will certainly not be taken:}
-Some of the blue nodes can be ignored as they "collide" with green nodes
-\end{step}
-\begin{step}
-\textbf{Prune the caterpillar so that $\pmb{\forall\lambda\in [\lambda_1,\lambda_2)  y_i < \lambda/2}$ :}
-
+Some of the blue nodes can be ignored as they "collide" with green nodes. We start by finding the closest green node to each blue node. We can do this in linear time by scanning the caterpillar bottom-up, while saving for each blue, the closest green node below it and the distance to it. We the do the same scan from top to bottom, and get for each blue node the closest green node and the distance to it. Now we want to find the blue nodes that are too close to a green node. Find the median of the distances, run a feasibility test on it, and repeat for the remaining distances, while updating the interval. Delete all blue nodes for which the distance to the closest green node is smaller than $\lambda^*$.
+Notice that we are only left with some of the blue nodes to consider, and for all of them it hold that $y_i < \lambda_1/2$, and from this point we can ignore the green nodes.
 \end{step}
 \begin{step}
 \textbf{Prune the caterpillar so that $\pmb{x_i+y_i}$  is non-decreasing:}
@@ -208,24 +201,15 @@ So in fact, we can remove the i-th leaf from the caterpillar.
 \end{step}
 \begin{step}
 \textbf{Construct a row and column sorted matrix storing all pairwise distance in the caterpillar}
+It is easy to see that arranging the matrix in the natural order will produce a triangular matrix with monotone rows and columns.
 \end{step}
 \begin{step}
 \textbf{Run a searching algorithm on the sorted matrices of all the heavy paths}
+We now use Frederickson's method to search our sorted matrix and eliminate its entries using $O(logk)$ calls to out feasibility test algorithm. We thus narrow down our interval to be $[\lambda_1,\lambda_2)$ where $\lambda_1$ and $\lambda_2$ are consecutive pairwise distances in the caterpillar (i.e there is no $x\in [\lambda_1,\lambda_2)$ s.t x is a pairwise distance in the caterpillar, and so we can mark a blue and a green node of the caterpillar that will be valid for any value of $\lambda^*$.  %TODO citation needed. explanation of the search?
 \end{step}
 
-To find the smallest "good" $\lambda$, we proceed in log(n) phases. The phases are guided with the heavy path decomposition of the tree. In the i-th phase we process all heavy paths at level i (i.e., whose heads have subtrees of size $[2^i,2^{i+1})$). We maintain the current interval $[\lambda_1,\lambda_2)$ with the property that $\lambda^* \in [\lambda_1,\lambda_2)$, and furthermore for any $\lambda \in [\lambda_1,\lambda_2)$ there is a largest cardinality solution for the whole tree which is consistent with decision made in every subtree of size $<2^{i+1}$. "Consistent" here means that in every subtree we have a partial solution, i.e., a subset of nodes, and only one of these nodes we are not fully sure about. From the remaining nodes only the nearest to the root of the subtree matters, so again we keep a blue and a green node. The distance between the blue and green (if both exist) is $\geq \lambda$ for any $\lambda$ in the current interval, and we for sure take the blue and possibly also the green.
+\paragraph{Complexity analysis }
 
-Increase i by one. Then, because we have determined $\lambda^*$ with sufficient accuracy, each subtree hanging off a heavy path at level i can be replaced by its blue and green nodes attached by single edges to the heavy path. Hence each such heavy path is a caterpillar.
-
-Consider a single caterpillar on k nodes. Let the i-th leaf be connected with an edge of length $y_i$ to a node at distance $x_i$ from the root of the caterpillar. Order the leaves so that $x_1 < x_2 < ... < x_k$. I want to claim that we can first prune the caterpillar so that $y_i < \lambda/2$ for each $\lambda$ in the current interval. This should be clear (check), but I don't really know the value of $\lambda/2$ exactly, hence I need to further narrow down the current interval.
-
-For this, choose the median of all $y_i$s, run the feasibility test, repeat on the remaining medians. This is $O(logk)$ feasibility tests and $O(k)$ time for the bookkeeping, and now the current interval is sufficiently small so that we know if $y_i < \lambda/2$.
-
-I want to further prune the caterpillar so that $x_i+y_i$ is nondecreasing. Consider $i$ and choose $j < i$ such that $x_j+y_j$ is maximized, see the figure. Assume that $x_j+y_j > x_i+y_i$. Then, by $y_j \leq \lambda/2$, the distance between the i-th and the j-th leaf is $\leq \lambda$ (check). So optimal solution contains at most one of them, assume that it is the i-th. Replace it with the j-th there. The solution is still valid (check), so in fact we can remove the i-th leaf from the caterpillar.
-
-Such pruning can be done in O(k) time by scanning the caterpillar bottom-up and maintaining a stack of "alive" leaves. Now it seems to me that I can repeat the reasoning in the other direction: prune the caterpillar so that $x_i-y_i$ is non-decreasing (imagine flipping the legs in the other direction) also in O(k) and without breaking the optimal solution. 
-
-I have obtained a very structured caterpillar. In particular, now I can create a row- and column-sorted matrix storing all pairwise distance between the leaves, because for j<i the distance between the leaves is $y_i+y_j+x_i-x_j = (x_i+y_i) - (x_j-y_i)$, so arranging the matrix in the natural order gives monotone rows and columns. I can also create a sorted list containing the distances from every leaf to the head of the caterpillar. Then I run Frederickson's searching algorithm on such sorted matrices, in each of the log(n) steps (check if he is really using only that many steps) calling the feasibility test. This allows me to to run the blue-green reduction on the whole caterpillar I think (because other way to view it is: find the largest cardinality solution, and if there is a tie maximize the distance to the nearest chosen node).
 
 
 
