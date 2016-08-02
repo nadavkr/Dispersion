@@ -180,48 +180,21 @@ Lemma \ref{greenNodesLemma} implies the correctness of the algorithm.
 %TODO extend proof of correctness
 
 \subsection{Sublinear feasibility test for the MMDP}
-The idea is partitioning the tree to fragments and preprocessing them, so that in query time (for a feasibility test query) we can "skip" over most fragments in $O(1)$.
-\paragraph{The Tree Partitioning} We would like to have fragments of size $b=log^2n$, s.t each fragment will be connected to the rest of the tree by at most two vertices. Each fragment have at most $b$ vertices, and will be defined by its border vertices $u$ and $v$ s.t $v$ is a descendant of $u$, as in the figure. We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. %TODO add figure
+The idea is partitioning the tree to fragments and preprocessing them, so that in query time (for a feasibility test query) we can "skip" over most fragments in $O(1)$. We will assume the tree is binary, and provide justification for this later on.
+\subsubsection{Tree Partitioning} We would like to have fragments of size $b=log^2n$, s.t each fragment will be connected to the rest of the tree by at most two vertices. Each fragment have at most $b$ vertices, and will be defined by its border vertices $u$ and $v$ s.t $v$ is a descendant of $u$, as in the figure. We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. %TODO add figure
 \begin{lemma}
-For any binary tree on n nodes and a parameter b there is a
-partition of the tree into $O(n/b)$ fragments of size at most b.
+For any binary tree on $n$ nodes and a parameter $b$ there is a
+partition of the tree into $O(n/b)$ fragments of size at most $2b$.
 \end{lemma}
 \begin{proof}
 Call a node $u$ \textit{large} if the size of its subtree is greater than b and \textit{small}
-otherwise. Consider the subtree consisting of only large nodes. For
-each leaf in that subtree, make each of its children a new fragment
-with no holes. Then, for every branching node in that subtree, make it
-a fragment consisting of just one node. Remove all already created
-fragments from the tree. The remaining nodes correspond to paths
-consisting of large nodes in the original tree with some small
-subtrees possibly attached to them (in other words: unary chains in
-the subtree). Greedily partition each such path into fragments of size
-<= b by traversing bottom-up. Essentially, there will be at most one
-"extra" fragment per such path, but the number of paths is O(n/b), so
-O(n/b) fragments in total.
+otherwise. Consider the tree $T_L$ induced by the large nodes of the original tree. For
+each leaf in $T_L$, make each of its children a new fragment with no holes. This creates $O(n/b)$ fragments since each leaf of $T_L$ is the root of a subtree of size at least $b$ in the original tree, and so we have at most $O(n/b)$ leaves in $T_L$. The size of each of these fragments is at most $2b-1$, since we assume that the tree is binary.
+Next, for every branching node in $T_L$, make it a fragment consisting of just one node. This also creates $O(n/b)$ fragments, since in any tree the number of branching nodes is at most the number of leaves. We could not have simply gone up the tree and cut fragments of size $b$, since this would create fragments with more than two boundary nodes.
+Ignoring the fragments we have already created, we are left with nodes that form unary chains in $T_L$. Each of this nodes might also have a child that is a small node. We have $O(n/b)$ of these subgraphs. We scan each of these subgraphs' large nodes bottom-up, and greedily cut them. Clearly these fragments are of size at most $2b$, as this is where we choose to cut. Denote the size of subgraph $i$, as $b_i$. The number of fragments we created in this phase is $$\sum_{i=1}^{n/b} \frac{b_i}{b} +1 \leq \frac{n}{b}$$. In total we have created $O(n/b)$ fragments, each of which is of size at most $2b$.
 \end{proof}
 
-We partition the tree into fragments of size $b=log^2n$. The fragments
-have structure as described in the quoted email, i.e., at most one
-hole in each of them (maybe no holes at all in some of them, also
-maybe u=v and the fragment is just a single node). It means that every
-fragment is specified by two nodes u, v such that u is an ancestor of
-v, path u - v will be called its spine (for obvious reasons).
 
-Lemma. For any binary tree on n nodes and a parameter b there is a
-partition of the tree into O(n/b) fragments of size <= b.
-Proof: Call a node u large if the size of its subtree is > b and small
-otherwise. Consider the subtree consisting of only large nodes. For
-each leaf in that subtree, make each of its children a new fragment
-with no holes. Then, for every branching node in that subtree, make it
-a fragment consisting of just one node. Remove all already created
-fragments from the tree. The remaining nodes correspond to paths
-consisting of large nodes in the original tree with some small
-subtrees possibly attached to them (in other words: unary chains in
-the subtree). Greedily partition each such path into fragments of size
-<= b by traversing bottom-up. Essentially, there will be at most one
-"extra" fragment per such path, but the number of paths is O(n/b), so
-O(n/b) fragments in total.
 
 Consider a single fragment. Assume that we already know the solution
 restricted to the subtree rooted at its hole and now want to extend
@@ -336,7 +309,7 @@ It is easy to see that arranging the matrix in the natural order will produce a 
 \textbf{Run a searching algorithm on the sorted matrices of all the heavy paths}
 We now use Frederickson's method to search our sorted matrix and eliminate its entries using $O(logk)$ calls to out feasibility test algorithm. We thus narrow down our interval to be $[\lambda_1,\lambda_2)$ where $\lambda_1$ and $\lambda_2$ are consecutive pairwise distances in the caterpillar (i.e there is no $x\in [\lambda_1,\lambda_2)$ s.t x is a pairwise distance in the caterpillar, and so we can mark a blue and a green node of the caterpillar that will be valid for any value of $\lambda^*$.  %TODO citation needed. explanation of the search?
 \end{step}
-
+%TODO justify the tree being binary
 \paragraph{Complexity analysis }
 
 
