@@ -188,26 +188,31 @@ Next, for every branching node in $T_L$, make it a fragment consisting of just o
 Ignoring the fragments we have already created, we are left with nodes that form unary chains in $T_L$. Each of these nodes might also have a child that is a small node. We have $O(n/b)$ of these subgraphs (because each of them is defined by two of the previously defined fragments). We scan each of these subgraphs' large nodes bottom-up, and greedily cut them. Clearly these fragments are of size at most $2b$, as this is where we choose to cut. Denote the size of subgraph $i$, as $b_i$. The number of fragments we created in this phase is $$\sum_{i=1}^{n/b} \left\lceil \frac{b_i}{b} \right\rceil \leq \frac{n}{b}$$
 In total we have created $O(n/b)$ fragments, each of which is of size at most $2b$.
 \end{proof}
-
+This partitioning is done in $O(n)$ time.
 We now would like to pre-process the fragments s.t we can later check in constant time for any two nodes in a fragment, $u_1,u_2$ if $d(u,v)\geq\lambda$, and if $d(u_1,u_2) \leq \lambda/2$, for any possible $\lambda$. We achieve this for most of the fragments.
 
 \subsubsection{Pre-Processing}
-For each fragment, we would like to implicitly construct matrices of total size $O(blogb \times blogb)$, that are row and column sorted, and contain all pairwise distances in the fragment.
-Since each fragment is a tree, we can use the centroid decomposition on it, and at each level of the recursion, compute all the distances to the centroid. In the recursion step we have three subgraphs, and for each of them we have the distances from all %TODO
+For each fragment, we would like to implicitly construct matrices of total side length $O(blogb)$ (number of rows and columns), that are row and column sorted, and contain all pairwise distances in the fragment.
 
+\begin{definition} \textbf{Centroid Decomposition} %TODO citation?
+Given a binary tree, we can find its \textit{centroid} node in linear time. This node divides the tree into three pieces, each of which has no more than half of the nodes of the entire tree. Recursing on each of the pieces will produce the centroid decomposition.
+\end{definition}
 
-Now, we can use Frederickson's serching algorithm to eliminate entries of the matrices. %TODO cite. explain?
+Apply the centroid decomposition on each fragment. At each level of the recursion, we are given 3 pieces, and for each of them a sorted list of the distances to the inner centroid. We would like to compute a sorted list of distances of all nodes of the current piece to the current centroid. Let us look at one of the three pieces we have already processed. It contains three pieces of its own. For two of these pieces, all paths from a node inside the piece to the outer centroid passes through the inner centroid. Thus we can add to all the entries of the lists we have for these two pieces, the distance from the inner centroid to the outer centroid, and then merge the two sorted lists. This is all done in linear time.\\
+Our only problem now is the piece where the paths to the outer centroid do not go through the inner one. But notice that if you go one step deeper in the recursion you can see the inside the "problematic" piece there are two pieces that are okay, and we can do the same for their two list and so on. This recursive routine will also take linear time. All together we have $O(logb)$ levels of recursion, and spend linear time on each one, so we get a running time of $O(blogb)=O(nloglogn)$.\\
+Now we have for level $i$ of the recursion $3^i$ centroids, and for each of them a sorted list of the distances to it from all nodes in its piece. We could find any pairwise distance in a piece by adding two entries of this list. Since the lists are sorted, we can look at the situation as if we have $3^i$ matrices of and their total side length is $n$. Looking at the matrices of centroid from all $O(logb)$ levels of the recursion, the total side length is $O(blogb)$. These matrices contain all pairwise distances in all the fragments. Note that we also have some entries in the matrices that do not actually represent pairwise distances, but that does not hurt us.\\
 
-
-We finish this phase with an interval $[\lambda_1,\lambda_2)$, s.t the $\lambda^*$ we are searching for in the MMDP, is in this interval. We call fragments that do not contain a pairwise distance the is in the interval \textit{inactive}, and all other fragments \textit{active}.
-%TODO how many inactive fragments?
+Now, we can use Frederickson's serching algorithm to eliminate entries of the matrices.\\ %TODO cite. explain?
+We finish this phase with an interval $[\lambda_1,\lambda_2)$, s.t the $\lambda^*$ we are searching for in the MMDP, is in this interval.\\
+We call fragments that do not contain a pairwise distance the is in the interval \textit{inactive}, and all other fragments \textit{active}.
+%TODO hows many inactive fragments?
 
 Active fragments, will be processed as in the linear algorithm described before, so we can ignore them for now.
 
 We now do the following pre-processing for each inactive fragment:
 \begin{step}
 \textbf{reduce the fragment to a caterpillar:}
-Observe that each fragment is comprised of its spine, and the subtrees hanging off of it. Using queries on pairwise distances as described above, we can use our linear feasibility test on the subtrees hanging off the spine, and get a blue and a green node for each of them (this costs linear time, but is only done once in preprocessing).
+Observe that each fragment is comprised of its spine, and the subtrees hanging off of it. Using queries on pairwise distances as described above, we can use our linear feasibility test on the subtrees hanging off the spine, and get a blue and a green node for each of them. This is done in linear time.\\
 Our fragment is now reduced to caterpillar with a blue child and a green child for every spine node.
 \end{step}
 \begin{step}\label{removing green nodes}
@@ -312,8 +317,8 @@ If we do take it, we need to again binary search to find how many
 leaves are blocked by it, then we have the remaining prefix of the
 spine and we proceed as in 1).
 
-It seem to me that the preprocessing is only O(nloglogn), not
-$O(n(loglogn)^2)$: there are O(loglogn) iterations, in each of them we
+It seem to me that the preprocessing is only $O(nloglogn)$, not
+$O(n(loglogn)^2)$: there are $O(loglogn)$ iterations, in each of them we
 run the naive feasibility test. There is also the additional
 bookkeeping cost, which if I understand Frederickson's theorem
 correctly would be $O(nloglogn)$ as well, because this is the total size
