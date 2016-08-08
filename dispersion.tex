@@ -189,7 +189,7 @@ Ignoring the fragments we have already created, we are left with nodes that form
 In total we have created $O(n/b)$ fragments, each of which is of size at most $2b$.
 \end{proof}
 This partitioning is done in $O(n)$ time.
-We now would like to pre-process the fragments s.t we can later check in constant time for any two nodes in a fragment, $u_1,u_2$ if $d(u,v)\geq\lambda$, and if $d(u_1,u_2) \leq \lambda/2$, for any possible $\lambda$. We achieve this for most of the fragments.
+We now would like to pre-process the fragments s.t we can later check in constant time for any two nodes in a fragment, $u_1,u_2$ if $d(u,v)\geq\lambda$, and if $d(u_1,u_2) \leq \frac{\lambda}{2}$, for any possible $\lambda$. We achieve this for most of the fragments.
 
 \subsubsection{Pre-Processing}
 For each fragment, we would like to implicitly construct matrices of total side length $O(blogb)$ (number of rows and columns), that are row and column sorted, and contain all pairwise distances in the fragment.
@@ -222,13 +222,20 @@ Some of the blue nodes can be ignored as they "collide" with green nodes. We sta
 Now we are only left with some of the blue nodes to consider, and for all of them it hold that $y_i < \lambda_1/2$, and from this point we can ignore the green nodes.
 \end{step}
 \begin{step}
-\textbf{Prune the caterpillar so that the leaves' distances to the bottom is non-decreasing:} %TODO check the direction
+\textbf{Prune the caterpillar so that the leaves' distances to the bottom are non-decreasing:} %TODO check the direction
 Traverse the caterpillar from bottom to top. Observe the $i$-th leaf, $u$. Denote by $v$ the leaf above $u$, and let  $j=i-1$. Assume $x_j+y_j > x_i+y_i$ (i.e $v$ is farther from the root than $u$). We get that $x_i-x_j+y_i < y_j$. $d(u,v) = x_i-x_j+y_i+y_j < 2y_j < \lambda$. So an optimal solution cannot contain both $u$ and $v$. If $u$ is in the solution we can replace it with $v$. This can be done because $v$ is farther away from any node above it than $u$, and $u$ is closer to any node below it than $v$. Let $v'$ be a leaf node above $v$, then $d(v,v') - d(v',u) = y_j-(x_i-x_j)-y_i = x_j+y_j-(x_i+y_i) > 0$, and the reasoning for the second case is similar.
 So in fact, we can remove the i-th leaf from the caterpillar.
 \end{step}
 \begin{step}
+\textbf{Prune the caterpillar so that the leaves' distances to the top are non-decreasing:}
+This is done as in the previous step.
+\end{step}
+\begin{step}
 \textbf{Compute the solution for any possible value of the nearest chosen node in the hole}
-In query time we will want to process each fragment after we have already processed its hole. Assuming we know what is the closest chosen node in the fragment's hole, we can eliminate a suffix of the caterpillar (because of the monotonicity of the distances of blue nodes from the hole). We can compute in preprocessing, for any possible eliminated suffix, which nodes in the fragment should be chosen, and also which nodes are the blue and green node. %TODO how to do it in blogb
+In query time we will want to process each fragment after we have already processed its hole.\\
+We call a set of consecutive leaves of the caterpillar, that contains the closest leaf to the hole, a \emph{suffix} of the caterpillar. Similarly we can define the caterpillar's \emph{prefix}.\\
+Assuming we know what is the closest chosen node in the fragment's hole, we can eliminate an entire suffix of the caterpillar,  (because of the monotonicity of the distances of blue nodes from the hole). We can compute in preprocessing, for any possible eliminated suffix, which nodes in the fragment should be chosen, and also which nodes are the blue and green node we need to pass to the next fragment.\\
+In order to pre-compute this, scan the caterpillar from top to bottom. For every possible prefix of the caterpillar we would like to store the numbers of nodes chosen, the green node and the blue node, assuming all nodes that are not in the prefix are eliminated as they are too close to the hole. Observe the bottom node of the current prefix. If the distance of this node to the fragment's root is less than $\frac{\lambda}{2}$ \footnote{We do not actually know $\lambda$ in preprocessing, but due to the previous steps, such a query of a node inside the fragment would produce the same result for any possible $\lambda$.}, store itself as the blue node, zero as the number of chosen nodes, and NULL as the green node. Else (the node's distance to the root is more than $\frac{\lambda}{2}$), write itself as the green node. Then, use binary search to find the node closest to it, that is at distance of at least $\lambda$. Add 1 to the number of chosen nodes stored in the node you found, and either store it as the blue node, or copy the blue node stored there.
 \end{step}
 
 
@@ -236,94 +243,7 @@ In query time we will want to process each fragment after we have already proces
 For each fragment we would like to produce in $O(logb)$ time: the number of chosen nodes in the fragments, the blue node, and the green node.
 We assume we have already done this for the fragment rooted at the hole of the current one.
 First, note that if the hole's blue node were chosen, knowing the hole's green node would not have been necessary (since the blue node is closer to any node in the current fragment than the green). We run the following routine twice, once only with the hole's blue node attached to the current fragment, and once only with the hole's green node.
-
-Consider a single fragment. Assume that we already know the solution
-restricted to the subtree rooted at its hole and now want to extend
-it. By "know the solution" we mean that we have already decided that
-some nodes for sure belong to the solution and there is at most one
-one (at distance $< \lambda/2$ from the hole) that we are not sure
-about. All already taken nodes are at distance >= $\lambda/2$. This is
-guaranteed by our blue-green procedure. Now we would like to run the
-procedure on the fragment. To run the procedure, for sure we need to
-know for any two nodes $u_1, u_2$ in the fragment whether $d(u_1,u_2) <=
-\lambda$. It seems that we also need to know whether $d(u_1,u_2) <=
-\lambda/2$, at least for $u_2$ being a descendant of $u_1$. As in the $1D$
-solution, we first binary search over intra-fragment distances to
-determine this. These distances can be captured, for each fragment, by
-a collection of doubly-sorted matrices of total size $O(blogb)$. After
-O(logb)=O(loglogn) iterations, we can determine this for most of the
-fragments. Other fragments will be processed naively, from now on I
-will ignore them.
-
-So the setting is: for any pair of nodes $u_1, u_2$ inside the fragment
-we know whether $d(u_1,u_2) <= \lambda/2$ and $d(u_1,u_2) <= \lambda$. We
-also have two nodes attached to the hole, the one that is closer to it
-might be still removed from the current solution, but the other
-cannot. We want to run the blue-green procedure.
-
-Here is the first trick: having to keep track of two nodes attached
-to the hole is difficult. I claim that, in fact, it is enough to run
-the blue-green procedure with only one node attached to the hole and
-an additional boolean flag denoting whether we must include it in
-the solution. As the output, the procedure returns the blue and the
-green node, but if the boolean flag was set to false it also informs
-us whether that extra node has been taken. Now, to deal with two
-nodes, first run the procedure with the closer one and the boolean
-flag set to false. If the extra node has been taken, then the other
-node is irrelevant inside the fragment, and we only need to check if
-it is maybe closer to the root of the fragment than the returned blue
-node. Otherwise, run the procedure again with the other node and the
-boolean flag set to true.
-
-Now, the second trick: consider the spine connecting u (the root) and
-v (the hole) and the subtrees hanging off from it. Because we have
-already consider the intra-fragment distances, we have enough data to
-run the blue-green procedure on these subtrees (irrespectively to what
-is attached to the hole!). Then, the blue nodes can be used to prune
-the green nodes. We also find the nearest blue node to the hole and to
-the root. The former is used to check, after attaching a node to the
-hole, if it can be included in the solution (if not and if we don't
-need to take it, we don't take it i.e. proceed as if nothing was
-attached to the hole; if we do need to take it we have a
-contradiction, so this cannot happen). The latter is used to update
-the blue node after having finished processing the fragment. So in
-fact, we can reduce the situation to a caterpillar, where all leaves
-are the green nodes of these hanging off subtrees.
-
-Finally, the third trick: we already know that in a caterpillar wlog
-we can include in the solution all legs at distance $>= \lambda/2$ from
-the spine. We do so and prune (potentially also updating the nearest
-blue node to the hole). Then, we use the "monotone" pruning rule to
-remove some of the remaining legs and obtain the situation where the
-distances of the legs to the hole are increasing as we climb up on the
-spine (so we use the monotonicity in only one direction). We have two
-cases:
-1) the node attached to the hole must be included in the solution.
-Then we binary search over the spine to find its suffix consisting of
-leaves that are too close to the hole to be taken. This takes O(logb)
-time in the query time. For each possible remaining prefix we process
-the result, this can be done in a single top-down sweep over the spine
-in O(b) time during the preprocessing stage (check).
-2) the node attached to the hole might or might not be included in the
-solution. We consider the next leaf (closest to the hole), call it
-$\ell_k$ and let $v_k$ be its parent on the spine. Consider the situation
-at $v_k$. If the attached node is closer to $v_k$ than $\ell_k$, then it can
-be safely discarded. Otherwise, we can discard $\ell_k$. This reasoning
-can be repeated, so in the end we should binary search for the largest
-i such that all leaves $\ell_{i+1}, \ell_{i+2}, ..., \ell_k$ can be
-discarded. Then, we check if the distance from $v_k$ to the attached
-node is at least $\lambda/2$ and if so we take it, otherwise we don't.
-If we do take it, we need to again binary search to find how many
-leaves are blocked by it, then we have the remaining prefix of the
-spine and we proceed as in 1).
-
-It seem to me that the preprocessing is only $O(nloglogn)$, not
-$O(n(loglogn)^2)$: there are $O(loglogn)$ iterations, in each of them we
-run the naive feasibility test. There is also the additional
-bookkeeping cost, which if I understand Frederickson's theorem
-correctly would be $O(nloglogn)$ as well, because this is the total size
-of all our small matrices. Accelerating this to $O(nlog^*n)$ is not that
-trivial. I will try to fully understand his paper now.
+%TODO
 
 
 \subsection{Solution for the MMDP}
