@@ -106,10 +106,10 @@ bla bla
 
 \section{Introduction}
 \begin{definition}
-\emph{Max-Min Dispersion Problem (MMDP)} Given a tree $T$ with non-negative edge lengths, and a natural number $p$, find a subset $P\subseteq V$ of size $p$ s.t $f(P)=min{\scriptscriptstyle \forall u,v\in P,u\neq v}d(u,v)$ is maximized.
+\emph{Max-Min Dispersion Problem (MMDP)} Given a tree $T$ with non-negative edge lengths, and a natural number $p$, find a subset $P\subseteq V$ of size $p$ s.t. $f(P)=min{\scriptscriptstyle \forall u,v\in P,u\neq v}d(u,v)$ is maximized.
 \end{definition}
 \begin{definition}
-\emph{MMDP Feasibility Test} Given a MMDP instance and a number $\lambda\geq0$ decide if there exists a subset $P\subseteq V$ of size $p$ s.t $f(P)\geq\lambda$.
+\emph{MMDP Feasibility Test} Given a MMDP instance and a number $\lambda\geq0$ decide if there exists a subset $P\subseteq V$ of size $p$ s.t. $f(P)\geq\lambda$.
 \end{definition}
 
 \section{The unweighted case}
@@ -117,18 +117,18 @@ We first describe how to solve the feasibility test in linear time, and then use
 \subsection{Linear algorithm for the MMDP Feasibility Test}
 %\begin{algo} \label{unWeightedFeasibilityAlgo}
 We show a recursive linear algorithm.
-At each step of the recursion, we would like to provide the maximal valid solution for the current subtree, given some $\lambda$. I.e, we would like to return $P$, a maximal subset of the vertices of the subtree, s.t   $P\subseteq V$ of size $p$ s.t $f(P)\geq\lambda$.
+At each step of the recursion, we would like to provide the maximal valid solution for the current subtree, given some $\lambda$. I.e, we would like to return $P$, a maximal subset of the vertices of the subtree, s.t.   $P\subseteq V$ of size $p$ and $f(P)\geq\lambda$.
 We are given a root vertex $v$ and its children nodes $v_{1},v_{2},...,v_{k}$, and for each child we are given a valid solution for the MMDP feasibility test on its subtree. We would like to produce a valid solution for the feasibility test on $v\text{'s subtree}$.
 Denote by $P_{1},...,P_{k}$ the solutions for the feasibility test on each subtree rooted at a child of $v$.
-For any subtree of $T$ rooted at node $r$, and a valid solution $P$ for the MMDP feasibility test on the subtree, we call a node $u\in P$, s.t $d(r,u)\leq\frac{\lambda}{2}$, a \textcolor{blue}{blue} node of the subtree. We call the vertex in $P$ that is closest to $r$, but isn't blue, \textcolor{green}{green}.
+For any subtree of $T$ rooted at node $r$, and a valid solution $P$ for the MMDP feasibility test on the subtree, we call a node $u\in P$, s.t. $d(r,u)\leq\frac{\lambda}{2}$, a \textcolor{blue}{blue} node of the subtree. We call the vertex in $P$ that is closest to $r$, but isn't blue, \textcolor{green}{green}.
 Note that each $P_{i}$ contains at most one blue vertex and one green vertex.
 
 \paragraph{The recursion step} Given $P_{1},...,P_{k}$, we would like to produce a solution for $v$'s subtree.
 \begin{enumerate}
 \item Put in $P$ all the vertices in $P_{1},...,P_{k}$, except for the blue vertices.
-\item Take all blue nodes $u$ s.t $d(u,v)> \frac{\lambda}{2}$
-\item Take $u'$, the blue node farthest from $v$ s.t $d(u',v)\leq \frac{\lambda}{2}$, if it exists, and if $d(u',x)\leq \lambda$, where $x$ is the closest node to the root $v$ we have chosen so far.
-\item Decide weather to take $v$ (the root) to the solution by looking at the closest vertex to it we have already put in $P$.
+\item Take all blue nodes $u$ s.t. $d(u,v)> \frac{\lambda}{2}$
+\item Take $u'$, the blue node farthest from $v$ s.t. $d(u',v)\leq \frac{\lambda}{2}$, if it exists, and if $d(u',x)\leq \lambda$, where $x$ is the closest node to the root $v$ we have chosen so far.
+\item Decide whether to take $v$ (the root) to the solution by looking at the closest vertex to it we have already put in $P$.
 \end{enumerate}
 %\end{algo}
 
@@ -139,7 +139,7 @@ Note that each $P_{i}$ contains at most one blue vertex and one green vertex.
 For any subtree of $T$ rooted at node $r$, let $u$ be the most distant active vertex from $r$ in the subtree. if $d(u,r)\ge\frac{\lambda}{2}$, then there exists a solution to the MMDP, for which $f(P)\leq\lambda$ and $u$ is in the solution.
 \end{lemma}
 \begin{proof}
-Assume for contradiction that there is no solution $P$ for which $f(P)\leq\lambda$ s.t $u\in P$. We consider the stage of a Denote the closest vertex to $u$ in $P$ by $u'$. We assume that we cannot replace $u'$ with $u$ and still get a valid solution. This means that there is a vertex $x$, s.t $x\in P$ and $d(u,x)<\lambda$. 
+Assume for contradiction that there is no solution $P$ for which $f(P)\leq\lambda$ s.t. $u\in P$. We consider the stage of a Denote the closest vertex to $u$ in $P$ by $u'$. We assume that we cannot replace $u'$ with $u$ and still get a valid solution. This means that there is a vertex $x$, s.t. $x\in P$ and $d(u,x)<\lambda$. 
 We know that:
 \corollary{\label{corol1} $d(r,u)\ge\frac{\lambda}{2}$ (by definition)}
 \corollary{\label{corol2} $d(u,u')<\lambda$ (because otherwise we could definitely add $u$ to the solution as $u'$ is defined as closest to $u$ in $P$)}
@@ -176,35 +176,35 @@ Lemma \ref{greenNodesLemma} implies the correctness of the algorithm.
 \subsection{Sublinear feasibility test for the MMDP}
 The main idea here is partitioning the tree to fragments and preprocessing them, so that in query time we can process fragments in sub-linear time. We will assume the tree is binary, and provide justification for this later on.
 \subsubsection{Tree Partitioning}
-We would like to have fragments of size $b=log^2n$, s.t each fragment will be connected to the rest of the tree by at most two vertices. Each fragment has at most $2b$ vertices, and will be defined by its border vertices $u$ and $v$, s.t $v$ is a descendant of $u$, as in the figure. The fragment will consist of $u$'s subtree without $v$'s subtree. We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. %TODO add figure
+We would like to have fragments of size $b=log^2n$, s.t. each fragment will be connected to the rest of the tree by at most two vertices. Each fragment has at most $2b$ vertices, and will be defined by its border vertices $u$ and $v$, s.t. $v$ is a descendant of $u$, as in the figure. The fragment will consist of $u$'s subtree without $v$'s subtree. We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. %TODO add figure
 \begin{lemma}
-For any binary tree on $n$ nodes and a parameter $b$ there is a
-partition of the tree into $O(n/b)$ fragments of size at most $2b$.
+For any binary tree on $n$ nodes and a parameter $b$, there is a partition of the tree into $O(n/b)$ such fragments of size at most $2b$.
 \end{lemma}
 \begin{proof}
 Call a node $u$ \textit{large} if the size of its subtree is greater than b and \textit{small}
-otherwise. Consider the tree $T_L$ induced by the large nodes of the original tree. Make each leaf in $T_L$ a new fragment with no holes. This creates $O(n/b)$ fragments since each leaf of $T_L$ is the root of a subtree of size at least $b$ in the original tree, and so we have at most $O(n/b)$ leaves in $T_L$. The size of each of these fragments is at most $2b-1$, since we assume that the tree is binary.
+otherwise. Consider the tree $T_L$ induced by the large nodes of the original tree. Make each leaf in $T_L$ a new fragment with no holes. This creates $O(n/b)$ fragments since each leaf of $T_L$ is the root of a subtree of size at least $b$ in the original tree, and so we have at most $O(n/b)$ leaves in $T_L$. The size of each of these fragments is at most $2b$, since we assume that the tree is binary.
 Next, for every branching node in $T_L$, make it a fragment consisting of just one node. This also creates $O(n/b)$ fragments, since in any tree the number of branching nodes is at most the number of leaves. We could not have simply gone up the tree and cut fragments of size $b$, since this would create fragments with more than two boundary nodes.
 Ignoring the fragments we have already created, we are left with nodes that form unary chains in $T_L$. Each of these nodes might also have a child that is a small node. We have $O(n/b)$ of these subgraphs (because each of them is defined by two of the previously defined fragments). We scan each of these subgraphs' large nodes bottom-up, and greedily cut them. Clearly these fragments are of size at most $2b$, as this is where we choose to cut. Denote the size of subgraph $i$, as $b_i$. The number of fragments we created in this phase is $$\sum_{i=1}^{n/b} \left\lceil \frac{b_i}{b} \right\rceil \leq \frac{n}{b}$$
 In total we have created $O(n/b)$ fragments, each of which is of size at most $2b$.
 \end{proof}
 This partitioning is done in $O(n)$ time.
-We now would like to pre-process the fragments s.t we can later check in constant time for any two nodes in a fragment, $u_1,u_2$ if $d(u,v)\geq\lambda$, and if $d(u_1,u_2) \leq \frac{\lambda}{2}$, for any possible $\lambda$. We achieve this for most of the fragments.
+We now would like to pre-process the fragments s.t. we can later check in constant time for any two nodes in a fragment, $u_1,u_2$ if $d(u,v)\geq\lambda$, and if $d(u_1,u_2) \leq \frac{\lambda}{2}$, for any possible $\lambda$. We achieve this for most of the fragments.
 
 \subsubsection{Pre-Processing}
-For each fragment, we would like to implicitly construct matrices of total side length $O(blogb)$ (number of rows and columns), that are row and column sorted, and contain all pairwise distances in the fragment.
+For each fragment, we would like to implicitly construct matrices of total side length (number of rows and columns) $O(blogb)$, that are row and column sorted, and contain all pairwise distances in the fragment.
 
 \begin{definition} \textbf{Centroid Decomposition} %TODO citation?
 Given a binary tree, we can find its \textit{centroid} node in linear time. This node divides the tree into three pieces, each of which has no more than half of the nodes of the entire tree. Recursing on each of the pieces will produce the centroid decomposition.
 \end{definition}
 
-Apply the centroid decomposition on each fragment. At each level of the recursion, we are given 3 pieces, and for each of them a sorted list of the distances to the inner centroid. We would like to compute a sorted list of distances of all nodes of the current piece to the current centroid. Let us look at one of the three pieces we have already processed. It contains three pieces of its own. For two of these pieces, all paths from a node inside the piece to the outer centroid passes through the inner centroid. Thus we can add to all the entries of the lists we have for these two pieces, the distance from the inner centroid to the outer centroid, and then merge the two sorted lists. This is all done in linear time.\\
-Our only problem now is the piece where the paths to the outer centroid do not go through the inner one. But notice that if you go one step deeper in the recursion you can see the inside the "problematic" piece there are two pieces that are okay, and we can do the same for their two list and so on. This recursive routine will also take linear time. All together we have $O(logb)$ levels of recursion, and spend linear time on each one, so we get a running time of $O(blogb)=O(nloglogn)$.\\
-Now we have for level $i$ of the recursion $3^i$ centroids, and for each of them a sorted list of the distances to it from all nodes in its piece. We could find any pairwise distance in a piece by adding two entries of this list. Since the lists are sorted, we can look at the situation as if we have $3^i$ matrices of and their total side length is $n$. Looking at the matrices of centroid from all $O(logb)$ levels of the recursion, the total side length is $O(blogb)$. These matrices contain all pairwise distances in all the fragments. Note that we also have some entries in the matrices that do not actually represent pairwise distances, but that does not hurt us.\\
+Apply the centroid decomposition on each fragment. Now, run the following recursive routine: at each level of the recursion, we are given 3 pieces, and for each of them a sorted list of the distances to the inner centroid. We would like to compute a sorted list of distances of all nodes of the current piece to the current centroid. Let us look at one of the three pieces we have already processed. It contains three pieces of its own. For two of these pieces, it holds that all paths from a node inside them to the outer centroid passes through the inner centroid. We call the third piece, for which this does not hold a \textit{problematic} piece. For the two pieces that are not problematic, we can add to all the entries of the lists we have, the distance from the inner centroid to the outer centroid, and then merge the two sorted lists. This is all done in linear time.\\
+Our only problem now is the piece where the paths to the outer centroid do not go through the inner one. But notice that if you go one step deeper in the recursion you can see the inside the problematic piece there are two pieces that are not problematic, and we can do the same for their two list and so on. This recursive routine will also take linear time. All together we have $O(logb)$ levels of recursion, and spend linear time on each one, so we get a running time of $O(blogb)=O(nloglogn)$.\\
+Now we have for level $i$ of the recursion $3^i$ centroids, and for each of them a sorted list of the distances to it from all nodes in its piece. We could find any pairwise distance in a piece by adding two entries of this list. Since the lists are sorted, we can look at the situation as if we have $3^i$ matrices of and their total side length is $n$. Looking at the matrices from all $O(logb)$ levels of the recursion, the total side length is $O(blogb)$. These matrices contain all pairwise distances in all the fragments. Note that we also have some entries in the matrices that do not actually represent pairwise distances, but that does not hurt us.
+Since we would like to also answer queries for \frac{\lambda}{2}, we do the same process for matrices that contain twice the distance in every entry of the original matrices.\\
 
 Now, we can use Frederickson's serching algorithm to eliminate entries of the matrices.\\ %TODO cite. explain?
-We finish this phase with an interval $[\lambda_1,\lambda_2)$, s.t the $\lambda^*$ we are searching for in the MMDP, is in this interval.\\
-We call fragments that do not contain a pairwise distance the is in the interval \textit{inactive}, and all other fragments \textit{active}.
+We finish this phase with an interval $[\lambda_1,\lambda_2)$, s.t. the $\lambda^*$ we are searching for in the MMDP, is in this interval.\\
+We call fragments that do not contain a pairwise distance that is in the interval \textit{inactive}, and all other fragments \textit{active}. For inactive fragment, it is clear that wee can answer queries checking whether some pairwise distance inside the fragment is at least \lambda, or if it is at most \frac{\lambda}{2}.
 %TODO hows many inactive fragments?
 
 Active fragments, will be processed as in the linear algorithm described before, so we can ignore them for now.
@@ -218,12 +218,12 @@ Our fragment is now reduced to caterpillar with a blue child and a green child f
 \begin{step}\label{removing green nodes}
 \textbf{Find the blue nodes that will certainly not be taken:}
 Let the $i$-th leaf be connected by an edge of length $y_i$ to a spine node at distance $x_i$ from the root of the caterpillar. Order the leaves so that $x_1 < x_2 < ... < x_k$.
-Some of the blue nodes can be ignored as they "collide" with green nodes. We start by finding the closest green node to each blue node. We can do this in linear time by scanning the caterpillar bottom-up, while saving for each blue node, the closest green node below it and the distance to it. We then do the same scan from top to bottom, and from both scans combined, we get for each blue node the closest green node and the distance to it. Now we want to find the blue nodes that are too close to a green node. Find the median of the distances, run a feasibility test on it, and repeat for the remaining distances, while updating the interval. Delete all blue nodes for which the distance to the closest green node is smaller than $\lambda_1$. Notice that after this median routine, the distance between any blue node and the closest green node to it does not fall inside the interval. Thus we can know for certain weather a specific blue node is too close to any green node, or not.
+Some of the blue nodes can be ignored as they "collide" with green nodes. We start by finding the closest green node to each blue node. We can do this in linear time by scanning the caterpillar bottom-up, while saving for each blue node, the closest green node below it and the distance to it. We then do the same scan from top to bottom, and from both scans combined, we get for each blue node the closest green node and the distance to it. Now we want to find the blue nodes that are too close to a green node. Find the median of the distances, run a feasibility test on it, and repeat for the remaining distances, while updating the interval. Delete all blue nodes for which the distance to the closest green node is smaller than the new $\lambda_1$. Notice that after this median routine, the distance between any blue node and the closest green node to it does not fall inside the interval. Thus, we can know for certain whether a specific blue node is too close to any green node, or not.
 Now we are only left with some of the blue nodes to consider, and for all of them it hold that $y_i < \lambda_1/2$, and from this point we can ignore the green nodes.
 \end{step}
 \begin{step}
-\textbf{Prune the caterpillar so that the leaves' distances to the bottom are non-decreasing:} %TODO check the direction
-Traverse the caterpillar from bottom to top. Observe the $i$-th leaf, $u$. Denote by $v$ the leaf above $u$, and let  $j=i-1$. Assume $x_j+y_j > x_i+y_i$ (i.e $v$ is farther from the root than $u$). We get that $x_i-x_j+y_i < y_j$. $d(u,v) = x_i-x_j+y_i+y_j < 2y_j < \lambda$. So an optimal solution cannot contain both $u$ and $v$. If $u$ is in the solution we can replace it with $v$. This can be done because $v$ is farther away from any node above it than $u$, and $u$ is closer to any node below it than $v$. Let $v'$ be a leaf node above $v$, then $d(v,v') - d(v',u) = y_j-(x_i-x_j)-y_i = x_j+y_j-(x_i+y_i) > 0$, and the reasoning for the second case is similar.
+\textbf{Prune the caterpillar so that the leaves' distances to the root are non-decreasing:} %TODO check the direction
+Traverse the caterpillar from bottom to top. Observe the $i$-th leaf, $u$. Denote by $v$ the leaf above $u$, and let  $j=i-1$. Assume $x_j+y_j > x_i+y_i$ (i.e $v$ is farther from the root than $u$). We get that $x_i-x_j+y_i < y_j$. $d(u,v) = x_i-x_j+y_i+y_j < 2y_j < \lambda$. So an optimal solution cannot contain both $u$ and $v$. If $u$ is in the solution we can replace it with $v$. This can be done because $v$ is farther away from any node above it than $u$, and $u$ is closer to any node below it than $v$. Let $v'$ be a leaf node above $v$, then $d(v,v') - d(v',u) \geq y_j-(x_i-x_j)-y_i = x_j+y_j-(x_i+y_i) > 0$, and the reasoning for the second case is similar.
 So in fact, we can remove the i-th leaf from the caterpillar.
 \end{step}
 \begin{step}
@@ -235,20 +235,25 @@ This is done as in the previous step.
 In query time we will want to process each fragment after we have already processed its hole.\\
 We call a set of consecutive leaves of the caterpillar, that contains the closest leaf to the hole, a \emph{suffix} of the caterpillar. Similarly we can define the caterpillar's \emph{prefix}.\\
 Assuming we know what is the closest chosen node in the fragment's hole, we can eliminate an entire suffix of the caterpillar,  (because of the monotonicity of the distances of blue nodes from the hole). We can compute in preprocessing, for any possible eliminated suffix, which nodes in the fragment should be chosen, and also which nodes are the blue and green node we need to pass to the next fragment.\\
-In order to pre-compute this, scan the caterpillar from top to bottom. For every possible prefix of the caterpillar we would like to store the numbers of nodes chosen, the green node and the blue node, assuming all nodes that are not in the prefix are eliminated as they are too close to the hole. Observe the bottom node of the current prefix. If the distance of this node to the fragment's root is less than $\frac{\lambda}{2}$ \footnote{We do not actually know $\lambda$ in preprocessing, but due to the previous steps, such a query of a node inside the fragment would produce the same result for any possible $\lambda$.}, store itself as the blue node, zero as the number of chosen nodes, and NULL as the green node. Else (the node's distance to the root is more than $\frac{\lambda}{2}$), write itself as the green node. Then, use binary search to find the node closest to it, that is at distance of at least $\lambda$. Add 1 to the number of chosen nodes stored in the node you found, and either store it as the blue node, or copy the blue node stored there. This step is done in $O(blogb)$ time. \footnote{We could actually do it without the binary search and get linear time}
+In order to pre-compute this, scan the caterpillar from top to bottom. For every possible prefix of the caterpillar we would like to store the numbers of nodes chosen, the green node and the blue node, assuming all nodes that are not in the prefix are eliminated as they are too close to the hole. Observe the bottom node of the current prefix. If the distance of this node to the fragment's root is less than $\frac{\lambda}{2}$ \footnote{We do not actually know $\lambda$ in preprocessing, but due to the previous steps, such a query of a node inside the fragment would produce the same result for any possible $\lambda$.}, store itself as the blue node, zero as the number of chosen nodes, and NULL as the green node. Else (the node's distance to the root is more than $\frac{\lambda}{2}$), write itself as the green node. Then, use binary search to find the node closest to it, that is at distance of at least $\lambda$. Add 1 to the number of chosen nodes stored in the node you found, and either store it as the blue node, or copy the blue node stored there. This would take $O(blogb)$ time. We can improve this by not binary searching for the first node far enough, but instead saving it for each prefix, and then only go down from the previous node found. This would only take $O(b)$ time.
 \end{step}
 
-
 \subsubsection{Feasibility Test}
-For each fragment we would like to produce in $O(logb)$ time: the number of chosen nodes in the fragments, the blue node, and the green node.
-We assume we have already done this for the fragment rooted at the hole of the current one.
-First, note that if the hole's blue node were chosen, knowing the hole's green node would not have been necessary (since the blue node is closer to any node in the current fragment than the green). We run the following routine twice, once only with the hole's blue node attached to the current fragment, and once only with the hole's green node.
+For each inactive fragment we would like to produce in $O(logb)$ time: the number of chosen nodes in the fragments, the blue node, and the green node. In this procedure we use the caterpillars we have created in the preprocessing. Notice that now we are given $\lambda$.
+We run this procedure bottom-up, so assume we have already processed the fragment rooted at the hole of the current one.\\
+Denote the root of the fragment, $r$, the hole's blue node, $u$, and the current fragment's leaf farthest from $r$, $v$.\\
+\begin{case}
+\textbf{$d(r,u)\leq \frac{\lambda}{2}$:} Because of the monotonicity of the distances of leaves from the hole, every leaf of the caterpillar is closer to $r$ than $u$, so we return $u$ as the blue node, and the same green node and number of chosen nodes as we had before.
+\end{case}
+\begin{case}
+\textbf{$d(r,u)\leq \frac{\lambda}{2}$:}
+\end{case}
 %TODO
 
 
 \subsection{Solution for the MMDP}
 The general idea of the algorithm is using the heavy path decomposition. We are searching for $\lambda^*$, which is the distance between some two nodes in the tree, and the largest number for which the MMDP feasibility test would return true.
-We go through the heavy path tree bottom-up, and process all heavy paths at a specific level in parallel, until we are left with a green and blue node for each of them. We maintain an interval $[\lambda_1,\lambda_2)$ s.t $\lambda^*$ is in the interval, that gets smaller and smaller throughout the run.
+We go through the heavy path tree bottom-up, and process all heavy paths at a specific level in parallel, until we are left with a green and blue node for each of them. We maintain an interval $[\lambda_1,\lambda_2)$ s.t. $\lambda^*$ is in the interval, that gets smaller and smaller throughout the run.
 
 We now describe the processing of a heavy path. Notice that the traversal is bottom-up, so we have already processed all of its children in the heavy path tree. Because we have determined $\lambda^*$ with sufficient accuracy (i.e. reduced the size of the maintained interval), each subtree hanging off a heavy path can be replaced by its blue and green node attached by single edges to the heavy path. Hence each such heavy path is a caterpillar, with one or two children for each spine node. We would like to be able to find the green and blue nodes for this heavy path. The situation is illustrated in figure %TODO add a figure
 Assume that the caterpillar has k nodes. Let the $i$-th leaf be connected by an edge of length $y_i$ to a spine node at distance $x_i$ from the root of the caterpillar. Order the leaves so that $x_1 < x_2 < ... < x_k$.
@@ -269,7 +274,7 @@ It is easy to see that arranging the matrix in the natural order will produce a 
 \end{step}
 \begin{step}
 \textbf{Run a searching algorithm on the sorted matrices of all the heavy paths}
-We now use Frederickson's method to search our sorted matrix and eliminate its entries using $O(logk)$ calls to out feasibility test algorithm. We thus narrow down our interval to be $[\lambda_1,\lambda_2)$ where $\lambda_1$ and $\lambda_2$ are consecutive pairwise distances in the caterpillar (i.e there is no $x\in [\lambda_1,\lambda_2)$ s.t x is a pairwise distance in the caterpillar, and so we can mark a blue and a green node of the caterpillar that will be valid for any value of $\lambda^*$.  %TODO citation needed. explanation of the search?
+We now use Frederickson's method to search our sorted matrix and eliminate its entries using $O(logk)$ calls to out feasibility test algorithm. We thus narrow down our interval to be $[\lambda_1,\lambda_2)$ where $\lambda_1$ and $\lambda_2$ are consecutive pairwise distances in the caterpillar (i.e there is no $x\in [\lambda_1,\lambda_2)$ s.t. x is a pairwise distance in the caterpillar, and so we can mark a blue and a green node of the caterpillar that will be valid for any value of $\lambda^*$.  %TODO citation needed. explanation of the search?
 \end{step}
 %TODO justify the tree being binary
 \paragraph{Complexity analysis }
