@@ -1,4 +1,24 @@
-% Encoding: UTF-8
+@article{Kannan,
+  author    = {Sampath Kannan and
+               Moni Naor and
+               Steven Rudich},
+  title     = {Implicit Representation of Graphs},
+  journal   = {{SIAM} J. Discrete Math.},
+  volume    = {5},
+  number    = {4},
+  pages     = {596--603},
+  year      = {1992}
+}
+
+@article{chung1981universal,
+  title={Universal caterpillars},
+  author={Chung, Fan RK and Graham, Ronald L and Shearer, J},
+  journal={Journal of Combinatorial Theory, Series B},
+  volume={31},
+  number={3},
+  pages={348--355},
+  year={1981},
+}
 
 
 @inproceedings{alstrup2015distance,
@@ -11,11 +31,216 @@
   year      = {2016},
 }
 
-@InProceedings{FredericksonTreePartitioning,
-  author    = {G. N. Frederickson},
-  title     = {Optimal Algorithms for Tree Partitioning},
-  booktitle = {SODA '91},
-  year      = {1991},
+
+@article{alstrup2005labeling,
+  title={Labeling schemes for small distances in trees},
+  author={Alstrup, Stephen and Bille, Philip and Rauhe, Theis},
+  journal={SIAM Journal on Discrete Mathematics},
+  volume={19},
+  number={2},
+  pages={448--462},
+  year={2005},
 }
 
-@Comment{jabref-meta: databaseType:bibtex;}
+
+@inproceedings{alstrup2003labeling,
+  title={Labeling schemes for small distances in trees},
+  author={Alstrup, Stephen and Bille, Philip and Rauhe, Theis},
+  booktitle={14th SODA},
+  pages={689--698},
+  year={2003},
+}
+
+
+@inproceedings{gavoille2007distributed,
+  title={Distributed relationship schemes for trees},
+  author={Gavoille, Cyril and Labourel, Arnaud},
+  booktitle={18th ISAAC},
+  pages={728--738},
+  year={2007},
+}
+
+
+@article{gavoille2004distance,
+  title={Distance labeling in graphs},
+  author={Gavoille, Cyril and Peleg, David and P{\'e}rennes, St{\'e}phane and Raz, Ran},
+  journal={Journal of Algorithms},
+  volume={53},
+  number={1},
+  pages={85--112},
+  year={2004},
+  note={A preliminary version in \emph{12th SODA}, 2001},
+}
+
+
+@inproceedings{alstrup2015optimal,
+  title={Optimal induced universal graphs and adjacency labeling for trees},
+  author={Alstrup, Stephen and Dahlgaard, S{\o}ren and Knudsen, Mathias B{\ae}k Tejs},
+  booktitle={56th FOCS},
+  pages={1311--1326},
+  year={2015},
+}
+
+
+@article{sleator1983data,
+  title={A data structure for dynamic trees},
+  author={Sleator, Daniel D and Tarjan, Robert Endre},
+  journal={Journal of computer and system sciences},
+  volume={26},
+  number={3},
+  pages={362--391},
+  year={1983},
+}
+
+
+@article{bonichon2007short,
+  title={Short labels by traversal and jumping},
+  author={Bonichon, Nicolas and Gavoille, Cyril and Labourel, Arnaud},
+  journal={Electronic Notes in Discrete Mathematics},
+  volume={28},
+  pages={153--160},
+  year={2007},
+}
+
+
+@inproceedings{gavoille2007local,
+  title={On local representation of distances in trees},
+  author={Gavoille, Cyril and Labourel, Arnaud},
+  booktitle={26th PODC},
+  pages={352--353},
+  year={2007},
+}
+
+
+@article{peleg2000proximity,
+  title={Proximity-preserving labeling schemes},
+  author={Peleg, David},
+  journal={Journal of Graph Theory},
+  volume={33},
+  number={3},
+  pages={167--176},
+  year={2000},
+}
+
+
+@inproceedings{alstrup2002small,
+  title={Small induced-universal graphs and compact implicit graph representations},
+  author={Alstrup, Stephen and Rauhe, Theis},
+  booktitle={43rd FOCS},
+  pages={53--62},
+  year={2002},
+}
+
+
+@article{elias1975universal,
+  title={Universal codeword sets and representations of the integers},
+  author={Elias, Peter},
+  journal={IEEE transactions on information theory},
+  volume={21},
+  number={2},
+  pages={194--203},
+  year={1975},
+}
+
+
+@article{graham1981trees,
+  title={On trees containing all small trees},
+  author={Chung, FRK and Graham, RL and Coppersmith, D},
+  journal={The Theory and Applications of Graphs},
+  pages={265--272},
+  year={1981}
+}
+
+
+@article{gol1968minimal,
+  title={On minimal universal trees},
+  author={Gol'dberg, MK and Livshits, EM},
+  journal={Mathematical Notes of the Academy of Sciences of the USSR},
+  volume={4},
+  number={3},
+  pages={713--717},
+  year={1968},
+}
+
+
+@inproceedings{petersen2015near,
+  title={Near-optimal adjacency labeling scheme for power-law graphs},
+  author={Petersen, Casper and Rotbart, Noy and Simonsen, Jakob Grue and Wulff-Nilsen, Christian},
+  booktitle={43rd ICALP},
+  year={2016}
+}
+
+
+@inproceedings{alstrup2016simpler,
+  title={Simpler, faster and shorter labels for distances in graphs},
+  author={Alstrup, Stephen and Gavoille, Cyril and Halvorsen, Esben Bistrup and Petersen, Holger},
+  booktitle={27th SODA},
+  pages={338--350},
+  year={2016},
+}
+
+
+@inproceedings{alstrup2015adjacency,
+  title={Adjacency labeling schemes and induced-universal graphs},
+  author={Alstrup, Stephen and Kaplan, Haim and Thorup, Mikkel and Zwick, Uri},
+  booktitle={47th STOC},
+  pages={625--634},
+  year={2015},
+}
+
+
+@inproceedings{fraigniaud2010compact,
+  title={Compact ancestry labeling schemes for xml trees},
+  author={Fraigniaud, Pierre and Korman, Amos},
+  booktitle={21st SODA},
+  pages={458--466},
+  year={2010},
+}
+
+@inproceedings{GavoilleKKPP01,
+  author    = {Cyril Gavoille and
+               Michal Katz and
+               Nir A. Katz and
+               Christophe Paul and
+               David Peleg},
+  title     = {Approximate Distance Labeling Schemes},
+  booktitle = {{9th ESA}},
+  pages     = {476--487},
+  year      = {2001}
+}
+
+@inproceedings{fischer2009short,
+  title={Short labels for lowest common ancestors in trees},
+  author={Fischer, Johannes},
+  booktitle={17th ESA},
+  pages={752--763},
+  year={2009},
+}
+
+@inproceedings{kaplan2001short,
+  title={Short and simple labels for small distances and other functions},
+  author={Kaplan, Haim and Milo, Tova},
+  booktitle={7th WADS},
+  pages={246--257},
+  year={2001},
+}
+
+
+@article{abiteboul2006compact,
+  title={Compact Labeling Scheme for Ancestor Queries},
+  author={Abiteboul, Serge and Alstrup, Stephen and Kaplan, Haim and Milo, Tova and Rauhe, Theis},
+  journal={SIAM Journal on Computing},
+  volume={35},
+  number={6},
+  pages={1295--1309},
+  year={2006},
+}
+
+
+@inproceedings{alstrup2014near,
+  title={Near-optimal labeling schemes for nearest common ancestors},
+  author={Alstrup, Stephen and Halvorsen, Esben Bistrup and Larsen, Kasper Green},
+  booktitle={25th SODA},
+  pages={972--982},
+  year={2014},
+}
