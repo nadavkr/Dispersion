@@ -190,7 +190,7 @@ In total we have created $O(n/b)$ fragments, each of which is of size at most $2
 This partitioning is done in $O(n)$ time.
 We now would like to pre-process the fragments s.t. we can later check in constant time for any two nodes in a fragment, $u_1,u_2$ if $d(u,v)\geq\lambda$, and if $d(u_1,u_2) \leq \frac{\lambda}{2}$, for any possible $\lambda$. We achieve this for most of the fragments.
 
-\subsubsection{Pre-Processing}
+\subsubsection{Pre-Processing Fragments}
 For each fragment, we would like to implicitly construct matrices of total side length (number of rows and columns) $O(blogb)$, that are row and column sorted, and contain all pairwise distances in the fragment.
 
 \begin{definition} \textbf{Centroid Decomposition} %TODO citation?
@@ -202,10 +202,11 @@ Our only problem now is the piece where the paths to the outer centroid do not g
 Now we have for level $i$ of the recursion $3^i$ centroids, and for each of them a sorted list of the distances to it from all nodes in its piece. We could find any pairwise distance in a piece by adding two entries of this list. Since the lists are sorted, we can look at the situation as if we have $3^i$ matrices of and their total side length is $n$. Looking at the matrices from all $O(logb)$ levels of the recursion, the total side length is $O(blogb)$. These matrices contain all pairwise distances in all the fragments. Note that we also have some entries in the matrices that do not actually represent pairwise distances, but that does not hurt us.
 Since we would like to also answer queries for $\frac{\lambda}{2}$, we do the same process for matrices that contain twice the distance in every entry of the original matrices.\\
 
-Now, we can use Frederickson's serching algorithm to eliminate entries of the matrices.\\ %TODO cite. explain?
-We finish this phase with an interval $[\lambda_1,\lambda_2)$, s.t. the $\lambda^*$ we are searching for in the MMDP, is in this interval.\\
-We call fragments that do not contain a pairwise distance that is in the interval \textit{inactive}, and all other fragments \textit{active}. For inactive fragment, it is clear that wee can answer queries checking whether some pairwise distance inside the fragment is at least $\lambda$, or if it is at most $\frac{\lambda}{2}$.
-%TODO hows many inactive fragments?
+Now, we can use Frederickson's serching algorithm to eliminate entries of the matrices. Using this searching method, we find an interval $[\lambda_1,\lambda_2)$, s.t. the $\lambda^*$ we are searching for in the MMDP, is in this interval.\\
+We call fragments that do not contain a pairwise distance that is in the interval \textit{inactive}, and all other fragments \textit{active}.
+for this search, we use theorem 2.1 in \cite{FredericksonTreePartitioning}. In our case the theorem implies that we can use $O(logb)$ feasibility tests and discard all but $logb$ elements of the matrices. This means that we have at most $logb$ active fragments (out of all $n/b$ fragments). \\ %TODO citation. can we do log(blogb) tests to eliminate all elements?
+For inactive fragment, it is clear that we can answer queries checking whether some pairwise distance inside the fragment is at least $\lambda$, or if it is at most $\frac{\lambda}{2}$.
+
 
 Active fragments, will be processed as in the linear algorithm described before, so we can ignore them for now.
 
@@ -243,13 +244,13 @@ We now scan the whole tree, and for each inactive fragment we would like to prod
 We run this procedure bottom-up, so we assume the fragment rooted at the hole of the current one has already been processed.\\
 Denote the root of the fragment, $r$, the hole's blue node, $u$, and the current fragment's leaf farthest from $r$, $v$.\\
 \begin{case}
-\textbf{$d(r,u)\leq \frac{\lambda}{2}$:} Because of the monotonicity of the distances of leaves from the hole, every leaf of the caterpillar is closer to $r$ than $u$, so we return $u$ as the blue node, and the same green node and number of chosen nodes as we had before.
+\textbf{$d(r,u)\leq \frac{\lambda}{2}$:} Because of the monotonicity of the distances of leaves from the hole, every leaf of the caterpillar is closer to $r$ than $u$, so we return $u$ as the blue node, and the same green node as we have for the hole, and number of chosen nodes as we had before.
 \end{case}
 \begin{case}
 \textbf{$d(r,u) > \frac{\lambda}{2}$:}
 This means we can ignore the hole's green node (as it will surely be taken), and take $u$ as the green node. Now we need to compute the suffix of the fragment that cannot be taken. We can do this by binary searching for the first node of the fragment that is at distance at least $\lambda$ from $u$. We have pre-computed all we need to know once we have the relevant prefix.
 \end{case}
-Each feasibility test will cost us $O(logb)$ for each inactive fragment, and $O(b)$ for each active one. In total %TODO
+Each feasibility test will cost us $O(logb)$ for each inactive fragment, and $O(b)$ for each active one. In total $O(\frac{n}{b} \times logb) + O(blogb) = O(\frac{nloglogn}{log^2n})$.
 
 
 \subsection{Solution for the MMDP}
