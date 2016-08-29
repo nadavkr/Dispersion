@@ -105,6 +105,67 @@ bla bla
 \end{abstract}
 
 \section{Introduction}
+Facility location is a family of problems, where the goal is to place
+a number of facilities as to minimize the total cost while preserving
+given constraints. Its basic version, called the metric k-center
+problem, we want to designate up to k nodes of a given weighted graph
+to be facilities, as to minimize the maximum distance of a node to its
+closes facility. Even this simplest version is already NP-hard (\cite{Vazirani2003}). However, a simple greedy 2-approximation algorithm is known (cite Gonzalez, Teofilo F. (1985), "Clustering to
+minimize the maximum intercluster distance", Theoretical Computer
+Science, 38, Elsevier Science B.V., pp. 293–306,
+doi:10.1016/0304-3975(85)90224-5). The situation for different
+objective functions or more restrictions on the placement is of course
+more complex, but nevertheless one can often design an efficient
+approximation algorithm, see
+https://people.orie.cornell.edu/shmoys/approx00.ps and the references
+therein.
+
+Given that facility location problems are usually if not always
+NP-hard, it makes sense to consider them on a restricted family of
+graphs. The simplest yet still nontrivial such a family are trees on
+$n$ nodes. There are multiple possible versions of the k-center
+problem on trees: the facilities can be either only the nodes of the
+tree or any points on an edge, and we might either minimize the
+distance of any node or any point on an edge to its closest facility.
+All these versions have been extensively studied, culminating in an
+O(n) time and space algorithm given by Frederickson (cite WADS) that
+solves all but one of them. This was an improvement on the previous
+$O(n\log n)$ time algorithm (cite FJ1), which in turn was an improvement
+on the $O(n\log^2n)$ time algorithm (cite MTZC). Also weighted version
+of the problem, where every node has its associated weight and the
+distance is multiplied by the corresponding weight, has been
+considered, and $O(n\log^2n)$ time algorithm is known (cite Cole and
+Megiddo \& Tamir). Among other facility location problems on trees there
+is the max-min tree k-partitioning (cite PeS) and the min-max tree
+k-partitioning (cite PBS), both solved by Frederickson in $O(n)$ time
+(cite F2) using a clever approach based on the parametric search that
+he has later extended to solve the k-center problem.
+
+We consider another problem that falls within the class of facility
+location problem on trees. In the max-min tree k-dispersion the goal
+is to select k nodes as to maximize the minimum distance between any
+two chosen nodes. This nicely generalizes the maximum independent set
+problem by binary searching for the largest value of k for which the
+minimum distance is at least 2. The best previously known algorithm
+for the max-min tree k-dispersion was given by Bhattacharya and Houle
+(cite) and takes $O(n\log n)$ time, improving on an earlier $O(n^2)$
+solution (cite Wang and Kao, but please look inside first). Using the
+framework of Frederickson, we construct an optimal O(n) time algorithm
+for this problem. In our solution we also develop a slightly modified
+version of this framework, which might be simpler to understand. Then
+we move the weighted version, where the goal is to select nodes with
+the total weight being at last k. There, the best previously known
+solution requires $O(n\log^4 n)$ time (cite
+http://dl.acm.org/citation.cfm?id=689402). We present a significantly
+faster $O(n\log^2 n)$ time algorithm. We also show that the decision
+version, where the goal is to check if there exists a set of of nodes
+total weight k such that any two nodes are at distance at least b,
+requires $\Theta(n\log n)$ time in the algebraic decision tree model. We
+also present a matching $O(n\log n)$ time algorithm, which is then used
+to construct our $O(n\log^2n)$ time solution for the weighted max-min
+tree k-dispersion using the standard parametric search paradigm. 
+
+\section{Preliminaries}
 \begin{definition}
 \emph{Max-Min Dispersion Problem (MMDP)} Given a tree $T$ with non-negative edge lengths, and a natural number $p$, find a subset $P\subseteq V$ of size $p$ s.t. $f(P)=min{\scriptscriptstyle \forall u,v\in P,u\neq v}d(u,v)$ is maximized.
 \end{definition}
@@ -136,8 +197,10 @@ Note that each $P_{i}$ contains at most one blue vertex and one green vertex.
 \emph{Active and Inactive nodes} We will call a vertex $v$ of the tree \emph{inactive} if there is a vertex $u$ we already chose to be in $P$, s.t $d(u,v)<\lambda$. We will call $v$ \emph{active} if there is no such vertex $u$ and $v \notin P$.
 \end{definition}
 \begin{lemma} \label{greenNodesLemma}
+For any subtree of $T$ rooted at node $r$, let $u$ be the most distant active vertex from $r$ in the subtree. Assume $\exists P \subseteq V$ s.t. $f(P)\geq\lambda$, then if $d(u,r)\ge\frac{\lambda}{2}$, $\exists P' \subseteq V$ s.t. $f(P')\geq\lambda$ and $u \in P'$.
 \end{lemma}
 \begin{proof}
+Assume for contradiction that there is no such $P'$. Denote the closest vertex to $u$ in $P$ by $u'$.
 We assume that we cannot replace $u'$ with $u$ and still get a valid solution. This means that there is a vertex $x$, s.t. $x\in P$ and $d(u,x)<\lambda$. 
 We know that:
 \corollary{\label{corol1} $d(r,u)\ge\frac{\lambda}{2}$ (by definition)}
