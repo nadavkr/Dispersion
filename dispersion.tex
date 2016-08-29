@@ -117,8 +117,8 @@ We first describe how to solve the feasibility test in linear time, and then use
 \subsection{Linear algorithm for the MMDP Feasibility Test}
 %\begin{algo} \label{unWeightedFeasibilityAlgo}
 We show a recursive linear algorithm.
-At each step of the recursion, we would like to provide the maximal valid solution for the current subtree, given some $\lambda$. I.e, we would like to return $P$, a maximal subset of the vertices of the subtree, s.t.   $P\subseteq V$ of size $p$ and $f(P)\geq\lambda$.
-We are given a root vertex $v$ and its children nodes $v_{1},v_{2},...,v_{k}$, and for each child we are given a valid solution for the MMDP feasibility test on its subtree. We would like to produce a valid solution for the feasibility test on $v\text{'s subtree}$.
+At each step of the recursion, we would like to provide the maximal valid solution for the current subtree, given some $\lambda$. I.e, we would like to return $P$, a maximal subset of the vertices of the subtree, s.t. $f(P)\geq\lambda$.
+We are given a root vertex $v$ and its children nodes $v_{1},v_{2},...,v_{k}$, and for each child we are given a maximal valid solution for the MMDP feasibility test on its subtree. We would like to produce a maximal valid solution for the feasibility test on $v\text{'s subtree}$.
 Denote by $P_{1},...,P_{k}$ the solutions for the feasibility test on each subtree rooted at a child of $v$.
 For any subtree of $T$ rooted at node $r$, and a valid solution $P$ for the MMDP feasibility test on the subtree, we call a node $u\in P$, s.t. $d(r,u)\leq\frac{\lambda}{2}$, a \textcolor{blue}{blue} node of the subtree. We call the vertex in $P$ that is closest to $r$, but isn't blue, \textcolor{green}{green}.
 Note that each $P_{i}$ contains at most one blue vertex and one green vertex.
@@ -127,45 +127,44 @@ Note that each $P_{i}$ contains at most one blue vertex and one green vertex.
 \begin{enumerate}
 \item Put in $P$ all the vertices in $P_{1},...,P_{k}$, except for the blue vertices.
 \item Take all blue nodes $u$ s.t. $d(u,v)> \frac{\lambda}{2}$
-\item Take $u'$, the blue node farthest from $v$ s.t. $d(u',v)\leq \frac{\lambda}{2}$, if it exists, and if $d(u',x)\leq \lambda$, where $x$ is the closest node to the root $v$ we have chosen so far.
+\item Take $u'$, the blue node farthest from $v$ s.t. $d(u',v)\leq \frac{\lambda}{2}$, if it exists, and if $d(u',x)\geq \lambda$, where $x$ is the closest node to the root $v$ we have chosen so far.
 \item Decide whether to take $v$ (the root) to the solution by looking at the closest vertex to it we have already put in $P$.
 \end{enumerate}
-%\end{algo}
+
 
 \begin{definition}
-\emph{Active and Inactive nodes} We will call a vertex $v$ of the tree \emph{inactive} if there is a vertex $u$ we already chose to be in $P$, s.t $d(u,v)<\lambda$. We will call $v$ \emph{active} if there is no such vertex $u$.
+\emph{Active and Inactive nodes} We will call a vertex $v$ of the tree \emph{inactive} if there is a vertex $u$ we already chose to be in $P$, s.t $d(u,v)<\lambda$. We will call $v$ \emph{active} if there is no such vertex $u$ and $v \notin P$.
 \end{definition}
 \begin{lemma} \label{greenNodesLemma}
-For any subtree of $T$ rooted at node $r$, let $u$ be the most distant active vertex from $r$ in the subtree. if $d(u,r)\ge\frac{\lambda}{2}$, then there exists a solution to the MMDP, for which $f(P)\leq\lambda$ and $u$ is in the solution.
 \end{lemma}
 \begin{proof}
-Assume for contradiction that there is no solution $P$ for which $f(P)\leq\lambda$ s.t. $u\in P$. We consider the stage of a Denote the closest vertex to $u$ in $P$ by $u'$. We assume that we cannot replace $u'$ with $u$ and still get a valid solution. This means that there is a vertex $x$, s.t. $x\in P$ and $d(u,x)<\lambda$. 
+We assume that we cannot replace $u'$ with $u$ and still get a valid solution. This means that there is a vertex $x$, s.t. $x\in P$ and $d(u,x)<\lambda$. 
 We know that:
 \corollary{\label{corol1} $d(r,u)\ge\frac{\lambda}{2}$ (by definition)}
-\corollary{\label{corol2} $d(u,u')<\lambda$ (because otherwise we could definitely add $u$ to the solution as $u'$ is defined as closest to $u$ in $P$)}
+\corollary{\label{corol2} $d(u,u')<\lambda$ (because otherwise we could definitely add $u$ to the solution, as $u'$ is defined as closest to $u$ in $P$)}
 \corollary{\label{corol3} $d(x,u')\ge\lambda$ (since $x$ and $u'$ are both in $P$)}
-\corollary{\label{corol4} $d(x,u)<\lambda$ (by definition) $d(r,u)>d(r,u')$ (since otherwise $u$ is not the active vertex most distant from $r$).}
-Let us look at the possible cases:
-\begin{case} Both $u'$ and $x$ are in the subtree rooted at $r$:
-$d(u,u')=d(u,r)+d(r,u')<\lambda$ (due to corollary \ref{corol2}) $\Rightarrow d(r,u')<\frac{\lambda}{2}$ (due to corollary \ref{corol1}, and to the fact that by definition $u$ is closer to $r$ than $u'$), and similarly $d(r,x)<\frac{\lambda}{2} \Rightarrow d(x,u')<\lambda$ in contradiction to corollary \ref{corol3}. 
-\end{case}
-\begin{case} $u'$ is in the subtree, and $x$ is not:
+\corollary{\label{corol4} $d(x,u)<\lambda$ (by definition)}
+%\corollary{\label{corol5} $d(r,u)>d(r,u')$ (since otherwise $u$ is not the active vertex most distant from $r$).}
+\\Let us look at the possible cases:
+\begin{enumerate}
+\item \textit{Both $u'$ and $x$ are in the subtree rooted at $r$:}
+$d(u,u')=d(u,r)+d(r,u')<\lambda$ (due to corollary \ref{corol2}) $\Rightarrow d(r,u')<\frac{\lambda}{2}$ (due to corollary \ref{corol1}), and similarly $d(r,x)<\frac{\lambda}{2} \Rightarrow d(x,u')<\lambda$ in contradiction to corollary \ref{corol3}. 
+
+\item \textit{$u'$ is in the subtree, and $x$ is not:}
 This means that the paths from $u$ and $u'$ to $x$ go through $r$. We have that $d(r,u)>d(r,u')$ (since otherwise $u$ is not the active vertex most distant from $r$), which implies that $d(r,u)+d(r,x)>d(r,u')+d(r,x)\Rightarrow d(u,x)>d(u',x)$ in contradiction to corollary \ref{corol3} and corollary \ref{corol4}.
-\end{case}
-\begin{case} $x$ is in the subtree and $u'$ is not:
+
+\item \textit{$x$ is in the subtree and $u'$ is not:}
 We have that $d(r,u)>d(r,x)$ (since otherwise $u$ is not the active vertex most distant from $r$), and corollary \ref{corol2} implies that $d(u',r)+d(r,u)<\lambda$, so we get that $d(u',r)+d(r,x)<\lambda$ in contradiction to corollary \ref{corol3}.
-\end{case}
-\begin{case} Both $x$ and $u'$ are not in the subtree:
-\begin{case} $x$ is on the path from $u$ to $u'$:
+\item \textit{Both $x$ and $u'$ are not in the subtree:}
+\begin{enumerate}
+\item \textit{$x$ is on the path from $u$ to $u'$:}
 We have that $d(u,u')=d(u,r)+d(r,x)+d(x,u')<\lambda\,\,\Rightarrow\,\,d(x,u')<\lambda$ in contradiction to corollary \ref{corol3}.
-\end{case}
-\begin{case} $u'$ is on the path from $u$ to $x$:
+\item \textit{$u'$ is on the path from $u$ to $x$:}
 We have that $d(u,x)=d(u,r)+d(r,u')+d(u',x)<\lambda\Rightarrow d(x,u')<\lambda$ in contradiction to corollary \ref{corol3}.
-\end{case}
-\begin{case} neither $u'$ is on the path from $u$ to $x$ nor $x$ is on the path from $u$ to $u'$:
+\item \textit{neither $u'$ is on the path from $u$ to $x$ nor $x$ is on the path from $u$ to $u'$:}
 $d(u,x)=d(x,r)+d(r,u)<\lambda\Rightarrow(\text{by 1) }d(x,r)\le\frac{\lambda}{2}$ and similarly we get that $d(u',r)\le\frac{\lambda}{2}\,\,\,\Rightarrow\,\,\,d(u',x)\le\lambda$. 
-\end{case}
-\end{case}
+\end{enumerate}
+\end{enumerate}
 %TODO fix case nesting
 \end{proof}
 %TODO add a drawing for each case
