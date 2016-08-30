@@ -76,7 +76,7 @@
 \newtheorem{algo}{Algorithm}[section]
 \newtheorem{corollary}{Corollary}
 \newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{observation}[theorem]{Observation}
+\newtheorem{observation}{Observation}
 \newtheorem{fact}[theorem]{Fact}
 \theoremstyle{definition}   
 \newtheorem{definition}[theorem]{Definition}
@@ -197,38 +197,40 @@ Note that each $P_{i}$ contains at most one blue vertex and one green vertex.
 \emph{Active and Inactive nodes} We will call a vertex $v$ of the tree \emph{inactive} if there is a vertex $u$ we already chose to be in $P$, s.t $d(u,v)<\lambda$. We will call $v$ \emph{active} if there is no such vertex $u$ and $v \notin P$.
 \end{definition}
 \begin{lemma} \label{greenNodesLemma}
-For any subtree of $T$ rooted at node $r$, let $u$ be the most distant active vertex from $r$ in the subtree. Assume $\exists P \subseteq V$ s.t. $f(P)\geq\lambda$, then if $d(u,r)\ge\frac{\lambda}{2}$, $\exists P' \subseteq V$ s.t. $f(P')\geq\lambda$ and $u \in P'$.
+For any subtree of $T$ rooted at node $r$, let $u$ be the most distant active vertex from $r$ in the subtree. Assume $\exists P \subseteq V$ s.t. $f(P)\geq\lambda$, and denote the closest vertex to $u$ in $P$ by $u'$. Then, if $d(u,r)\ge\frac{\lambda}{2}$, and $P' := P \setminus \lbrace u' \rbrace \cup \lbrace u \rbrace$, it holds that $f(P')\geq\lambda$.
 \end{lemma}
 \begin{proof}
-Assume for contradiction that there is no such $P'$. Denote the closest vertex to $u$ in $P$ by $u'$.
-We assume that we cannot replace $u'$ with $u$ and still get a valid solution. This means that there is a vertex $x$, s.t. $x\in P$ and $d(u,x)<\lambda$. 
+Assume for contradiction that $f(P')<\lambda$. We assume that we cannot replace $u'$ with $u$ and still get a valid solution. This means that there is a vertex $x \neq u'$, s.t. $x\in P$ and $d(u,x)<\lambda$. 
 We know that:
-\corollary{\label{corol1} $d(r,u)\ge\frac{\lambda}{2}$ (by definition)}
-\corollary{\label{corol2} $d(u,u')<\lambda$ (because otherwise we could definitely add $u$ to the solution, as $u'$ is defined as closest to $u$ in $P$)}
-\corollary{\label{corol3} $d(x,u')\ge\lambda$ (since $x$ and $u'$ are both in $P$)}
-\corollary{\label{corol4} $d(x,u)<\lambda$ (by definition)}
+\observation{ $d(r,u)\ge\frac{\lambda}{2}$ (by definition)}
+\observation{ $d(u,u')<\lambda$ (because otherwise we could definitely add $u$ to the solution, as $u'$ is defined as closest to $u$ in $P$)}
+\observation{ $d(x,u')\ge\lambda$ (since $x$ and $u'$ are both in $P$)}
+\observation{ $d(x,u)<\lambda$ (by definition)}
 %\corollary{\label{corol5} $d(r,u)>d(r,u')$ (since otherwise $u$ is not the active vertex most distant from $r$).}
-\\Let us look at the possible cases:
+\\ {\normalfont Let us look at the possible cases:
 \begin{enumerate}
 \item \textit{Both $u'$ and $x$ are in the subtree rooted at $r$:}
-$d(u,u')=d(u,r)+d(r,u')<\lambda$ (due to corollary \ref{corol2}) $\Rightarrow d(r,u')<\frac{\lambda}{2}$ (due to corollary \ref{corol1}), and similarly $d(r,x)<\frac{\lambda}{2} \Rightarrow d(x,u')<\lambda$ in contradiction to corollary \ref{corol3}. 
+Because $u$ is the lowest active node $r$'s subtree, it cannot be an ancestor of $u'$ or $x$.
+Let $z=lca(u,u')$. We know that $d(u,z)\geq d(u',z)$ (because $u$ is farther from $r$ than $u'$). Observe two possible cases:
+\begin{enumerate}
+\item \emph{The path from $u$ to $x$ passes through $z$:}
+$\lambda> d(u,x) = d(u,z) + d(z,x) \geq d(u',z)+d(z,x) = d(u',x)$ in contradiction to observation 3.
+\item \emph{The path from $u$ to $x$ does not pass through $z$:}
+In this case $z':=lca(u,x)$ must be a descendant of $z$. It holds that $d(x,z')\leq d(u,z')$.
+Also, $\lambda \leq d(u',x) \leq d(u',z')+d(x,z') \leq d(u',z')+d(u,z') = d(u',u)$ in contradiction to observation 2.
+\end{enumerate}
 
 \item \textit{$u'$ is in the subtree, and $x$ is not:}
-This means that the paths from $u$ and $u'$ to $x$ go through $r$. We have that $d(r,u)>d(r,u')$ (since otherwise $u$ is not the active vertex most distant from $r$), which implies that $d(r,u)+d(r,x)>d(r,u')+d(r,x)\Rightarrow d(u,x)>d(u',x)$ in contradiction to corollary \ref{corol3} and corollary \ref{corol4}.
+This means that the paths from $u$ and $u'$ to $x$ go through $r$. We have that $d(r,u)>d(r,u')$ (since otherwise $u$ is not the active vertex most distant from $r$), which implies that $d(r,u)+d(r,x)>d(r,u')+d(r,x)\Rightarrow d(u,x)>d(u',x)$ in contradiction to observations 3 and 4.
 
 \item \textit{$x$ is in the subtree and $u'$ is not:}
-We have that $d(r,u)>d(r,x)$ (since otherwise $u$ is not the active vertex most distant from $r$), and corollary \ref{corol2} implies that $d(u',r)+d(r,u)<\lambda$, so we get that $d(u',r)+d(r,x)<\lambda$ in contradiction to corollary \ref{corol3}.
+In this case we know that the paths from $u'$ to $x$ and $u$ go through $r$.
+This means that $d(u,u') = d(u,r)+d(r,u')$ and $d(x,u') = d(x,r)+d(r,u')$ $\Rightarrow d(x,r)>d(u,r)$ (because by observation 2 and 3 $d(x,u')>d(u,u')$), but this is a contradiction to $u$ being the lowest active node in the subtree rooted at $r$.
+
 \item \textit{Both $x$ and $u'$ are not in the subtree:}
-\begin{enumerate}
-\item \textit{$x$ is on the path from $u$ to $u'$:}
-We have that $d(u,u')=d(u,r)+d(r,x)+d(x,u')<\lambda\,\,\Rightarrow\,\,d(x,u')<\lambda$ in contradiction to corollary \ref{corol3}.
-\item \textit{$u'$ is on the path from $u$ to $x$:}
-We have that $d(u,x)=d(u,r)+d(r,u')+d(u',x)<\lambda\Rightarrow d(x,u')<\lambda$ in contradiction to corollary \ref{corol3}.
-\item \textit{neither $u'$ is on the path from $u$ to $x$ nor $x$ is on the path from $u$ to $u'$:}
-$d(u,x)=d(x,r)+d(r,u)<\lambda\Rightarrow(\text{by 1) }d(x,r)\le\frac{\lambda}{2}$ and similarly we get that $d(u',r)\le\frac{\lambda}{2}\,\,\,\Rightarrow\,\,\,d(u',x)\le\lambda$. 
+In this case the paths from $u$ to $u'$ and $x$ got through $r$. $d(u,u') = d(r,u)+d(r,u') < \lambda$ (due to observation 2) $\Rightarrow d(r,u')<\frac{\lambda}{2}$ (due to observation 1). In addition we have that $d(u,x) = d(r,u)+d(r,x) < \lambda$ (due to observation 4) $\Rightarrow d(r,x)<\frac{\lambda}{2}$. It is clear that $d(u',x) \leq d(u',r)+d(r,x) < \lambda$ in contradiction to observation 3.
 \end{enumerate}
-\end{enumerate}
-%TODO fix case nesting
+}
 \end{proof}
 %TODO add a drawing for each case
 Lemma \ref{greenNodesLemma} implies the correctness of the algorithm.
