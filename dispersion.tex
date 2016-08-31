@@ -343,10 +343,18 @@ It is easy to see that arranging the matrix in the natural order will produce a 
 We now use Frederickson's method to search our sorted matrix and eliminate its entries using $O(logk)$ calls to out feasibility test algorithm. We thus narrow down our interval to be $[\lambda_1,\lambda_2)$ and $\nexists x\in [\lambda_1,\lambda_2)$ s.t. x is a pairwise distance in the caterpillar, and so we can mark a blue and a green node of the caterpillar that will be valid for any value of $\lambda^*$.  %TODO citation needed.
 \end{step}
 After processing all heavy paths we finally a maximal valid solution for the whole tree. Using the sublinear feasibility test we introduced, this is done in O(n) time.
-\paragraph{Complexity analysis }
+
 
 \subsection{$\textbf{O(nlog*n)}$ Algorithm}
-
+The bottleneck of the algorithm that we have presented is the $O(nloglogn)$ pre-processing we use to make sub-linear feasibility test possible. We did this by dividing the input tree to fragments of size $b$, and using the linear feasibility test to eliminate possible values of $\lambda^*$. This elimination process needed to use $O(logb)$ calls to the feasibility test procedure.
+\\We will now use a simple bootstrapping technique to lower the preprocessing time by iteratively using growing fragment sizes, each time improving the complexity of our feasibility test (f.t.).\\
+We start with fragments of size $c^2$ for some constant $c$.
+We pay $O(nlog(c^2)) = O(n)$ time for preprocessing and get an $O(\frac{n}{c^2} \times logc)$ time f.t.
+we use this f.t. to do the same preprocessing again, this time with fragments of size $(2^c)^2$.
+We will now pay $O(log(2^{2c}) \times \frac{nlogc}{c^2})= O(\frac{nlogc}{c})$ for preprocessing and get an $O(\frac{n}{2^{2c}} \times c)$ f.t.
+We do this for $log*n$ iterations until we get to fragments of size $log^2n$.
+Generally, we want to take a tester for fragments size of $(log^{i+1}n)^2$ (iterated logarithm), do linear time processing, and get a f.t. for fragments size of $(log^in)^2$. We have a tester that works in $O(\frac{nlog^{i+2}n}/{log^{i+1}n)^2}$, and now we use it for fragments size of $(log^in)^2$. We do $log((log^in)^2) = log^{i+1}n$   steps of matrix elimination using our f.t., which costs in total $O(log^{i+1}n \times ((nlog^{i+2}n)/(log^{i+1}n)^2)) = O(nlog^{i+2}n/log^{i+1}n)$, (less than linear time), and we get a f.t. that works in $O(\frac{nlog^{i+1}n}/{log^in)^2}$.
+We do this for $log^*n$ iterations until we get to fragments of size $log^2n$, and have a f.t. of $O(\frac{nloglogn}{log^2n})$. Since we did $log^*n$ iterations and at most linear time work at each of them the total preprocessing is in $O(nlog^*n)$ time.
 
 
 
