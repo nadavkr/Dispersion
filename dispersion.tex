@@ -238,7 +238,7 @@ Lemma \ref{greenNodesLemma} implies the correctness of the algorithm.
 
 
 \subsection{Sublinear feasibility test for the MMDP}
-The main idea here is partitioning the tree to fragments and preprocessing them, so that in query time we can process fragments in sub-linear time. We will assume the tree is binary, and provide justification for this later on.
+The main idea here is partitioning the tree to fragments and preprocessing them, so that in query time we can process fragments in sub-linear time. We will assume the tree is binary. \footnote{Notice that throughout our algorithm we process caterpillars, and do not consider taking spine nodes to our solution. This is okay, since we can add some artificial nodes with zero-weighted edges. This is also how we handle non-binary trees.}
 \subsubsection{Tree Partitioning}
 We would like to have fragments of size $b=log^2n$, s.t. each fragment will be connected to the rest of the tree by at most two vertices. Each fragment has at most $2b$ vertices, and will be defined by its border vertices $u$ and $v$, s.t. $v$ is a descendant of $u$, as in the figure. The fragment will consist of $u$'s subtree without $v$'s subtree. We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. %TODO add figure
 \begin{lemma}
@@ -321,7 +321,7 @@ Each feasibility test will cost us $O(logb)$ for each inactive fragment, and $O(
 The general idea of the algorithm is using the heavy path decomposition. We are searching for $\lambda^*$, which is the distance between some two nodes in the tree, and the largest number for which the MMDP feasibility test would return true.
 We go through the heavy path tree bottom-up, and process all heavy paths at a specific level in parallel, until we are left with a green and blue node for each of them. We maintain an interval $[\lambda_1,\lambda_2)$ s.t. $\lambda^*$ is in the interval, that gets smaller and smaller throughout the run.
 
-We now describe the processing of a heavy path. Notice that the traversal is bottom-up, so we have already processed all of its children in the heavy path tree. Because we have determined $\lambda^*$ with sufficient accuracy (i.e. reduced the size of the maintained interval), each subtree hanging off a heavy path can be replaced by its blue and green node attached by single edges to the heavy path. Hence each such heavy path is a caterpillar, with one or two children for each spine node. We would like to be able to find the green and blue nodes for this heavy path. The situation is illustrated in figure %TODO add a figure
+We now describe the processing of a heavy path. Notice that the traversal is bottom-up, so we have already processed all of its children in the heavy path tree. Because we have determined $\lambda^*$ with sufficient accuracy (i.e. reduced the size of the maintained interval), each subtree hanging off a heavy path can be replaced by its blue and green node attached by single edges to the heavy path. Hence, each such heavy path is a caterpillar, with one or two children for each spine node. We would like to be able to find the green and blue nodes for this heavy path. %The situation is illustrated in figure %TODO add a figure
 Assume that the caterpillar has k nodes. Let the $i$-th leaf be connected by an edge of length $y_i$ to a spine node at distance $x_i$ from the root of the caterpillar. Order the leaves so that $x_1 < x_2 < ... < x_k$.
 
 \begin{step}
@@ -340,10 +340,12 @@ It is easy to see that arranging the matrix in the natural order will produce a 
 \end{step}
 \begin{step}
 \textbf{Run a searching algorithm on the sorted matrices of all the heavy paths}
-We now use Frederickson's method to search our sorted matrix and eliminate its entries using $O(logk)$ calls to out feasibility test algorithm. We thus narrow down our interval to be $[\lambda_1,\lambda_2)$ where $\lambda_1$ and $\lambda_2$ are consecutive pairwise distances in the caterpillar (i.e there is no $x\in [\lambda_1,\lambda_2)$ s.t. x is a pairwise distance in the caterpillar, and so we can mark a blue and a green node of the caterpillar that will be valid for any value of $\lambda^*$.  %TODO citation needed. explanation of the search?
+We now use Frederickson's method to search our sorted matrix and eliminate its entries using $O(logk)$ calls to out feasibility test algorithm. We thus narrow down our interval to be $[\lambda_1,\lambda_2)$ and $\nexists x\in [\lambda_1,\lambda_2)$ s.t. x is a pairwise distance in the caterpillar, and so we can mark a blue and a green node of the caterpillar that will be valid for any value of $\lambda^*$.  %TODO citation needed.
 \end{step}
-%TODO justify the tree being binary
+After processing all heavy paths we finally a maximal valid solution for the whole tree. Using the sublinear feasibility test we introduced, this is done in O(n) time.
 \paragraph{Complexity analysis }
+
+\subsection{$\textbf{O(nlog*n)}$ Algorithm}
 
 
 
