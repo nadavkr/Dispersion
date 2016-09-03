@@ -1,0 +1,67 @@
+\begin{thebibliography}{MTZC81}
+
+\bibitem[BH91]{Bhattacharya1991}
+Binay~K. Bhattacharya and Michael~E. Houle.
+\newblock Generalized maximum independent sets for trees in subquadratic time.
+\newblock In {\em ISAAC}, 1991.
+
+\bibitem[BSP82]{Becker1982}
+Ronald~I. Becker, Stephen~R. Schach, and Yehoshua Perl.
+\newblock A shifting algorithm for min-max tree partitioning.
+\newblock {\em J. ACM 29(1): 58-67}, 1982.
+
+\bibitem[FJ83]{Frederickson1983}
+Greg~N. Frederickson and Donald~B. Johnson.
+\newblock Finding k-th paths and p-centers by generating and searching good
+  data structures.
+\newblock {\em J. Algorithms 4(1): 61-80}, 1983.
+
+\bibitem[Fre91a]{Frederickson1991}
+G.~N. Frederickson.
+\newblock Optimal algorithms for tree partitioning.
+\newblock In {\em SODA '91}, 1991.
+
+\bibitem[Fre91b]{Frederickson1991a}
+Greg~N. Frederickson.
+\newblock Parametric search and locating supply centers in trees.
+\newblock In {\em 2nd Workshop, WADS '91 Ottawa, Canada, August 14–16, 1991
+  Proceedings}, 1991.
+
+\bibitem[Gon85]{Gonzalez1985}
+Teofilo~F. Gonzalez.
+\newblock Clustering to minimize the maximum intercluster distance.
+\newblock {\em Theoretical Computer Science}, 1985.
+
+\bibitem[MT83]{Megiddo1983}
+Nimrod Megiddo and Arie Tamir.
+\newblock New results on the complexity of p-center problems.
+\newblock {\em SIAM J. Comput. 12(4): 751-758}, 1983.
+
+\bibitem[MTZC81]{Megiddo1981}
+Nimrod Megiddo, Arie Tamir, Eitan Zemel, and R.~Chandrasekaran.
+\newblock An o(n log2 n) algorithm for the k-th longest path in a tree with
+  applications to location problems.
+\newblock {\em SIAM J. Comput. 10(2): 328-337}, 1981.
+
+\bibitem[PS81]{Perl1981}
+Yehoshua Perl and Stephen~R. Schach.
+\newblock Max-min tree partitioning.
+\newblock {\em J. ACM 28(1): 5-15}, 1981.
+
+\bibitem[SvTA97]{DavidB.Shmoys1997}
+David~B. Shmoys, Éva Tardos, and Karen Aardal.
+\newblock Approximation algorithms for facility location problems.
+\newblock In {\em STOC '97 Proceedings of the twenty-ninth annual ACM symposium
+  on Theory of computing}, 1997.
+
+\bibitem[Vaz03]{Vazirani2003}
+Vijay~V. Vazirani.
+\newblock {\em Approximation Algorithms}.
+\newblock Springer, 2003.
+
+\bibitem[WK88]{Wang1988}
+D.W. Wang and Yue-Sun Kuo.
+\newblock A study on two geometric location problems.
+\newblock {\em Information Processing Letters}, 1988.
+
+\end{thebibliography}

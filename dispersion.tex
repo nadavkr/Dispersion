@@ -110,35 +110,31 @@ a number of facilities as to minimize the total cost while preserving
 given constraints. Its basic version, called the metric k-center
 problem, we want to designate up to k nodes of a given weighted graph
 to be facilities, as to minimize the maximum distance of a node to its
-closes facility. Even this simplest version is already NP-hard (\cite{Vazirani2003}). However, a simple greedy 2-approximation algorithm is known (cite Gonzalez, Teofilo F. (1985), "Clustering to
-minimize the maximum intercluster distance", Theoretical Computer
-Science, 38, Elsevier Science B.V., pp. 293–306,
-doi:10.1016/0304-3975(85)90224-5). The situation for different
+closes facility. Even this simplest version is already NP-hard (\cite{Vazirani2003}). However, a simple greedy 2-approximation algorithm is known \cite{Gonzalez1985}. The situation for different
 objective functions or more restrictions on the placement is of course
 more complex, but nevertheless one can often design an efficient
-approximation algorithm, see
-https://people.orie.cornell.edu/shmoys/approx00.ps and the references
+approximation algorithm, see \cite{DavidB.Shmoys1997} and the references
 therein.
 
 Given that facility location problems are usually if not always
 NP-hard, it makes sense to consider them on a restricted family of
-graphs. The simplest yet still nontrivial such a family are trees on
+graphs. The simplest yet still non-trivial such a family are trees on
 $n$ nodes. There are multiple possible versions of the k-center
 problem on trees: the facilities can be either only the nodes of the
 tree or any points on an edge, and we might either minimize the
 distance of any node or any point on an edge to its closest facility.
 All these versions have been extensively studied, culminating in an
-O(n) time and space algorithm given by Frederickson (cite WADS) that
+O(n) time and space algorithm given by Frederickson (\cite{Frederickson1991a}) that
 solves all but one of them. This was an improvement on the previous
-$O(n\log n)$ time algorithm (cite FJ1), which in turn was an improvement
-on the $O(n\log^2n)$ time algorithm (cite MTZC). Also weighted version
+$O(n\log n)$ time algorithm by Frederickson and Johnson (\cite{Frederickson1983}), which in turn was an improvement
+on the $O(n\log^2n)$ time algorithm (\cite{Megiddo1981}). There is also weighted version
 of the problem, where every node has its associated weight and the
 distance is multiplied by the corresponding weight, has been
-considered, and $O(n\log^2n)$ time algorithm is known (cite Cole and
-Megiddo \& Tamir). Among other facility location problems on trees there
-is the max-min tree k-partitioning (cite PeS) and the min-max tree
-k-partitioning (cite PBS), both solved by Frederickson in $O(n)$ time
-(cite F2) using a clever approach based on the parametric search that
+considered, and $O(n\log^2n)$ time algorithm is known (%cite Cole and
+\cite{Megiddo1983}). Among other facility location problems on trees there
+is the max-min tree k-partitioning (\cite{Perl1981}) and the min-max tree
+k-partitioning (\cite{Becker1982}), both solved by Frederickson in $O(n)$ time
+(\cite{Frederickson1991}) using a clever approach based on the parametric search that
 he has later extended to solve the k-center problem.
 
 We consider another problem that falls within the class of facility
@@ -148,15 +144,14 @@ two chosen nodes. This nicely generalizes the maximum independent set
 problem by binary searching for the largest value of k for which the
 minimum distance is at least 2. The best previously known algorithm
 for the max-min tree k-dispersion was given by Bhattacharya and Houle
-(cite) and takes $O(n\log n)$ time, improving on an earlier $O(n^2)$
-solution (cite Wang and Kao, but please look inside first). Using the
+(\cite{Bhattacharya1991}) and takes $O(n\log n)$ time, improving on an earlier $O(n^2)$
+solution (\cite{Wang1988}, look inside). Using the
 framework of Frederickson, we construct an optimal O(n) time algorithm
 for this problem. In our solution we also develop a slightly modified
 version of this framework, which might be simpler to understand. Then
 we move the weighted version, where the goal is to select nodes with
 the total weight being at last k. There, the best previously known
-solution requires $O(n\log^4 n)$ time (cite
-http://dl.acm.org/citation.cfm?id=689402). We present a significantly
+solution requires $O(n\log^4 n)$ time (\cite{Bhattacharya1991}). We present a significantly
 faster $O(n\log^2 n)$ time algorithm. We also show that the decision
 version, where the goal is to check if there exists a set of of nodes
 total weight k such that any two nodes are at distance at least b,
@@ -268,7 +263,7 @@ Since we would like to also answer queries for $\frac{\lambda}{2}$, we do the sa
 
 Now, we can use Frederickson's serching algorithm to eliminate entries of the matrices. Using this searching method, we find an interval $[\lambda_1,\lambda_2)$, s.t. the $\lambda^*$ we are searching for in the MMDP, is in this interval.\\
 We call fragments that do not contain a pairwise distance that is in the interval \textit{inactive}, and all other fragments \textit{active}.
-for this search, we use theorem 2.1 in \cite{FredericksonTreePartitioning}. In our case the theorem implies that we can use $O(logb)$ feasibility tests and discard all but $logb$ elements of the matrices. This means that we have at most $logb$ active fragments (out of all $n/b$ fragments). \\ %TODO citation. can we do log(blogb) tests to eliminate all elements?
+for this search, we use theorem 2.1 in \cite{Frederickson1991}. In our case the theorem implies that we can use $O(logb)$ feasibility tests and discard all but $logb$ elements of the matrices. This means that we have at most $logb$ active fragments (out of all $n/b$ fragments). \\ %TODO citation. can we do log(blogb) tests to eliminate all elements?
 For inactive fragment, it is clear that we can answer queries checking whether some pairwise distance inside the fragment is at least $\lambda$, or if it is at most $\frac{\lambda}{2}$.
 
 
@@ -358,7 +353,7 @@ We do this for $log^*n$ iterations until we get to fragments of size $log^2n$, a
 
 
 
-\bibliographystyle{plain}
+\bibliographystyle{alpha}
 \bibliography{dispersion}
 
 
