@@ -82,11 +82,11 @@
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{algo}{Algorithm}[section]
 \newtheorem{corollary}{Corollary}
-\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{lemma}{Lemma}
 \newtheorem{observation}{Observation}
 \newtheorem{fact}[theorem]{Fact}
 \theoremstyle{definition}   
-\newtheorem{definition}[theorem]{Definition}
+\newtheorem{definition}{Definition}
 \usepackage{authblk}
 \theoremstyle{remark}
 \newtheorem{example}[theorem]{Example}
@@ -150,13 +150,8 @@ is to select k nodes as to maximize the minimum distance between any
 two chosen nodes. This nicely generalizes the maximum independent set
 problem by binary searching for the largest value of k for which the
 minimum distance is at least 2. The best previously known algorithm
-for the max-min tree k-dispersion was given by Bhattacharya and Houle
-<<<<<<< HEAD
-(\cite{Bhattacharya1991}) and takes $O(n\log n)$ time, after Wang and Kuo solved the problem in the one dimensional case with a running time of $O(np + nlogn)$ \cite{Wang1988}. Using the
-=======
-\cite{Bhattacharya1991} and takes $O(n\log n)$ time, improving on an earlier $O(n^2)$
-solution \cite{Wang1988}. Using the
->>>>>>> origin/master
+for the max-min tree k-dispersion was given by Bhattacharya and Houle in
+\cite{Bhattacharya1991} and takes $O(n\log n)$ time, after Wang and Kuo solved the problem in the one dimensional case with a running time of $O(np + nlogn)$ in \cite{Wang1988}. Using the
 framework of Frederickson, we construct an optimal O(n) time algorithm
 for this problem. In our solution we also develop a slightly modified
 version of this framework, which might be simpler to understand. Then
