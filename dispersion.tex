@@ -160,7 +160,7 @@ Note that each $P_{i}$ contains at most one blue vertex and one green vertex.
 \emph{Active and Inactive nodes} We will call a vertex $v$ of the tree \emph{inactive} if there is a vertex $u$ we already chose to be in $P$, s.t $d(u,v)<\lambda$. We will call $v$ \emph{active} if there is no such vertex $u$ and $v \notin P$.
 \end{definition}
 \begin{lemma} \label{greenNodesLemma}
-For any subtree of $T$ rooted at node $r$, let $u$ be the most distant active vertex from $r$ in the subtree. Assume $\exists P \subseteq V$ s.t. $f(P)\geq\lambda$, and denote the closest vertex to $u$ in $P$ by $u'$. Then, if $d(u,r)\ge\frac{\lambda}{2}$, and $P' := P \setminus \lbrace u' \rbrace \cup \lbrace u \rbrace$, it holds that $f(P')\geq\lambda$.
+For any subtree of $T$ rooted at node $r$, let $u$ be the most distant active vertex from $r$ in the subtree. Assume $P$ is a maximal subset of the vertices of the subtree s.t. $f(P)\geq\lambda$ and assume $u \notin P$. Denote the closest vertex to $u$ in $P$ by $u'$. Then, if $d(u,r)\ge\frac{\lambda}{2}$, and $P' := P \setminus \lbrace u' \rbrace \cup \lbrace u \rbrace$, it holds that $f(P')\geq\lambda$.
 \end{lemma}
 \begin{proof}
 Assume for contradiction that $f(P')<\lambda$. We assume that we cannot replace $u'$ with $u$ and still get a valid solution. This means that there is a vertex $x \neq u'$, s.t. $x\in P$ and $d(u,x)<\lambda$. 
@@ -173,18 +173,23 @@ We know that:
 \\ {\normalfont Let us look at the possible cases:
 \begin{enumerate}
 \item \textit{Both $u'$ and $x$ are in the subtree rooted at $r$:}
-Because $u$ is the lowest active node $r$'s subtree, it cannot be an ancestor of $u'$ or $x$.
-Let $z=lca(u,u')$. We know that $d(u,z)\geq d(u',z)$ (because $u$ is farther from $r$ than $u'$). Observe two possible cases:
+Because $u$ is the lowest active node in $r$'s subtree, it cannot be an ancestor of $u'$ or $x$.
+Let $z=lca(u,u')$. We know that $d(u,z)\geq d(u',z)$ (because $u$ is farther from $r$ than $u'$). Observe the possible cases:
 \begin{enumerate}
 \item \emph{The path from $u$ to $x$ passes through $z$:}
+\begin{enumerate}
+\item \emph{The path from $u'$ to $x$ passes through $z$:}
 $\lambda> d(u,x) = d(u,z) + d(z,x) \geq d(u',z)+d(z,x) = d(u',x)$ in contradiction to observation 3.
+\item \emph{The path from $u'$ to $x$ does not pass through $z$:}
+Let $z'=lca(u',x)$. In this case $x$ is also a descendant of $z$ (because u' is a descendant of $z$ by definition and otherwise the path from $x$ to $u'$ would go through $z$). Thus, $d(x,z) \leq d(u,z)$ (since $u$ is the lowest active node). $z'$ is a descendant of $z$, which implies that $d(x,z) \geq d(x,z')$. We know that $\lambda \leq d(x,u') = d(x,z')+d(z',u)$, so we get that $d(x,z') \geq \frac{\lambda}{2}$ (since $d(x,z')\geq d(z',u)$ because $u'$ is closer to $u$ than $x$ by definition). Thus, we have that $d(u,z) \geq d(x,z) \geq d(x,z')\geq \frac{\lambda}{2} \Rightarrow d(u,x) = d(u,z)+d(z,x) \geq \lambda$ in contradiction to observation 4.
+\end{enumerate}
 \item \emph{The path from $u$ to $x$ does not pass through $z$:}
-In this case $z':=lca(u,x)$ must be a descendant of $z$. It holds that $d(x,z')\leq d(u,z')$.
+In this case $z':=lca(u,x)$ must be on the path from $u$ to $z$. It holds that $d(x,z')\leq d(u,z')$.
 Also, $\lambda \leq d(u',x) \leq d(u',z')+d(x,z') \leq d(u',z')+d(u,z') = d(u',u)$ in contradiction to observation 2.
 \end{enumerate}
 
 \item \textit{$u'$ is in the subtree, and $x$ is not:}
-This means that the paths from $u$ and $u'$ to $x$ go through $r$. We have that $d(r,u)>d(r,u')$ (since otherwise $u$ is not the active vertex most distant from $r$), which implies that $d(r,u)+d(r,x)>d(r,u')+d(r,x)\Rightarrow d(u,x)>d(u',x)$ in contradiction to observations 3 and 4.
+This means that the paths from $u$ and $u'$ to $x$ go through $r$. We have that $d(r,u) \geq d(r,u')$ (since otherwise $u$ is not the active vertex most distant from $r$), which implies that $d(r,u)+d(r,x) \geq d(r,u')+d(r,x)\Rightarrow d(u,x) \geq d(u',x)$ in contradiction to observations 3 and 4.
 
 \item \textit{$x$ is in the subtree and $u'$ is not:}
 In this case we know that the paths from $u'$ to $x$ and $u$ go through $r$.
