@@ -49,3 +49,14 @@ dispersion.aux
 dispersion.synctex.gz
 dispersion.pdf
 dispersion.log
+.texpadtmp/dispersion.bbl
+.texpadtmp/dispersion.blg
+.texpadtmp/dispersion.out
+.texpadtmp/proposal.aux
+.texpadtmp/proposal.bbl
+.texpadtmp/proposal.blg
+.texpadtmp/proposal.log
+.gitignore
+.texpadtmp/proposal.out
+.gitignore
+.texpadtmp/proposal.synctex.gz
