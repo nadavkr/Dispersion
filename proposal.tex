@@ -1,7 +1,9 @@
 
-\documentclass[11pt,a4paper]{article}
+\documentclass[12pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+
+\renewcommand{\baselinestretch}{1.5}
 
 \usepackage[dvipsnames,usenames]{color}
 \usepackage[colorlinks=true,urlcolor=Blue,citecolor=Green,linkcolor=BrickRed]{hyperref}
@@ -121,9 +123,23 @@ for the max-min tree $k$-dispersion was given by Bhattacharya and Houle
 solution for the one dimensional case given by Wang and Kuo~\cite{Wang1988} . Using the
 framework of Frederickson, we construct an optimal $\Oh(n)$ time algorithm
 for this problem. In our solution we also develop a slightly modified
-version of this framework, which might be simpler to understand. Then
-we move the weighted version, where the goal is to select nodes with
- total weight  at last $k$. There, the best previously known
+version of this framework, which might be simpler to understand. 
+
+
+For a subset of nodes $P\subseteq V$, let $d(u,v)$ denote the distance between nodes $u$ and $v$ and let $f(P)=min_{u,v\in P} \{d(u,v)\}$. The problems we solve are formally defined as: 
+
+\newpage 
+\begin{enumerate}
+\item {\bf The Dispersion Optimization Problem:} Given a tree $T$ with non-negative edge lengths, and a  number $p$, find a subset $P\subseteq V$ of size $p$ s.t.  $f(P)$ is maximized. 
+
+\item {\bf The Dispersion Decision Problem:}  Given a tree $T$ with non-negative edge lengths, a number $p$, and a number $\lambda$, find a subset $P\subseteq V$ of size $p$ s.t. $f(P)\geq\lambda$.
+\end{enumerate}
+
+
+
+
+We then move to the weighted version, where the tree nodes are weighted and the goal is to select $P$ nodes with
+ total weight at last $k$. There, the best previously known
 solution requires $\Oh(n\log^4 n)$ time \cite{Bhattacharya1991}. We present a significantly
 faster $\Oh(n\log^2 n)$ time algorithm. We also show that the decision
 version, where the goal is to check if there exists a set of of nodes

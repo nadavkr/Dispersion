@@ -134,13 +134,24 @@ to construct our $\Oh(n\log^2n)$ time solution for the weighted max-min
 tree $k$-dispersion using the standard parametric search paradigm of Fredrickson. 
 
 \section{Preliminaries}
-\begin{definition}
-\emph{Max-Min Dispersion Problem (MMDP)} Given a tree $T$ with non-negative edge lengths, and a natural number $p$, find a subset $P\subseteq V$ of size $p$ s.t. $f(P)=min{\scriptscriptstyle \forall u,v\in P,u\neq v}d(u,v)$ is maximized.
-\end{definition}
-\begin{definition}
-\emph{MMDP Feasibility Test} Given a MMDP instance and a number $\lambda\geq0$ decide if there exists a subset $P\subseteq V$ of size $p$ s.t. $f(P)\geq\lambda$.
-\end{definition}
 
+For a subset of nodes $P\subseteq V$, let $d(u,v)$ denote the distance between nodes $u$ and $v$ and let $f(P)=min_{u,v\in P} \{d(u,v)\}$. The problems we solve are formally defined as: 
+
+\begin{enumerate}
+\item {\bf The Dispersion Optimization Problem:} Given a tree $T$ with non-negative edge lengths, and a  number $p$, find a subset $P\subseteq V$ of size $p$ s.t.  $f(P)$ is maximized. 
+
+\item {\bf The Dispersion Decision Problem:}  Given a tree $T$ with non-negative edge lengths, a number $p$, and a number $\lambda$, find a subset $P\subseteq V$ of size $p$ s.t. $f(P)\geq\lambda$.
+\end{enumerate}
+
+\noindent The optimization problem is called {\em MMDP} and the decision version is called the {\em feasibility test}.
+%
+%\begin{definition}
+%\emph{Max-Min Dispersion Problem (MMDP)} Given a tree $T$ with non-negative edge lengths, and a natural number $p$, find a subset $P\subseteq V$ of size $p$ s.t. $f(P)=min{\scriptscriptstyle \forall u,v\in P,u\neq v}d(u,v)$ is maximized.
+%\end{definition}
+%\begin{definition}
+%\emph{MMDP Feasibility Test} Given a MMDP instance and a number $\lambda\geq0$ decide if there exists a subset $P\subseteq V$ of size $p$ s.t. $f(P)\geq\lambda$.
+%\end{definition}
+%
 \section{The unweighted case}
 We first describe how to solve the feasibility test in linear time, and then use this algorithm to solve the MMDP.
 \subsection{Linear algorithm for the MMDP Feasibility Test}
