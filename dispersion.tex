@@ -305,7 +305,7 @@ In this case we need to consider the suffixes of the current fragment. If $v$ is
 Each feasibility test will cost us $O(logb)$ for each inactive fragment, and $O(b)$ for each active one. In total $O(\frac{n}{b} \times logb) + O(\frac{n}{b^2} \times b) = O(\frac{nloglogn}{log^2n})$.
 
 
-\subsection{O(nloglogn) Solution for the Dispersion problem}
+\subsection{O(nloglogn) Solution for the Dispersion problem} \label{nloglogn solution}
 The general idea of the algorithm is using the heavy path decomposition. We are searching for $\lambda^*$, which is the distance between some two nodes in the tree, and the largest number for which a feasibility test would return true.
 We go through the heavy path tree bottom-up, and process all heavy paths at a specific level in parallel, until we are left with a green and blue node for each of them. We maintain an interval $[\lambda_1,\lambda_2)$ as we previously did. The interval will get smaller and smaller throughout the run.
 
@@ -333,7 +333,7 @@ After processing all heavy paths we finally have a maximal valid solution for th
 
 
 \subsection{$\textbf{O(nlog*n)}$ Algorithm}
-The $O(nloglogn)$ algorithm that we have presented has three bottlenecks. First, we spend $O(nlogb)=O(nloglogn)$ time for the centroid decomposition which is used to implicitly build matrices that contain all pairwise distances inside fragments. Next we use Frederickson's searching method for which we pay $O(nloglogn)$ once for $O(logb)$ feasibility test, and again for processing which does not use feasibility tests. We can eliminate the third bottleneck by using the following bootstrapping technique.\\
+The $O(nloglogn)$ algorithm that we have presented has Four bottlenecks. First, we spend $O(nlogb)=O(nloglogn)$ time for the centroid decomposition which is used to implicitly build matrices that contain all pairwise distances inside fragments. Next we use Frederickson's searching method for which we pay $O(nloglogn)$ once for $O(logb)$ linear feasibility tests, and again for processing which does not use feasibility tests. We then use our sublinear feasibility tests to complete the solution which also costs $O(nloglogn)$ time. We can eliminate the second bottleneck by using the following bootstrapping technique.\\
 The  pre-processing we use to make sub-linear feasibility test possible, divides the input tree to fragments of size $b$, and uses the linear feasibility test to eliminate possible values of $\lambda^*$. This elimination process needed to use $O(logb)$ calls to the feasibility test procedure.
 We will use iteratively growing fragment sizes, each time improving the complexity of our feasibility test (f.t.).\\
 We start with fragments of size $c^2$ for some constant $c$.
@@ -343,8 +343,12 @@ We will now pay $O(log(2^{2c}) \times \frac{nlogc}{c^2})= O(\frac{nlogc}{c})$ fo
 We do this for $log*n$ iterations until we get to fragments of size $log^2n$.
 Generally, we want to take a tester for fragments size of $(log^{i+1}n)^2$ (iterated logarithm), do linear time processing, and get a f.t. for fragments size of $(log^in)^2$. We have a tester that works in $O(\frac{nlog^{i+2}n}{log^{i+1}n)^2}$, and now we use it for fragments size of $(log^in)^2$. We do $log((log^in)^2) = log^{i+1}n$   steps of matrix elimination using our f.t., which costs in total $O(log^{i+1}n \times ((nlog^{i+2}n)(log^{i+1}n)^2)) = O(nlog^{i+2}n/log^{i+1}n)$, (less than linear time), and we get a f.t. that works in $O(\frac{nlog^{i+1}n}{log^in)^2}$.
 We do this for $log^*n$ iterations until we get to fragments of size $log^2n$, and have a f.t. of $O(\frac{nloglogn}{log^2n})$. Since we did $log^*n$ iterations and at most linear time work at each of them the total preprocessing is in $O(nlog^*n)$ time, assuming we did not have the other bottlenecks.\\
-In order to get rid of the two additional bottlenecks, we will produce instead of $O(logb)$ matrices of total side length $O(blogb)$ for each fragment, just one matrix with $O(b)$ rows and columns.
-
+In order to get rid of the additional bottlenecks, we will need to produce matrices of linear side length.
+We will use a mixture of the techniques we have presented thus far.
+We start by creating a sublinear f.t.\\ We partition the input tree to fragments of increasing size as before, but instead of using centroid decomposition, we use a heavy path decomposition on each fragment. As we have seen in \ref{nloglogn solution}, we can create a matrix with linear number of rows and columns, that contains all pairwise distances of a path at the current level. \\
+Assuming we have obtained an f.t. of $O(\frac{n}{b^3} \times logb)$ from the previous step, we now partition the tree to fragments of size $B^3$, where $B:=2^b$. We go over the the heavy path trees of the fragments bottom up and in parallel. We have at most $logB$ levels, and each contains at most $logn$ vertices. After processing the heavy paths at the current level (pruning the resulting caterpillars, and obtaining the matrices of pairwise distances) we have $n/B^3$ matrices of size $B^3$. We use Frederickson's searching method, with the parameters set to $m:=n$ and $p:=\frac{n}{B^4}$. We thus need to use the f.t. $O(log(\frac{n}{\frac{n}{B^4}}))=O(logB)$ times, and an extra linear processing time exclusive of the feasibility tests. We Compute the blue and green node of each path as we did before, and continue up in the heavy path trees. In total, for all $O(logB)$ levels, we used $O(log^2B)$ calls to the previous f.t., that cost $(log^2B \times \frac{n}{b^3} \times logb)=O(\frac{n}{b} \times logb)$ which is less than linear time. After this we have at most $logB \times \frac{n}{B^4}$ active fragments (because we do not eliminate at most $p$ distances at each level), which we process in linear time, and the paths in all other fragments we process in logarithmic time as before. Thus we have obtained an f.t. of $O(\frac{n}{B^3} \times logB)$.\\
+We do this iteratively until we have an f.t. of $O(\frac{n}{log^3n} \times loglogn)$, and then use it solve the dispersion optimization problem.
+At each step we used at most linear time, and in total for all $O(log^*n)$ steps, $O(nlog^*n)$. 
 
 \bibliographystyle{alpha}
 \bibliography{dispersion}
