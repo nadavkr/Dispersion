@@ -347,7 +347,13 @@ We do this iteratively until we have an f.t. of $O(\frac{n}{\log ^3n} \times \lo
 In total, for all $O(\log B)$ levels of the heavy path trees, we used $O(\log ^2B)$ calls to the previous f.t., that cost $(\log ^2B \times \frac{n}{b^3} \times \log b)=O(\frac{n}{b} \times \log b)$ which is less than linear time. In addition at each step we used linear time for the decompositions, so in total $O(n \log ^*n)$. 
 
 \subsection{Linear time solution for the Dispersion Optimization Problem}
-Our linear algorithm is based on the $O(n \log ^*n)$ algorithm we have presented. In order to achieve linear time in total we cannot afford to partition the input tree to fragments independently for each fragment size.
+Our linear algorithm is based on the $O(n \log ^*n)$ algorithm we have presented. In order to achieve linear time in total we cannot partition the input tree to fragments independently for each fragment size. We need the decomposition to fragments to be in $O(n)$ time for all $\log ^*n$ phases together.
+\begin{lemma}
+Given a partition of a binary tree into $O(n/b)$ fragments s.t. each fragment is of size at most $2b$ and has at most two border vertices s.t. one is an ancestor of the other, there exists a partition of the tree into $O(n/2^b)$ such fragments of size at most $2 \times 2^b$, so that every small fragment is contained inside a large fragments.
+\end{lemma}
+\begin{proof}
+The correctness of the lemma is implied by lemma \ref{basic partitioning lemma}. we proved lemma \ref{basic partitioning lemma} by bounding the number of leaves in $T_L$. We will use the same argument here. Define $T_W$ by the tree received by collapsing each small fragment to a single node of weight equal to the size of the fragment. Since a leaf of weight $w$ has $w$ descendants in the original tree, we can again bound the number of leaves and branching nodes, and continue as in the previous lemma.
+\end{proof}
 
 
 
