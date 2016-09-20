@@ -355,6 +355,10 @@ Given a partition of a binary tree into $O(n/b)$ fragments s.t. each fragment is
 The correctness of the lemma is implied by lemma \ref{basic partitioning lemma}. we proved lemma \ref{basic partitioning lemma} by bounding the number of leaves in $T_L$. We will use the same argument here. Define $T_W$ by the tree received by collapsing each small fragment to a single node of weight equal to the size of the fragment. Since a leaf of weight $w$ has $w$ descendants in the original tree, we can again bound the number of leaves and branching nodes, and continue as in the previous lemma.
 \end{proof}
 
+We now describe a single iteration, i.e. how to achieve an $O(\frac{n}{\log ^3B} \times \log B)$ f.t. given an $O(\frac{n}{\log ^3b} \times \log b)$ f.t.
+Observe a large fragment of size $B$. It contains some small fragments of size $b$. If any of these small fragments is active, we declare the large fragment active and stop processing it. Otherwise, each of the smaller fragments is a caterpillar. The large fragment contains some small fragments whose roots and holes are spine nodes of the large fragment, and other fragments that form subtrees hanging off of the large fragment's spine. %TODO add drawing?
+\\We first reduce each of these hanging subtrees to at most two node - one blue and one green. Every small fragment in such a subtree has been reduced in the previous level to caterpillar which was preprocessed so it can be processed in logarithmic time once the distance from its hole the closest node taken below it is known. Since the bottom of the subtree is comprised of small fragments with no hole, we can reduce them to at most two nodes, and then continue reducing small fragments until we are left with at most one blue and one green node for the whole subtree.
+\\Now we are left with one large caterpillar which is the large fragment's spine, that consists of caterpillars from the smaller fragment (including the specific case were the small fragment is reduced to two nodes, which can be viewed as a caterpillar with a single spine node).
 
 
 \bibliographystyle{alpha}
