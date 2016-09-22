@@ -144,6 +144,10 @@ For a subset of nodes $P\subseteq V$, let $d(u,v)$ denote the distance between n
 \end{enumerate}
 
 \noindent The optimization problem is called {\em MMDP} and the decision version is called the {\em feasibility test}.
+
+\begin{definition}
+\emph{Heavy Path Decomposition} \cite{Sleator1983} Given a rooted tree, for each non-leaf child of the tree define its \emph{heavy edge} as the edge to the child that has the greatest number of descendants. These heavy edges form a decomposition of the tree. The heavy path decomposition induces a \emph{heavy path tree}, where each node corresponds to a path of the heavy path decomposition. For a path $p$ of the heavy path decomposition, $p$'s parent in the heavy path tree is the path that contains the parent of $p$'s head.
+\end{definition}
 %
 %\begin{definition}
 %\emph{Max-Min Dispersion Problem (MMDP)} Given a tree $T$ with non-negative edge lengths, and a natural number $p$, find a subset $P\subseteq V$ of size $p$ s.t. $f(P)=min{\scriptscriptstyle \forall u,v\in P,u\neq v}d(u,v)$ is maximized.
@@ -258,7 +262,7 @@ Let $M$ be a collection of $N$ sorted matrices ${M_l, M_2, . . . , M_N}$ in whic
 Let p be nonnegative. The number of feasibility tests needed to discard all but at most p of the elements is $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace)$, and the total running time exclusive of feasibility tests is $O(\sum_{j=1}^{N} m_j \times \log (2n_j/m_j))$.
 \end{theorem}
 In our case $m=b \log b \times \frac{n}{b} = n \log b$ (since for each of the $\frac{n}{b}$ fragments, we have $\log b$ levels of the centroid decomposition, and at level we have the distance of every node to a centroid) and we set $p$ to be $n/b^2$. The Theorem implies that we can use $O(\log b)$ feasibility tests and discard all but $n/b^2$ elements of the matrices. We also pay $O(n \log b)$ exclusive of the feasibility tests. This means that we have at most $n/b^2$ active fragments (out of all $n/b$ fragments). \\
-For inactive fragment, it is clear that we can now answer queries checking whether some pairwise distance inside the fragment is at least $\lambda$, or if it is at most $\frac{\lambda}{2}$ \footnote{We can easily compute any pairwise distance in the tree in $O(1)$ time by pre-computing all distances to the root of the tree, and using LCA queries.}.
+For inactive fragment, it is clear that we can now answer queries checking whether some pairwise distance inside the fragment is at least $\lambda$, or if it is at most $\frac{\lambda}{2}$ \footnote{We can easily compute any pairwise distance in the tree in $O(1)$ time by pre-computing all distances to the root of the tree, and using LCA queries (as in \cite{Djidjev1991}).}.
 
 Active fragments, will be processed as in the linear algorithm described before, so we can ignore them for now.
 
