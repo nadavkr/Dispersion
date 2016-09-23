@@ -1,5 +1,10 @@
 \begin{thebibliography}{MTZC81}
 
+\bibitem[BFC00]{Bender2000}
+M.A. Bender and M.~Farach-Colton.
+\newblock The lca problem revisited.
+\newblock In {\em LATIN}, 2000.
+
 \bibitem[BH91]{Bhattacharya1991}
 B.K. Bhattacharya and M.E. Houle.
 \newblock Generalized maximum independent sets for trees in subquadratic time.

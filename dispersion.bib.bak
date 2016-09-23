@@ -109,7 +109,7 @@
   pages   = {362–391},
 }
 
-@InProceedings{,
+@InProceedings{Djidjev1991,
   author    = {H.N Djidjev and G.E. Pantziou and C.D. Zaroliagis},
   title     = {Computing shortest paths and distances in planar graphs},
   booktitle = {ICALP},
