@@ -133,10 +133,10 @@ For a subset of nodes $P\subseteq V$, let $d(u,v)$ denote the distance between n
 \item {\bf The Dispersion Decision Problem:}  Given a tree $T$ with non-negative edge lengths, a number $p$, and a number $\lambda$, find a subset $P\subseteq V$ of size $p$ s.t. $f(P)\geq\lambda$.
 \end{enumerate}
 
-\noindent The optimization problem is called {\em MMDP} and the decision version is called the {\em feasibility test}.
+\noindent The the decision problem is also called the {\em feasibility test}.
 
 \begin{definition}
-\emph{Heavy Path Decomposition} \cite{Sleator1983} Given a rooted tree, for each non-leaf child of the tree define its \emph{heavy edge} as the edge to the child that has the greatest number of descendants. These heavy edges form a decomposition of the tree. The heavy path decomposition induces a \emph{heavy path tree}, where each node corresponds to a path of the heavy path decomposition. For a path $p$ of the heavy path decomposition, $p$'s parent in the heavy path tree is the path that contains the parent of $p$'s head.
+\emph{Heavy Path Decomposition} \cite{Sleator1983} Given a rooted tree, define the \emph{heavy edge} of each non-leaf node of the tree as the edge to the child that has the greatest number of descendants. These heavy edges form a decomposition of the tree into heavy paths. The heavy path decomposition induces a \emph{heavy path tree}, where each node corresponds to a path of the heavy path decomposition. For a path $p$ of the heavy path decomposition, $p$'s parent in the heavy path tree is the path that contains the parent of $p$'s head. The heavy path tree has at most $\log n$ levels.
 \end{definition}
 %
 %\begin{definition}
@@ -147,21 +147,21 @@ For a subset of nodes $P\subseteq V$, let $d(u,v)$ denote the distance between n
 %\end{definition}
 %
 \section{The unweighted case}
-We first describe how to solve the feasibility test in linear time, and then use this algorithm to solve the MMDP.
-\subsection{Linear algorithm for the MMDP Feasibility Test}\label{linear F.T.}
+We first describe how to solve the feasibility test in linear time, and then use this algorithm to solve the dispersion optimization problem.
+\subsection{Linear algorithm for the Feasibility Test}\label{linear F.T.}
 %\begin{algo} \label{unWeightedFeasibilityAlgo}
 We show a recursive linear algorithm.
 At each step of the recursion, we would like to provide the maximal valid solution for the current subtree, given some $\lambda$. I.e, we would like to return $P$, a maximal subset of the vertices of the subtree, s.t. $f(P)\geq\lambda$.
-We are given a root vertex $v$ and its children nodes $v_{1},v_{2},...,v_{k}$, and for each child we are given a maximal valid solution for the feasibility test on its subtree. We would like to produce a maximal valid solution for the feasibility test on $v\text{'s subtree}$.
+We are given a root vertex $v$, its children nodes $v_{1},v_{2},...,v_{k}$, and for each child we are given a maximal valid solution for the feasibility test on its subtree. We would like to produce a maximal valid solution for the feasibility test on $v\text{'s subtree}$.
 Denote by $P_{1},...,P_{k}$ the solutions for the feasibility test on each subtree rooted at a child of $v$.
-For any subtree of $T$ rooted at node $r$, and a valid solution $P$ for a feasibility test on the subtree, we call a node $u\in P$, s.t. $d(r,u)\leq\frac{\lambda}{2}$, a \emph{candidate} node of the subtree. We call the vertex in $P$ that is closest to $r$, but isn't a candidate, \emph{certain}.
+For any subtree of $T$ rooted at node $r$, and a valid solution $P$ for a feasibility test on the subtree, we call a node $u\in P$, s.t. $d(r,u)<\frac{\lambda}{2}$, a \emph{candidate} node of the subtree. We call the vertex in $P$ that is closest to $r$, but isn't a candidate, \emph{certain}.
 Note that each $P_{i}$ contains at most one candidate vertex and one certain vertex.
 
 \paragraph{The recursion step} Given $P_{1},...,P_{k}$, we would like to produce a solution for $v$'s subtree.
 \begin{enumerate}
 \item Put in $P$ all the vertices in $P_{1},...,P_{k}$, except for the candidate vertices.
-\item Take all candidate nodes $u$ s.t. $d(u,v)> \frac{\lambda}{2}$.
-\item Take $u'$, the candidate node farthest from $v$ s.t. $d(u',v)\leq \frac{\lambda}{2}$, if it exists, and if $d(u',x)\geq \lambda$, where $x$ is the closest node to the root $v$ we have chosen so far.
+\item Take all candidate nodes $u$ s.t. $d(u,v) \geq \frac{\lambda}{2}$.
+\item Take $u'$, the candidate node farthest from $v$ s.t. $d(u',v) < \frac{\lambda}{2}$, if it exists, and if $d(u',x)\geq \lambda$, where $x$ is the closest node to the root $v$ we have chosen so far.
 \item Decide whether to take $v$ (the root) to the solution by looking at the closest vertex to it we have already put in $P$.
 \end{enumerate}
 
@@ -212,9 +212,9 @@ In this case the paths from $u$ to $u'$ and $x$ got through $r$. $d(u,u') = d(r,
 \end{proof}
 %TODO add a drawing for each case
 \paragraph{Proof of correctness}
-Clearly it holds that $f(P) \geq \lambda$ for the set $P$ that the algorithm outputs. Assume for contradiction that $P$ is not maximal. Denote by $r$ the lowest vertex of the tree where the algorithm does not output a maximal valid subset for the subtree rooted at $r$. Due to Lemma \ref{greenNodesLemma}, there is a maximal valid solution that includes all the vertices in $P$ that are at distance greater or equal to $\frac{\lambda}{2}$ from $r$. Aside from these vertices, $P$ contains at most one more vertex, which is at distance less than $\frac{\lambda}{2}$ from $r$. Denote this vertex by $u$. There are no vertices $v \notin P$ s.t. $d(r,v) \geq \frac{\lambda}{2}$ and $f(P \setminus \lbrace u \rbrace \cup \lbrace v \rbrace) \geq \lambda$, because that would mean that the solutions for the subtrees rooted at children of $r$ were not all maximal. If there is some vertex at distance less than $\frac{\lambda}{2}$ from $r$, s.t. it is at distance at least $\lambda$ from the other chosen vertices, we always add it. Clearly we cannot add more than one such node. Thus, the algorithm outputs a maximal subset of the vertices of the tree s.t. the distance between any two nodes in it is at least $\lambda$.
+Clearly it holds that $f(P) \geq \lambda$ for the set $P$ that the algorithm outputs. Assume for contradiction that $P$ is not maximal. Denote by $r$ the lowest vertex of the tree where the algorithm does not output a maximal valid subset for the subtree rooted at $r$. Due to Lemma \ref{greenNodesLemma}, there is a maximal valid solution that includes all the vertices in $P$ that are at distance greater or equal to $\frac{\lambda}{2}$ from $r$. Denote this maximal solution by $P'$. $P'$ cannot contain a node at distance greater or equal to $\frac{\lambda}{2}$ from $r$, that is not in $P$, as that is a contradiction to the maximality of the solutions for the children of $r$. Aside from these vertices, $P$ contains at most one more vertex, which is at distance less than $\frac{\lambda}{2}$ from $r$. If $P$ does not contain such a vertex, $P'$ must contain one. This is a contradiction, since if there was such a vertex that was at distance at least $\lambda$ from all the nodes we have chosen so far, it would also be in $P$. If $P$ does contain a node at distance less than $\frac{\lambda}{2}$ from $r$, then $P'$ contains at least two such nodes, which is impossible of course.
 
-\subsection{Sublinear feasibility test for the MMDP}
+\subsection{Sublinear feasibility test}
 The main idea here is partitioning the tree to fragments and preprocessing them, so that in query time we can process fragments in sub-linear time. We will assume the tree is binary, and justify this assumption later.
 \subsubsection{Tree Partitioning}\label{tree partitioning}
 We would like to partition the tree into fragments s.t. each fragment will be connected to the rest of the tree by at most two vertices. Each fragment will have at most $2b$ vertices, and there will be $O(n/b)$ fragments. Each fragment will be defined by its border vertices $u$ and $v$, s.t. $v$ is a descendant of $u$. The fragment will consist of $u$'s subtree without $v$'s subtree. We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. We call such a partition of the tree a \emph{good partition}.
@@ -282,7 +282,7 @@ Assuming we know what is the closest chosen node in the fragment's hole, we can 
 In order to pre-compute this, scan the caterpillar from top to bottom. For every possible prefix of the caterpillar we would like to store the numbers of nodes chosen, the certain node and the candidate node, assuming all nodes that are not in the prefix are eliminated as they are too close to the hole. Observe the bottom node of the current prefix. If the distance of this node to the fragment's root is less than $\frac{\lambda}{2}$\footnote{We do not actually know $\lambda$ in preprocessing, but due to the previous steps, such a query of a node inside the fragment would produce the same result for any possible $\lambda$.}, store it as the candidate node, zero as the number of chosen nodes, and NULL as the certain node (if this fragment has a hole, we will consider its candidate and certain node in query time). Else, (the node's distance to the root is greater or equal to $\frac{\lambda}{2}$), write it as the certain node. Then, use binary search to find the node closest to it, that is at distance of at least $\lambda$. Add 1 to the number of chosen nodes stored in the node we found, and either store it as the candidate node, or copy the candidate node stored there. This would take $O(b \log b)$ time. We can improve this by not binary searching for the first node far enough, but instead saving it for each prefix, and then only going down from the previous node found. This would only take $O(b)$ time.
 \end{step}
 
-\subsubsection{Feasibility Test}
+\subsubsection{Feasibility Test} %TODO check if we can simplify
 We now scan the whole tree, and for each inactive fragment we would like to produce in $O(\log b)$ time: the number of chosen nodes in the fragment, the candidate node, and the certain node. In this procedure we use the caterpillars we have created in the preprocessing. Notice that now we are given $\lambda$.
 We run this procedure bottom-up, so we assume the fragments rooted at the hole of the current one have already been processed.\\
 Denote the root of the fragment, $r$, the hole's candidate node, $u$, and the current fragment's leaf farthest from $r$, $v$.\\
