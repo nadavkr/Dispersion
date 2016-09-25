@@ -1,14 +1,10 @@
-\documentclass[11pt,a4paper]{article}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+\documentclass[a4paper,UKenglish]{lipics-v2016}
 
-\usepackage[dvipsnames,usenames]{color}
-\usepackage[colorlinks=true,urlcolor=Blue,citecolor=Green,linkcolor=BrickRed]{hyperref}
-\usepackage[usenames,dvipsnames]{xcolor}
-\urlstyle{same}
+
+
 
 \usepackage{amsthm,amsmath,amssymb,mathabx}
-\usepackage{fullpage}
+
 \usepackage[ruled,noend,linesnumbered]{algorithm2e}     
 \usepackage{enumerate,comment}
 \usepackage{url}
@@ -32,18 +28,12 @@
 \newcommand{\Oh}{{O}}
 
 % For cleverref compatibility
-\newtheorem{theorem}{Theorem}[section]
 \newtheorem{algo}{Algorithm}[section]
-\newtheorem{corollary}{Corollary}
-\newtheorem{lemma}{Lemma}
-\newtheorem{observation}{Observation}
 \newtheorem{fact}[theorem]{Fact}
-\theoremstyle{definition}   
-\newtheorem{definition}{Definition}
+\theoremstyle{definition}  
+\newtheorem{observation}{Observation} 
 \usepackage{authblk}
 \theoremstyle{remark}
-\newtheorem{example}[theorem]{Example}
-\newtheorem*{claim}{Claim}
 \newtheorem{case}{Case}
 \newtheorem{step}{Step}[section]
 
@@ -373,7 +363,7 @@ For updating jump pointers, we only spent time linear in the number of nodes who
 Because we have set the parameter $p$ of Frederickson's method to $\frac{n}{B^5}$, that is the number of active fragments for the current iteration, in the worst case. Thus, we have achieved a $O(\frac{n}{B^4} \times \log B)$ feasibility test.\\
 After $\log ^*n$ iterations, we have a $O(\frac{n}{\log ^4n} \times \log \log n)$ test, which we use to solve the dispersion optimization problem in linear time. All iterations of pre-processing cost $O(n)$ time all together.
 
-\bibliographystyle{alpha}
+\bibliographystyle{plain}
 \bibliography{dispersion}
 
 
