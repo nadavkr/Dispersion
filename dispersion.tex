@@ -306,7 +306,7 @@ In this case we need to consider the suffixes of the current fragment. If $v$ is
 Each feasibility test will cost us $O(\log b)$ for each inactive fragment, and $O(b)$ for each active one. In total $O(\frac{n}{b} \times \log b) + O(\frac{n}{b^2} \times b) = O(\frac{n \log \log n}{\log ^2n})$.
 
 
-\subsection{O(nloglogn) Solution for the Dispersion problem} \label{nloglogn solution}
+\subsection{$O(n\log\log n)$ Solution for the Dispersion problem} \label{nloglogn solution}
 The general idea of the algorithm is using the heavy path decomposition. We are searching for $\lambda^*$, which is the distance between some two nodes in the tree, and the largest number for which a feasibility test would return true.
 We go through the heavy path tree bottom-up, and process all heavy paths at a specific level in parallel, until we are left with a certain and candidate node for each of them. We maintain an interval $[\lambda_1,\lambda_2)$ as we previously did. The interval will get smaller and smaller throughout the run.
 
@@ -334,7 +334,7 @@ After processing all heavy paths we finally have a maximal valid solution for th
 Notice that throughout our algorithm we process caterpillars, and do not consider taking spine nodes to our solution. This is okay, since we can add some artificial nodes with zero-weighted edges. This is also how we handle non-binary trees.
 
 
-\subsection{$\textbf{O(n log *n)}$ Algorithm}
+\subsection{$O(n\log^*n)$ Algorithm}
 The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test (or test for short) to get a sublinear one. In order to get the complexity down to $O(n \log ^*n)$ we will use a similar process, iteratively, with growing framents size, improving in each iteration the performance of our test.
 We start with fragments of size $c^3$ for some constant $c$.
 We pay $O(n)$ time for preprocessing and get an $O(\frac{n}{c^3} \times \log c)$ time test.
