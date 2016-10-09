@@ -1,10 +1,14 @@
-\documentclass[a4paper,UKenglish]{lipics-v2016}
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 
-
-
+\usepackage[dvipsnames,usenames]{color}
+\usepackage[colorlinks=true,urlcolor=Blue,citecolor=Green,linkcolor=BrickRed]{hyperref}
+\usepackage[usenames,dvipsnames]{xcolor}
+\urlstyle{same}
 
 \usepackage{amsthm,amsmath,amssymb,mathabx}
-
+\usepackage{fullpage}
 \usepackage[ruled,noend,linesnumbered]{algorithm2e}     
 \usepackage{enumerate,comment}
 \usepackage{url}
@@ -28,12 +32,18 @@
 \newcommand{\Oh}{{O}}
 
 % For cleverref compatibility
+\newtheorem{theorem}{Theorem}[section]
 \newtheorem{algo}{Algorithm}[section]
+\newtheorem{corollary}{Corollary}
+\newtheorem{lemma}{Lemma}
+\newtheorem{observation}{Observation}
 \newtheorem{fact}[theorem]{Fact}
-\theoremstyle{definition}  
-\newtheorem{observation}{Observation} 
+\theoremstyle{definition}   
+\newtheorem{definition}{Definition}
 \usepackage{authblk}
 \theoremstyle{remark}
+\newtheorem{example}[theorem]{Example}
+\newtheorem*{claim}{Claim}
 \newtheorem{case}{Case}
 \newtheorem{step}{Step}[section]
 
@@ -215,40 +225,41 @@ In this case the paths from $u$ to $u'$ and $x$ got through $r$. $d(u,u') = d(r,
 Clearly it holds that $f(P) \geq \lambda$ for the set $P$ that the algorithm outputs. Assume for contradiction that $P$ is not maximal. Denote by $r$ the lowest vertex of the tree where the algorithm does not output a maximal valid subset for the subtree rooted at $r$. Due to Lemma \ref{greenNodesLemma}, there is a maximal valid solution that includes all the vertices in $P$ that are at distance greater or equal to $\frac{\lambda}{2}$ from $r$. Denote this maximal solution by $P'$. $P'$ cannot contain a node at distance greater or equal to $\frac{\lambda}{2}$ from $r$, that is not in $P$, as that is a contradiction to the maximality of the solutions for the children of $r$. Aside from these vertices, $P$ contains at most one more vertex, which is at distance less than $\frac{\lambda}{2}$ from $r$. If $P$ does not contain such a vertex, $P'$ must contain one. This is a contradiction, since if there was such a vertex that was at distance at least $\lambda$ from all the nodes we have chosen so far, it would also be in $P$. If $P$ does contain a node at distance less than $\frac{\lambda}{2}$ from $r$, then $P'$ contains at least two such nodes, which is impossible of course.
 
 \subsection{Sublinear feasibility test}
-The main idea here is partitioning the tree to fragments and preprocessing them, so that in query time we can process fragments in sub-linear time. We will assume the tree is binary, and justify this assumption later.
+The main idea here is partitioning the tree to fragments and preprocessing them, so that in query time we can process fragments in sub-linear time. For this, we need to use a partitioning with some specific attributes, which we will now present. We will assume the tree is binary, and justify this assumption later.
 \subsubsection{Tree Partitioning}\label{tree partitioning}
-We would like to partition the tree into fragments s.t. each fragment will be connected to the rest of the tree by at most two vertices. Each fragment will have at most $2b$ vertices, and there will be $O(n/b)$ fragments. Each fragment will be defined by its border vertices $u$ and $v$, s.t. $v$ is a descendant of $u$. The fragment will consist of $u$'s subtree without $v$'s subtree. We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. We call such a partition of the tree a \emph{good partition}.
+We would like to partition the tree into fragments s.t. each fragment will be connected to the rest of the tree by at most two vertices. Each fragment will have at most $2b$ vertices, and there will be $O(n/b)$ fragments. Each fragment will be defined by its border vertices $u$ and $v$, s.t. $v$ is a descendant of $u$. The fragment will consist of $u$'s subtree without $v$'s subtree. We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. We call such a partition of the tree a \emph{good partition}. We set $b$ to $\log ^2b$.
 %TODO add figure
 \begin{lemma}\label{basic partitioning lemma}
 For any binary tree on $n$ nodes and a parameter $b$, there is a good partition of the tree.
 \end{lemma}
 \begin{proof}
-We prove the Lemma by construction. Call a node \textit{large} if the size of its subtree is greater than b and \textit{small} otherwise. Consider the tree $T_L$ induced by the large nodes of the original tree. Make each leaf in $T_L$ a new fragment with no hole. This creates $O(n/b)$ fragments since each leaf of $T_L$ is the root of a subtree of size at least $b$ in the original tree, and so we have at most $O(n/b)$ leaves in $T_L$. The size of each of these fragments is at most $2b$, since we assume that the tree is binary. Next, for every branching node in $T_L$, make it a fragment consisting of just one node. This also creates $O(n/b)$ fragments, since in any tree the number of branching nodes is at most the number of leaves. We could not have simply gone up the tree and cut fragments of size $b$, since this would create fragments with more than two boundary nodes. Ignoring the fragments we have already created, we are left with nodes that form unary chains in $T_L$. Each of these nodes might also have a child that is a small node. We have $O(n/b)$ of these subgraphs (because each of them is defined by two of the previously defined fragments). We scan each of these subgraphs' large nodes bottom-up, and greedily cut them. Clearly these fragments are of size at most $2b$. Denote the size of subgraph $i$, as $b_i$. The number of fragments we created in this phase is at most $$\sum_{i=1}^{n/b} \left\lceil \frac{b_i}{b} \right\rceil \leq \frac{n}{b}$$
+We prove the Lemma by construction. Call a node \textit{large} if the size of its subtree is greater than b and \textit{small} otherwise. Consider the tree $T_L$ induced by the large nodes of the original tree. Make each leaf in $T_L$ a new fragment with no hole. This creates $O(n/b)$ fragments since each leaf of $T_L$ is the root of a subtree of size at least $b$ in the original tree, and so we have at most $O(n/b)$ leaves in $T_L$. The size of each of these fragments is at most $2b$, since we assume that the tree is binary. Next, for every branching node in $T_L$, make it a fragment consisting of just one node. This also creates $O(n/b)$ fragments, since in any tree the number of branching nodes is at most the number of leaves. We could not have simply gone up the tree and cut fragments of size $b$, since this would create fragments with more than two boundary nodes. Ignoring the fragments we have already created, we are left with nodes that form unary chains in $T_L$. Each of these nodes might also have a child that is a small node. We have $O(n/b)$ of these subgraphs (because each of them is defined by two of the previously defined fragments). We scan each of these subgraphs' large nodes bottom-up, and greedily cut them to fragments of size at most $2b$. Denote the size of subgraph $i$, as $b_i$. The number of fragments we created in this phase is at most $$\sum_{i=1}^{n/b} \left\lceil \frac{b_i}{b} \right\rceil = O(n/b)$$
 In total we have created $O(n/b)$ fragments, each of which is of size at most $2b$.
 \end{proof}
 This partitioning is done in $O(n)$ time.
-We now would like to pre-process the fragments s.t. we can later check in constant time for any two nodes in a fragment, $u_1,u_2$ if $d(u,v)\geq\lambda$, and if $d(u_1,u_2) \leq \frac{\lambda}{2}$, for any possible $\lambda$. We achieve this for most of the fragments.
 
 \subsubsection{Pre-Processing Fragments} \label{Pre-Processing Fragments}
-For each fragment, we would like to implicitly construct matrices of total side length (number of rows and columns) $O(b \log b)$, that are row and column sorted, and contain all pairwise distances in the fragment.
+We now would like to pre-process the fragments s.t. we can later check in constant time for any two nodes in a fragment, $u_1,u_2$ if $d(u,v)\geq\lambda$, and if $d(u_1,u_2) \leq \frac{\lambda}{2}$, for any possible $\lambda$. The possible values of $\lambda$ in the beginning are of course all the pairwise distances in the input tree. We achieve the ability to perform such queries for most of the fragments, by using a parametric search method by Frederickson that will allow us to eliminate some of the possible values of $\lambda$ by using our existing feasibility test. By the end of this elimination process, most of the fragments will have the property that any pairwise distance inside them is either smaller then the smallest possible value of $\lambda$ or
+ greater or equal to the largest possible value of $\lambda$. The same will hold for $\frac{\lambda}{2}$.
+For each fragment, we will implicitly construct matrices of total side length (number of rows and columns) $O(b \log b)$, that are row and column sorted, and contain all pairwise distances in the fragment.
 
 \begin{definition} \textbf{Centroid Decomposition} %TODO citation?
 Given a binary tree, we can find its \textit{centroid} node in linear time. This node divides the tree into three pieces, each of which has no more than half of the nodes of the entire tree. Recursing on each of the pieces will produce the centroid decomposition.
 \end{definition}
 
 Apply the centroid decomposition on each fragment. Now, run the following recursive routine: at each level of the recursion, we are given 3 pieces, and for each of them a sorted list of the distances to the inner centroid. We would like to compute a sorted list of distances of all nodes of the current piece to the current centroid. Let us look at one of the three pieces we have already processed. It contains three pieces of its own. For two of these pieces, it holds that all paths from a node inside them to the outer centroid passes through the inner centroid. We call the third piece, for which this does not hold a \textit{problematic} piece. For the two pieces that are not problematic, we can add to all the entries of the lists we have, the distance from the inner centroid to the outer centroid, and then merge the two sorted lists. This is all done in linear time.\\
-Our only problem now is the piece where the paths to the outer centroid do not go through the inner one. But notice that if we go one step deeper in the recursion we can see the inside the problematic piece there are two pieces that are not problematic, and we can do the same for their two list and so on. This recursive routine will also take linear time. All together we have $O(\log b)$ levels of recursion, and spend linear time on each one, so we get a running time of $O(b \log b)$, and $O(n \log \log n)$. for all fragments.\\
-Now we have for level $i$ of the recursion $3^i$ centroids, and for each of them a sorted list of the distances to it from all nodes in its piece. We could find any pairwise distance in a piece by adding two entries of this list. Since the lists are sorted, we can look at the situation as if we have $3^i$ matrices of and their total side length is $n$ \footnote{We cannot actually afford to explicitly store these matrices, but that is not needed.}. These matrices contain all pairwise distances in all the fragments. Note that we also have some entries in the matrices that do not actually represent pairwise distances in the tree, but that does not matter.
-Since we would like to also answer queries for $\frac{\lambda}{2}$, we do the same process for matrices that contain twice the distance in every entry of the original matrices.\\
+Our only problem now is the piece where the paths to the outer centroid do not go through the inner one. But notice that if we go one step deeper in the recursion we can see the inside the problematic piece there are two pieces that are not problematic, and we can do the same for their two list and so on. This recursive routine will also take linear time. All together we have $O(\log b)$ levels of recursion, and spend linear time on each one, so we get a running time of $O(b \log b)$, and $O(n \log \log n)$ for all fragments.\\
+Now we have for level $i$ of the recursion $3^i$ centroids, and for each of them a sorted list of the distances to it from all nodes in its piece. We could find any pairwise distance in a piece by adding two entries of this list. Since the lists are sorted, we can look at the situation as if we have $3^i$ matrices of and their total side length is $n$ \footnote{We cannot actually afford to explicitly store these matrices, but that is not needed.}. These matrices contain all pairwise distances in all the fragments. Note that we also have some entries in the matrices that do not actually represent pairwise distances in the tree, because some entries in the matrix represent the length of a path between two nodes that passes through the centroid of the piece, but the shortest path between these two nodes does not pass through the centroid. This does not matter, since it just means we will try to do some unnecessary eliminations.
 
 Now, we can use a parametric search algorithm by Frederickson to eliminate entries of the matrices. Using this searching method, we find the interval of possible solutions to the dispersion problem, $[\lambda_1,\lambda_2)$, s.t. the $\lambda^*$ we are searching for, is in this interval, $\lambda_1$ is the largest number we know is feasible, and $\lambda_2$ is the smallest number we know is not feasible.\\
 We call fragments that do not contain a pairwise distance that is in the interval \textit{inactive}, and all other fragments \textit{active}.
+Since we would like to also answer queries for $\frac{\lambda}{2}$, we do the same process for matrices that contain twice the distance in every entry of the original matrices.\\
 For this search, we use Theorem 2.1 in \cite{Frederickson1991}:
 \begin{theorem}\label{Frederickson's theorem}
 Let $M$ be a collection of $N$ sorted matrices ${M_l, M_2, . . . , M_N}$ in which matrix $M_j$ is of dimension $m_j \times n_j$, $m_j \leq n_j$, and $\sum_{j=1}^{N} m_j = m$.
 Let p be nonnegative. The number of feasibility tests needed to discard all but at most p of the elements is $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace)$, and the total running time exclusive of feasibility tests is $O(\sum_{j=1}^{N} m_j \times \log (2n_j/m_j))$.
 \end{theorem}
-In our case $m=b \log b \times \frac{n}{b} = n \log b$ (since for each of the $\frac{n}{b}$ fragments, we have $\log b$ levels of the centroid decomposition, and at level we have the distance of every node to a centroid) and we set $p$ to be $n/b^2$. The Theorem implies that we can use $O(\log b)$ feasibility tests and discard all but $n/b^2$ elements of the matrices. We also pay $O(n \log b)$ exclusive of the feasibility tests. This means that we have at most $n/b^2$ active fragments (out of all $n/b$ fragments). \\
+In our case $m=b \log b \times \frac{n}{b} = n \log b$ (since for each of the $\frac{n}{b}$ fragments, we have $\log b$ levels of the centroid decomposition, and at each level we have the distance of every node to a centroid) and we set $p$ to be $n/b^2$. The Theorem implies that we can use $O(\log b)$ feasibility tests and discard all but $n/b^2$ elements of the matrices. We also pay $O(n \log b)$ exclusive of the feasibility tests. This means that we have at most $n/b^2$ active fragments (out of all $n/b$ fragments). \\
 For inactive fragment, it is clear that we can now answer queries checking whether some pairwise distance inside the fragment is at least $\lambda$, or if it is at most $\frac{\lambda}{2}$ \footnote{We can easily compute any pairwise distance in the tree in $O(1)$ time by pre-computing all distances to the root of the tree, and using LCA queries \cite{Bender2000}, \cite{Djidjev1991}.}.
 
 Active fragments, will be processed as in the linear algorithm described before, so we can ignore them for now.
@@ -296,7 +307,7 @@ In this case we need to consider the suffixes of the current fragment. If $v$ is
 Each feasibility test will cost us $O(\log b)$ for each inactive fragment, and $O(b)$ for each active one. In total $O(\frac{n}{b} \times \log b) + O(\frac{n}{b^2} \times b) = O(\frac{n \log \log n}{\log ^2n})$.
 
 
-\subsection{$O(n\log\log n)$ Solution for the Dispersion problem} \label{nloglogn solution}
+\subsection{O(nloglogn) Solution for the Dispersion problem} \label{nloglogn solution}
 The general idea of the algorithm is using the heavy path decomposition. We are searching for $\lambda^*$, which is the distance between some two nodes in the tree, and the largest number for which a feasibility test would return true.
 We go through the heavy path tree bottom-up, and process all heavy paths at a specific level in parallel, until we are left with a certain and candidate node for each of them. We maintain an interval $[\lambda_1,\lambda_2)$ as we previously did. The interval will get smaller and smaller throughout the run.
 
@@ -324,8 +335,8 @@ After processing all heavy paths we finally have a maximal valid solution for th
 Notice that throughout our algorithm we process caterpillars, and do not consider taking spine nodes to our solution. This is okay, since we can add some artificial nodes with zero-weighted edges. This is also how we handle non-binary trees.
 
 
-\subsection{$O(n\log^*n)$ Algorithm}
-The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test (or test for short) to get a sublinear one. In order to get the complexity down to $O(n \log ^*n)$ we will use a similar process, iteratively, with growing fragments size, improving in each iteration the performance of our test.
+\subsection{$\textbf{O(n log *n)}$ Algorithm}
+The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test (or test for short) to get a sublinear one. In order to get the complexity down to $O(n \log ^*n)$ we will use a similar process, iteratively, with growing framents size, improving in each iteration the performance of our test.
 We start with fragments of size $c^3$ for some constant $c$.
 We pay $O(n)$ time for preprocessing and get an $O(\frac{n}{c^3} \times \log c)$ time test.
 We use this test to do the same preprocessing again, this time with fragments of size $(2^c)^3$.
@@ -363,7 +374,7 @@ For updating jump pointers, we only spent time linear in the number of nodes who
 Because we have set the parameter $p$ of Frederickson's method to $\frac{n}{B^5}$, that is the number of active fragments for the current iteration, in the worst case. Thus, we have achieved a $O(\frac{n}{B^4} \times \log B)$ feasibility test.\\
 After $\log ^*n$ iterations, we have a $O(\frac{n}{\log ^4n} \times \log \log n)$ test, which we use to solve the dispersion optimization problem in linear time. All iterations of pre-processing cost $O(n)$ time all together.
 
-\bibliographystyle{plain}
+\bibliographystyle{alpha}
 \bibliography{dispersion}
 
 
