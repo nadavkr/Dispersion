@@ -45,6 +45,7 @@
 \newtheorem{example}[theorem]{Example}
 \newtheorem*{claim}{Claim}
 \newtheorem{case}{Case}
+\newtheorem{invariant}{Invariant}
 \newtheorem{step}{Step}[section]
 
 \newtheorem{property}[theorem]{Property}
@@ -157,72 +158,43 @@ For a subset of nodes $P\subseteq V$, let $d(u,v)$ denote the distance between n
 %\end{definition}
 %
 \section{The unweighted case}
-We first describe how to solve the feasibility test in linear time, and then use this algorithm to solve the dispersion optimization problem.
+We first describe how to solve the feasibility test in linear time, then show how to do linear time preprocessing to get a sublinear feasibility test, and then use this algorithm to solve the dispersion optimization problem.
 \subsection{Linear algorithm for the Feasibility Test}\label{linear F.T.}
 %\begin{algo} \label{unWeightedFeasibilityAlgo}
 We show a recursive linear algorithm.
-At each step of the recursion, we would like to provide the maximal valid solution for the current subtree, given some $\lambda$. I.e, we would like to return $P$, a maximal subset of the vertices of the subtree, s.t. $f(P)\geq\lambda$.
-We are given a root vertex $v$, its children nodes $v_{1},v_{2},...,v_{k}$, and for each child we are given a maximal valid solution for the feasibility test on its subtree. We would like to produce a maximal valid solution for the feasibility test on $v\text{'s subtree}$.
-Denote by $P_{1},...,P_{k}$ the solutions for the feasibility test on each subtree rooted at a child of $v$.
-For any subtree of $T$ rooted at node $r$, and a valid solution $P$ for a feasibility test on the subtree, we call a node $u\in P$, s.t. $d(r,u)<\frac{\lambda}{2}$, a \emph{candidate} node of the subtree. We call the vertex in $P$ that is closest to $r$, but isn't a candidate, \emph{certain}.
-Note that each $P_{i}$ contains at most one candidate vertex and one certain vertex.
+At each step of the recursion, we would like to provide a valid solution with maximal cardinality for the current subtree, given some $\lambda$. I.e, we would like to return $P$, a subset of the vertices of the subtree, s.t. $f(P)\geq\lambda$ and $|P|$ is maximal.
+We are given a root vertex $r$, its children nodes $r_{1},r_{2},...,r_{k}$, and for each child we are given a maximal valid solution for the feasibility test on its subtree. We would like to produce a maximal valid solution for the feasibility test on $r\text{'s subtree}$.
+Denote by $P_{1},...,P_{k}$ the solutions for the feasibility test on each subtree rooted at a child of $r$.
+\begin{definition}
+For any subtree of $T$ rooted at node $r$, and a valid solution $P$ for a feasibility test on the subtree, we call a node $u\in P$, s.t. $d(r,u)<\frac{\lambda}{2}$, the \emph{candidate} node of the subtree (or a candidate with respect to $r$). We call the vertices in $P$ that are not the candidate (i.e. every node $v \in P$ s.t. $d(r,v)\geq \frac{\lambda}{2}$), \emph{certain} (w.r.t $r$). When it is clear from the context, we will not explicitly mention which subtree we are referring to.
+Note that each $P_{i}$ contains at most one candidate vertex.
+\end{definition}
 
-\paragraph{The recursion step} Given $P_{1},...,P_{k}$, we would like to produce a solution for $v$'s subtree.
+\paragraph{The recursion step} Given $P_{1},...,P_{k}$, we would like to produce a solution for $r$'s subtree.
 \begin{enumerate}
 \item Put in $P$ all the vertices in $P_{1},...,P_{k}$, except for the candidate vertices.
-\item Take all candidate nodes $u$ s.t. $d(u,v) \geq \frac{\lambda}{2}$.
-\item Take $u'$, the candidate node farthest from $v$ s.t. $d(u',v) < \frac{\lambda}{2}$, if it exists, and if $d(u',x)\geq \lambda$, where $x$ is the closest node to the root $v$ we have chosen so far.
-\item Decide whether to take $v$ (the root) to the solution by looking at the closest vertex to it we have already put in $P$.
+\item Take all candidate nodes $u$ s.t. $d(u,r) \geq \frac{\lambda}{2}$ (i.e. they are certain w.r.t $r$).
+\item If it exists, take $u'$, the candidate node farthest from $r$ s.t. $d(u',r) < \frac{\lambda}{2}$ and $d(u',x)\geq \lambda$, where $x$ is the closest node to $u'$ we have chosen so far.
+\item Check if it is possible to take $r$ into the solution by looking at the closest vertex to it we have already put in $P$. If possible, put $r$ in the solution.
 \end{enumerate}
+Iterating over the input tree bottom-up as described, will provide us with the solution to the Dispersion decision problem as the output for the root of the tree.
 
-
-\begin{definition}
-\emph{Active and Inactive nodes} We will call a vertex $v$ of the tree \emph{inactive} if there is a vertex $u$ we already chose to be in $P$, s.t $d(u,v)<\lambda$. We will call $v$ \emph{active} if there is no such vertex $u$ and $v \notin P$.
-\end{definition}
-\begin{lemma} \label{greenNodesLemma}
-For any subtree of $T$ rooted at node $r$, let $u$ be the most distant active vertex from $r$ in the subtree. Assume $P$ is a maximal subset of the vertices of the subtree s.t. $f(P)\geq\lambda$. Denote the closest vertex to $u$ in $P$ by $u'$. Then, if $d(u,r)\ge\frac{\lambda}{2}$, and $P' := P \setminus \lbrace u' \rbrace \cup \lbrace u \rbrace$, it holds that $f(P')\geq\lambda$.
-\end{lemma}
-\begin{proof}
-Assume for contradiction that $f(P')<\lambda$. We assume that we cannot replace $u'$ with $u$ and still get a valid solution. This means that there is a vertex $x \neq u'$, s.t. $x\in P$ and $d(u,x)<\lambda$. 
-We know that:
-\observation{ $d(r,u)\ge\frac{\lambda}{2}$ (by definition)}
-\observation{ $d(u,u')<\lambda$ (because otherwise we could definitely add $u$ to the solution, as $u'$ is defined as closest to $u$ in $P$)}
-\observation{ $d(x,u')\ge\lambda$ (since $x$ and $u'$ are both in $P$)}
-\observation{ $d(x,u)<\lambda$ (by definition)}
-%\corollary{\label{corol5} $d(r,u)>d(r,u')$ (since otherwise $u$ is not the active vertex most distant from $r$).}
-\\ {\normalfont Let us look at the possible cases:
-\begin{enumerate}
-\item \textit{Both $u'$ and $x$ are in the subtree rooted at $r$:}
-Because $u$ is the lowest active node in $r$'s subtree, it cannot be an ancestor of $u'$ or $x$.
-Let $z=lca(u,u')$. We know that $d(u,z)\geq d(u',z)$ (because $u$ is farther from $r$ than $u'$). Observe the possible cases:
-\begin{enumerate}
-\item \emph{The path from $u$ to $x$ passes through $z$:}
-\begin{enumerate}
-\item \emph{The path from $u'$ to $x$ passes through $z$:}
-$\lambda> d(u,x) = d(u,z) + d(z,x) \geq d(u',z)+d(z,x) = d(u',x)$ in contradiction to Observation 3.
-\item \emph{The path from $u'$ to $x$ does not pass through $z$:}
-Let $z'=lca(u',x)$. In this case $x$ is also a descendant of $z$ (because u' is a descendant of $z$ by definition and otherwise the path from $x$ to $u'$ would go through $z$). Thus, $d(x,z) \leq d(u,z)$ (since $u$ is the lowest active node). $z'$ is a descendant of $z$, which implies that $d(x,z) \geq d(x,z')$. We know that $\lambda \leq d(x,u') = d(x,z')+d(z',u)$, so we get that $d(x,z') \geq \frac{\lambda}{2}$ (since $d(x,z')\geq d(z',u)$ because $u'$ is closer to $u$ than $x$ by definition). Thus, we have that $d(u,z) \geq d(x,z) \geq d(x,z')\geq \frac{\lambda}{2} \Rightarrow d(u,x) = d(u,z)+d(z,x) \geq \lambda$ in contradiction to Observation 4.
-\end{enumerate}
-\item \emph{The path from $u$ to $x$ does not pass through $z$:}
-In this case $z':=lca(u,x)$ must be on the path from $u$ to $z$. It holds that $d(x,z')\leq d(u,z')$.
-Also, $\lambda \leq d(u',x) \leq d(u',z')+d(x,z') \leq d(u',z')+d(u,z') = d(u',u)$ in contradiction to Observation 2.
-\end{enumerate}
-
-\item \textit{$u'$ is in the subtree, and $x$ is not:}
-This means that the paths from $u$ and $u'$ to $x$ go through $r$. We have that $d(r,u) \geq d(r,u')$ (since otherwise $u$ is not the active vertex most distant from $r$), which implies that $d(r,u)+d(r,x) \geq d(r,u')+d(r,x)\Rightarrow d(u,x) \geq d(u',x)$ in contradiction to Observations 3 and 4.
-
-\item \textit{$x$ is in the subtree and $u'$ is not:}
-In this case we know that the paths from $u'$ to $x$ and $u$ go through $r$.
-This means that $d(u,u') = d(u,r)+d(r,u')$ and $d(x,u') = d(x,r)+d(r,u')$ $\Rightarrow d(x,r)>d(u,r)$ (because by Observation 2 and 3 $d(x,u')>d(u,u')$), but this is a contradiction to $u$ being the lowest active node in the subtree rooted at $r$.
-
-\item \textit{Both $x$ and $u'$ are not in the subtree:}
-In this case the paths from $u$ to $u'$ and $x$ got through $r$. $d(u,u') = d(r,u)+d(r,u') < \lambda$ (due to Observation 2) $\Rightarrow d(r,u')<\frac{\lambda}{2}$ (due to Observation 1). In addition we have that $d(u,x) = d(r,u)+d(r,x) < \lambda$ (due to Observation 4) $\Rightarrow d(r,x)<\frac{\lambda}{2}$. It is clear that $d(u',x) \leq d(u',r)+d(r,x) < \lambda$ in contradiction to Observation 3.
-\end{enumerate}
-}
-\end{proof}
-%TODO add a drawing for each case
 \paragraph{Proof of correctness}
-Clearly it holds that $f(P) \geq \lambda$ for the set $P$ that the algorithm outputs. Assume for contradiction that $P$ is not maximal. Denote by $r$ the lowest vertex of the tree where the algorithm does not output a maximal valid subset for the subtree rooted at $r$. Due to Lemma \ref{greenNodesLemma}, there is a maximal valid solution that includes all the vertices in $P$ that are at distance greater or equal to $\frac{\lambda}{2}$ from $r$. Denote this maximal solution by $P'$. $P'$ cannot contain a node at distance greater or equal to $\frac{\lambda}{2}$ from $r$, that is not in $P$, as that is a contradiction to the maximality of the solutions for the children of $r$. Aside from these vertices, $P$ contains at most one more vertex, which is at distance less than $\frac{\lambda}{2}$ from $r$. If $P$ does not contain such a vertex, $P'$ must contain one. This is a contradiction, since if there was such a vertex that was at distance at least $\lambda$ from all the nodes we have chosen so far, it would also be in $P$. If $P$ does contain a node at distance less than $\frac{\lambda}{2}$ from $r$, then $P'$ contains at least two such nodes, which is impossible of course.
+We shall now prove the correctness of the algorithm. We will do this by proving that the following Invariant holds for every step of the algorithm.
+\begin{invariant}\label{Maximality of P and distance of closest node invariant}
+For every node of the tree, $r$, the algorithm produces $P$, a subset of the vertices of the subtree rooted at $r$, s.t. $f(P)\geq\lambda$ and $|P|$ is maximal. Out of all such subsets that are valid and have maximal cardinality, the distance between $r$ and the node closest to it is largest in $P$.
+\end{invariant}
+
+Let us observe some node of the tree $r$, and prove that the Invariant holds for it, assuming that it holds for its children, $r_{1},r_{2},...,r_{k}$.\\
+Denote the subtree rooted at a node $x$ by $T_x$. Assume for contradiction that $P'$ is a subset of the vertices of $T_r$, s.t. $f(P')\geq\lambda$ and $|P'| > |P|$. Let us look at the two possible cases:
+\begin{enumerate}
+\item If $P'$ has more certain nodes w.r.t $r$, then there must be some child of $r$, $r_i$, s.t. $P'_{r_i} > P_{r_i}$ (where $P'_{r_i}$ is $P'$ restricted to $T_{r_i}$), or the closest node to $r_i$ in $P'_{r_i}$ is farther than the closest node in $P_{r_i}$, and so the Invariant does not hold for $r_i$.
+\item If  $P'$ has the same number of certain nodes w.r.t $r$ as $P$, but $P'$ has a candidate w.r.t $r$ (denoted by $u$) and $P$ does not, we have two possible cases. First, if $u=r$ then there is some node $v \in P$ s.t. $d(u,v)<\lambda$. Clearly the Invariant does not hold for the child of $r$ which is ancestor of $v$ (or if $v$ is a child of $r$ then for itself). Second, if $u$ is in one of the subtrees rooted at a child of $r$, since all certain nodes w.r.t $r$ are also in these subtrees, there must be one such subtree, $r_j$ s.t. $|P'_{r_j}| > |P'_{r_j}|$, and so the Invariant does not hold for it.
+\end{enumerate} 
+Thus we have proved $P$ is of maximal cardinality. Now, assume for contradiction that $P'$ is a subset of the vertices of the subtree rooted at $r$, s.t. $f(P')\geq\lambda$ and $|P'| = |P|$, but the closest node to $r$ in $P$ (denoted by $u$) is closer to $r$ than the closest node to $r$ in $P'$. Assume that $u \neq r$ and denote by $T_{r_i}$ the subtree that $u$ is in. Thus, either $|P'_{r_i}| = |P_{r_i}|$, but the closest vertex to $r_i$ in $P'_{r_i}$ is farther away from $r_i$ than $u$, which means the Invariant does not hold for $T_{r_i}$, or $|P'_{r_i}| < |P_{r_i}|$, and it makes up for it in some other subtree where the Invariant does not hold.\\
+If $u=r$, then since $|P'| = |P|$, there must some child of $r$, $r_i$, s.t. $|P'_{r_i}| > |P_{r_i}|$, and so the invariant does not hold for $r_i$.\\
+We have proven that Invariant \ref{Maximality of P and distance of closest node invariant} holds for every node of the input tree, and thus proven the correctness of the algorithm.
+
 
 \subsection{Sublinear feasibility test}
 The main idea here is partitioning the tree to fragments and preprocessing them, so that in query time we can process fragments in sub-linear time. For this, we need to use a partitioning with some specific attributes, which we will now present. We will assume the tree is binary, and justify this assumption later.
@@ -336,7 +308,7 @@ Notice that throughout our algorithm we process caterpillars, and do not conside
 
 
 \subsection{$\textbf{O(n log *n)}$ Algorithm}
-The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test (or test for short) to get a sublinear one. In order to get the complexity down to $O(n \log ^*n)$ we will use a similar process, iteratively, with growing framents size, improving in each iteration the performance of our test.
+The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test (or test for short) to get a sublinear one. In order to get the complexity down to $O(n \log ^*n)$ we will use a similar process, iteratively, with growing fragments size, improving in each iteration the performance of our test.
 We start with fragments of size $c^3$ for some constant $c$.
 We pay $O(n)$ time for preprocessing and get an $O(\frac{n}{c^3} \times \log c)$ time test.
 We use this test to do the same preprocessing again, this time with fragments of size $(2^c)^3$.
