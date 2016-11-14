@@ -235,7 +235,7 @@ The idea of this method is looking at specific locations in the matrices, runnin
 In our case $m=b \log b \times \frac{n}{b} = n \log b$ (since for each of the $\frac{n}{b}$ fragments, we have $\log b$ levels of the centroid decomposition, and at each level we have the distance of every node to a centroid) and we set $p$ to be $n/b^2$. The Theorem implies that we can use $O(\log b)$ feasibility tests and discard all but $n/b^2$ elements of the matrices. We also pay $O(n \log b)$ exclusive of the feasibility tests. This means that we have at most $n/b^2$ active fragments (out of all $n/b$ fragments). \\
 For inactive fragment, it is clear that we can now answer queries checking whether some pairwise distance inside the fragment is at least $\lambda$, or if it is less than $\frac{\lambda}{2}$ \footnote{We can easily compute any pairwise distance in the tree in $O(1)$ time by pre-computing all distances to the root of the tree, and using LCA queries \cite{Bender2000}, \cite{Djidjev1991}.}.\\
 Active fragments will be processed as in the linear algorithm described before, so we can ignore them for now.\\
-We now do the following pre-processing for each inactive fragment:
+We refer to the certain node which is closest to the root simply as \textit{the certain node}. We now do the following pre-processing for each inactive fragment:
 \begin{enumerate}
 \item\textbf{reduce the fragment to a caterpillar:}\\
 Observe that each fragment is comprised of its spine, and the subtrees hanging off of it. Using queries on pairwise distances as described above, we can use our linear feasibility test on the subtrees hanging off the spine, and get a candidate and a certain node for each of them. This is done in linear time.\\
@@ -254,19 +254,20 @@ This is done as in the previous step.
 In query time we will want to process each fragment after its hole has already been processed.
 We call a set of consecutive leaves of the caterpillar, that contains the closest leaf to the hole, a \emph{suffix} of the caterpillar. Similarly we can define the caterpillar's \emph{prefix}.\\
 Assuming we know what is the closest chosen node in the fragment's hole, we can eliminate an entire suffix of the caterpillar (because of the monotonicity of the distances of candidate nodes from the hole). We can compute in preprocessing, for any possible eliminated suffix, which nodes in the fragment should be chosen, and also which nodes are the candidate and certain node we need to pass to the next fragment.\\
-In order to pre-compute this, scan the caterpillar from top to bottom. For every possible prefix of the caterpillar we would like to store the numbers of nodes chosen, the certain node and the candidate node, assuming all nodes that are not in the prefix are eliminated as they are too close to the hole. Observe the bottom node of the current prefix. If the distance of this node to the fragment's root is less than $\frac{\lambda}{2}$\footnote{We do not actually know $\lambda$ in preprocessing, but due to the previous steps, such a query of a node inside the fragment would produce the same result for any possible $\lambda$.}, store it as the candidate node, zero as the number of chosen nodes, and NULL as the certain node (if this fragment has a hole, we will consider its candidate and certain node in query time). Else, (the node's distance to the root is greater or equal to $\frac{\lambda}{2}$), write it as the certain node. Then, use binary search to find the node closest to it, that is at distance of at least $\lambda$. Add 1 to the number of chosen nodes stored in the node we found, and either store it as the candidate node, or copy the candidate node stored there. This would take $O(b \log b)$ time. We can improve this by not binary searching for the first node far enough, but instead saving it for each prefix, and then only going down from the previous node found. This would only take $O(b)$ time.
+In order to pre-compute this, scan the caterpillar from top to bottom. For every possible prefix of the caterpillar we would like to store the numbers of nodes chosen, the certain node and the candidate node, assuming all nodes that are not in the prefix are eliminated as they are too close to the hole. Observe the bottom node of the current prefix. If the distance of this node to the fragment's root is less than $\frac{\lambda}{2}$\footnote{We do not actually know $\lambda$ in preprocessing, but due to the previous steps, such a query of a node inside the fragment would produce the same result for any possible $\lambda$.}, store it as the candidate node, zero as the number of chosen nodes, and NULL as the certain node (if this fragment has a hole, we will consider its candidate and certain node in query time). Else, (the node's distance to the root is greater or equal to $\frac{\lambda}{2}$), write it as the certain node. Then, use binary search to find the closest node above it, that is at distance of at least $\lambda$. Add 1 to the number of chosen nodes stored in the node we found, and either store it as the candidate node, or copy the candidate node stored there. This would take $O(b \log b)$ time. We can improve this by not binary searching for the first node far enough, but instead saving it for each prefix, and then only going down from the previous node found. This would only take $O(b)$ time.
 \end{enumerate}
 
 \subsubsection{Feasibility Test} %TODO check if we can simplify
 We now scan the whole tree, and for each inactive fragment we would like to produce in $O(\log b)$ time: the number of chosen nodes in the fragment, the candidate node, and the certain node. In this procedure we use the caterpillars we have created in the preprocessing. Notice that now we are given $\lambda$.
 We run this procedure bottom-up, so we assume the fragments rooted at the hole of the current one have already been processed.\\
 Denote the root of the fragment, $r$, the hole's candidate node, $u$, and the current fragment's leaf farthest from $r$, $v$.\\
+If $d(u,v) \geq \lambda$ then $u$ does not eliminate any suffix of the current fragment (due to the monotonicity of distances from the hole). Thus, we can take the nodes chosen so far, including the hole's candidate, $u$, and add to them the nodes we stored in preprocessing for the case that no suffix is eliminated. If $u$ and $v$ "collide" (i.e. $d(u,v) < \lambda$), we have the following two cases:
 \begin{case}
-\textbf{$d(r,v) < \frac{\lambda}{2}$:} Because of the monotonicity of the distances of leaves from the root, every leaf of the caterpillar is closer to $r$ than $v$, so we return $u$ as the candidate node, and the hole's certain node, and number of chosen nodes. If $v$ is farther from $r$ than $u$ (which is possible, because the monotonicity only holds inside each fragment), we set it to be the new candidate node (since it would also be farther from any node in the hole than $u$).
+\textbf{$d(r,v) < \frac{\lambda}{2}$:} Because of the monotonicity of the distances of leaves from the root, every other leaf of the caterpillar is also at distance less than $\frac{\lambda}{2}$ from $r$. If $v$ is farther from $r$ than $u$ (which is possible, because the monotonicity only holds inside each fragment), or if $u$ is certain w.r.t $r$, we set $v$ to be the new candidate node (since it would also be farther from any node in the hole than $u$). If this is not the case, we leave $u$ as the candidate node and move up to the next fragment without taking any nodes.
 \end{case}
 \begin{case}
 \textbf{$d(r,v) \geq \frac{\lambda}{2}$:}
-In this case we need to consider the suffixes of the current fragment. If $v$ is farther from $r$ than $u$, we set it as the candidate node. We compute the suffix of the fragment that cannot be taken. We can do this by binary searching for the first node of the fragment that is at distance at least $\lambda$ from the current candidate node. We have pre-computed all we need to know once we have the relevant prefix.
+In this case we need to consider the suffixes of the current fragment. We compute the suffix of the fragment that cannot be taken. We can do this by binary searching for the first node of the fragment that is at distance at least $\lambda$ from the current candidate node. We have pre-computed all we need to know once we have the relevant prefix.
 \end{case}
 Each feasibility test will cost us $O(\log b)$ for each inactive fragment, and $O(b)$ for each active one. In total $O(\frac{n}{b} \times \log b) + O(\frac{n}{b^2} \times b) = O(\frac{n \log \log n}{\log ^2n})$.
 
@@ -277,23 +278,16 @@ We go through the heavy path tree bottom-up, and process all heavy paths at a sp
 
 We now describe the processing of a heavy path, which is very similar to the preprocessing of inactive fragments presented in \ref{Pre-Processing Fragments}. Notice that the traversal is bottom-up, so we have already processed all of the path's children in the heavy path tree. Because we have determined $\lambda^*$ with sufficient accuracy (i.e. reduced the size of the maintained interval), each subtree hanging off a heavy path can be replaced by its candidate and certain node attached by single edges to the heavy path. Hence, each such heavy path is a caterpillar, with one or two children for each spine node. We would like to be able to find the certain and candidate nodes for the current heavy path. %The situation is illustrated in figure %TODO add a figure
 Assume that the caterpillar has k nodes. As we defined before, Let the $i$-th leaf be connected by an edge of length $y_i$ to a spine node at distance $x_i$ from the root of the caterpillar, and order the leaves so that $x_1 < x_2 < ... < x_k$.
-
-\begin{step}
-\textbf{Find the candidate nodes that will certainly not be taken:}
+\begin{enumerate}
+\item\textbf{Find the candidate nodes that will certainly not be taken:}
 This is done as in step \ref{removing certain nodes}.
-\end{step}
-\begin{step}
-\textbf{Prune the caterpillar so that the distances of leaves from the root and the hole are monotone:}
+\item\textbf{Prune the caterpillar so that the distances of leaves from the root and the hole are monotone:}
 This is done as in steps \ref{making distances from the root monotone} and \ref{making distances from the hole monotone}.
-\end{step}
-\begin{step}
-\textbf{Construct a row and column sorted matrix storing all pairwise distance in the caterpillar}
+\item\textbf{Construct a row and column sorted matrix storing all pairwise distance in the caterpillar}
 We have obtained a caterpillar with one child for every spine node, s.t the distances of leaves are monotone. It is easy to see that arranging the matrix in the natural order will produce a triangular matrix with monotone rows and columns \footnote{Again, we cannot afford to explicitly store this matrix, but we can instead store the distances from all nodes of the fragment to the centroid node.}.
-\end{step}
-\begin{step}
-\textbf{Run a searching algorithm on the sorted matrices of all the heavy paths at the current level}
+\item\textbf{Run a searching algorithm on the sorted matrices of all the heavy paths at the current level}
 We now use Theorem \ref{Frederickson's theorem} to search the sorted matrices containing all pairwise distances in the heavy paths of the current level. We need to eliminate all of the entries, and so we set $p$ to zero. We thus narrow down our interval $[\lambda_1,\lambda_2)$ so that it does not contain any pairwise distance in the caterpillar. Now, we can use the same bottom up procedure we used for the linear feasibility test in subsection \ref{linear F.T.}, and produce a candidate and a certain node of the caterpillar that will be valid for any value of $\lambda^*$.
-\end{step}
+\end{enumerate}
 Since the number of vertices in the heavy paths of the current level is at most $n$, we need to use $O(\log n)$ feasibility tests for each level. There are at most $\log n$ levels in the heavy path tree, so we use $O(\log ^2n)$ calls to our sublinear feasibility test in total. This yields a time complexity of $O(n \log \log n)$ (the time needed for the search exclusive of the feasibility tests is linear). \\
 After processing all heavy paths we finally have a maximal valid solution for the whole tree.\\
 Notice that throughout our algorithm we process caterpillars, and do not consider taking spine nodes to our solution. This is okay, since we can add some artificial nodes with zero-weighted edges. This is also how we handle non-binary trees.
