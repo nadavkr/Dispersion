@@ -194,7 +194,14 @@ Thus we have proven that $P$ is of maximal cardinality. Now, assume for contradi
 The main idea here is partitioning the input tree into fragments and preprocessing them, so that in query time we can process fragments in sub-linear time. For this, we need to use a partitioning with some specific attributes, which we now present. We assume the tree is binary, and justify this assumption later.
 \subsection{Tree partitioning}\label{tree partitioning}
 We would like to partition the tree into fragments s.t. each fragment will be connected to the rest of the tree by at most two vertices. Each fragment will have at most $2b$ vertices, and there will be $O(n/b)$ fragments. Each fragment is defined by its border vertices $u$ and $v$, s.t. $v$ is a descendant of $u$. The fragment will consist of $u$'s subtree without $v$'s subtree ($v$ itself is not part of the fragment). We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. In the case where the fragment has only one border vertex, i.e. the fragment is a subtree of the input tree, we say the fragment has no hole. We call such a partition of the tree a \emph{good partition}.
-%TODO add figure
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=1]{fragment}
+\end{center}
+\caption{Example of a fragment in a good partition.}
+\end{figure}
+
 \begin{lemma}\label{basic partitioning lemma}
 For any binary tree on $n$ nodes and a parameter $b$, there is a good partition of the tree.
 \end{lemma}
@@ -209,10 +216,19 @@ We now would like to pre-process the fragments s.t. we can later check in consta
  greater or equal to the largest possible value of $\lambda$. The same will hold for $\frac{\lambda}{2}$.
 For each fragment, we will implicitly construct matrices of total side length (number of rows and columns) $O(b \log b)$, that are row and column sorted, and contain all pairwise distances in the fragment.
 
-\begin{definition} \textbf{Centroid Decomposition} %TODO citation?
-A \textit{centroid} node of a tree, is a node that divides the tree into pieces s.t. no piece has more than half of the nodes of the entire tree. The centroid decomposition decomposes the tree by recursively splitting the tree into pieces using the centroid node .
+\begin{definition} \textbf{Centroid Decomposition}
+A node $v\in T$ is a centroid if every connected component of $T\setminus\{v\}$ consists of at most $|T|/2$
+nodes. The centroid decomposition of $T$ is defined recursively by first choosing a centroid $v\in T$
+and then recursing on every connected component of $T\setminus\{v\}$ called \emph{pieces}.
 \end{definition}
-%TODO add drawing
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=1]{centroid}
+\end{center}
+\caption{A single step in the recursive procedure for constructing a sorted list of distances from $v$.}
+\end{figure}
+
 Apply the centroid decomposition on each fragment. This take linear time. Since we assume our input tree is binary, the centroid at each level of the recursion will split the tree into three pieces. Now, run the following recursive routine: at each level of the recursion, we are given the three pieces of the decomposition, and for each of them a sorted list of the distances to their inner centroid. We would like to compute a sorted list of distances of the nodes in all three pieces, to the current centroid. This would give us the ability to compute, in constant time, the distance between any two nodes that are in different pieces (since the path between them goes through the centroid). Let us look at one of the three pieces we have already processed. It contains three pieces of its own. For two of these pieces, it holds that the path from every node inside them to the outer centroid passes through the inner centroid. We call the third piece, for which this does not hold a \textit{problematic} piece. For the two pieces that are not problematic, we can add to all the entries of the lists we have, the distance from the inner centroid to the outer centroid, and then merge the two sorted lists. This is all done in linear time.
 
 Our only problem now is the piece where the paths to the outer centroid do not go through the inner one. But notice that if we go one step deeper in the recursion we can see that inside the problematic piece there are two pieces that are not problematic, as the paths from all their nodes to the outer centroid pass through their inner centroid. We can do the same kind of merging for their two list, and then look deeper inside the remaining problematic piece, and so on. This recursive routine will also take linear time. Altogether we have $O(\log b)$ levels of recursion, and spend linear time on each one, so we get a running time of $O(b \log b)$ per fragment. For now, we set $b$ to $\log ^2 n$ and get a running time of $O(\frac{n}{b} \times b\log b) = O(n \log \log n)$ for all fragments together.
@@ -243,6 +259,14 @@ Now we are only left with some of the candidate nodes to consider, and for all o
 \item\label{making distances from the root monotone}
 \textbf{Prune the caterpillar so that the leaves' distances to the root are non-decreasing:}\\
 Traverse the caterpillar from bottom to top. Consider the $i$-th leaf, $u_i$, and the adjacent leaf above it, $u_{i-1}$. Assume $x_{i-1}+y_{i-1} > x_i+y_i$ (i.e. $u_{i-1}$ is farther from the root than $u_i$). We get that $x_i-x_{i-1}+y_i < y_{i-1}$. $d(u_i,u_{i-1}) = x_i-x_{i-1}+y_i+y_{i-1} < 2y_{i-1} < \lambda_1$. So an optimal solution cannot contain both $u_{i}$ and $u_{i-1}$. If $u_{i}$ is in the solution we can replace it with $u_{i-1}$. This can be done because $u_{i-1}$ is farther away from any node above it than $u_i$, and $u_i$ is closer to any node below it than $u_{i-1}$. Let $u_j$ be a leaf node above $u_{i-1}$ ($j<i-1$), then $d(u_j,u_{i-1}) - d(u_j,u_{i}) = y_{i-1}-(x_i-x_{i-1})-y_i = x_{i-1}+y_{i-1}-(x_i+y_i) > 0$. The reasoning for the second case (where $u_j$ is a leaf below $u_i$, i.e. $j>i$) is similar. So in fact, we can remove the $i$-th leaf from the caterpillar. We continue down the caterpillar in the same manner and remove leaves, until the distances of the leaves from the root non-decreasing.
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=1]{caterpillar}
+\end{center}
+\caption{Pruning the caterpillar by removing $u_{i}$.}
+\end{figure}
+
 \item \label{making distances from the hole monotone}
 \textbf{Prune the caterpillar so that the leaves' distances to the bottom are non-decreasing:}\\
 This is done as in the previous step.
@@ -292,9 +316,14 @@ We now use Theorem \ref{Frederickson's theorem} to search the sorted matrices co
 Since the number of vertices in the heavy paths of the current level is at most $n$, we need to use $O(\log n)$ feasibility tests for each level. There are at most $\log n$ levels in the heavy path tree, so we use $O(\log ^2n)$ calls to our sublinear feasibility test in total. This yields a time complexity of $O(n \log \log n)$ (the time needed for the search exclusive of the feasibility tests is linear).
 
 After processing all heavy paths we finally have a maximal valid solution for the whole tree.
-Notice that throughout our algorithm we process caterpillars, and do not consider taking spine nodes to our solution. This is fine, since we can add some artificial nodes with zero-weighted edges. This is also how we would handle non-binary trees. Given an input tree which is not binary, we can separate each node of degree higher than three, to several nodes with degree at most three (with zero-weighted edges between them). These artificial nodes do not pose a problem, as they will be spine nodes that cannot be chosen.
+Notice that throughout our algorithm we process caterpillars, and do not consider taking spine nodes to our solution. 
+This is fine, since we can attach to every such spine node an artificial leaf connected with an edge of length zero.
+The same trick allows us to handle non-binary trees: given a non-binary tree, we can replace every 
+degree $d\geq 3$ node with a binary tree on $d$ leaves. The edges of the binary tree are all of length zero and
+its artificial inner nodes cannot be taken (notice that our algorithm easily generalises so that for each node
+we can specify if it can be included in a solution).
 
-\section{$\textbf{O(n log *n)}$ Algorithm}
+\section{$O(n\log^{*}n)$ Algorithm}
 The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test (or test for short) to get a sublinear one. In order to get the complexity down to $O(n \log ^*n)$ we will use a similar process, iteratively, with growing fragments size, improving in each iteration the performance of our test.
 We start with fragments of size $c^3$ for some constant $c$.
 We pay $O(n)$ time for preprocessing and get an $O(\frac{n}{c^3} \times \log c)$ time test.
@@ -317,7 +346,14 @@ Given a good partition of a binary tree into $O(n/b)$ fragments s.t. each fragme
 Define $T'$ by the tree received by collapsing each small fragment (of the given partition) to a single node. Apply Lemma \ref{basic partitioning lemma} to $T'$, with the parameter set to $B:= \frac{2^{b-1}}{b}$. We get $O(\frac{\frac{n}{b}}{B})=O(\frac{n}{2^b})$ fragments, each of which of size at most $2 \times B \times 2b = 2 \times 2^b$.
 \end{proof}
 We now describe a single iteration, i.e. how to achieve an $O(\frac{n}{B^4} \times \log B)$ test given an $O(\frac{n}{b^4} \times \log b)$ test.
-Observe a large fragment of size $B^4$. It contains some small fragments of size $b^4$. Notice that some of these are active fragments, that might be full subtrees, but the majority of them is inactive smaller fragments, which have been reduced to caterpillars. The large fragment contains some small fragments whose roots and holes are spine nodes of the large fragment, and other fragments that form subtrees hanging off of the large fragment's spine. %TODO add drawing
+Observe a large fragment of size $B^4$. It contains some small fragments of size $b^4$. Notice that some of these are active fragments, that might be full subtrees, but the majority of them is inactive smaller fragments, which have been reduced to caterpillars. The large fragment contains some small fragments whose roots and holes are spine nodes of the large fragment, and other fragments that form subtrees hanging off of the large fragment's spine. 
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=1]{refinement}
+\end{center}
+\caption{A large fragment containing a number of smaller fragments.}
+\end{figure}
 
 We first reduce each of these hanging subtrees to at most two nodes - one candidate and one certain. To do this, we perform a heavy path decomposition on each of them. Since each subtree like this is contained in one large fragment, its size is bounded by $B^4$, and so we have at most $O(\log B)$ levels in the heavy path trees. In each level we run Frederickson's search (similarly to what we presented before). The number of nodes in the current level for all the heavy path trees together is at most $n$. We set the parameter $p$ to $\frac{n}{B^5}$. Aside from linear (in the number of nodes in these subtrees) time processing exclusive of tests we need to call our $(\frac{n}{b^4} \times \log b)$ test $O(\log B)$ times for each of the $O(\log B)$ levels. That would take $O(\frac{n}{b^2} \times \log b) = O(\frac{n}{b})$. For all $\log ^*n$ iterations of the algorithm the cost of this step is bounded by $O(\frac{n}{2}+\frac{n}{4}+\frac{n}{16}+...+1) = O(n)$.
 
