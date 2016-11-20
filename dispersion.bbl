@@ -1,0 +1,80 @@
+\begin{thebibliography}{10}
+
+\bibitem{Becker1982}
+R.I. Becker, S.R. Schach, and Y.~Perl.
+\newblock A shifting algorithm for min-max tree partitioning.
+\newblock {\em J. ACM}, 29(1):56--67, 1982.
+
+\bibitem{Bender2000}
+M.A. Bender and M.~Farach-Colton.
+\newblock The {LCA} problem revisited.
+\newblock In {\em LATIN}, pages 88--94, 2000.
+
+\bibitem{Bhattacharya1991}
+B.K. Bhattacharya and M.E. Houle.
+\newblock Generalized maximum independent sets for trees in subquadratic time.
+\newblock In {\em ISAAC}, pages 435--445, 1991.
+
+\bibitem{Djidjev1991}
+H.N Djidjev, G.E. Pantziou, and C.D. Zaroliagis.
+\newblock Computing shortest paths and distances in planar graphs.
+\newblock In {\em ICALP}, pages 327--339, 1991.
+
+\bibitem{Frederickson1991}
+G.N. Frederickson.
+\newblock Optimal algorithms for tree partitioning.
+\newblock In {\em SODA}, pages 168--177, 1991.
+
+\bibitem{Frederickson1991a}
+G.N. Frederickson.
+\newblock Parametric search and locating supply centers in trees.
+\newblock In {\em WADS}, pages 299--319, 1991.
+
+\bibitem{Frederickson1983}
+G.N. Frederickson and D.B. Johnson.
+\newblock Finding k-th paths and p-centers by generating and searching good
+  data structures.
+\newblock {\em J. Algorithms}, 4(1):61--80, 1983.
+
+\bibitem{Gonzalez1985}
+T.F. Gonzalez.
+\newblock Clustering to minimize the maximum intercluster distance.
+\newblock {\em Theoretical Computer Science}, 38:293--306, 1985.
+
+\bibitem{Megiddo1983}
+N.~Megiddo and A.~Tamir.
+\newblock New results on the complexity of p-center problems.
+\newblock {\em SIAM J. Computing}, 12(3):751--758, 1983.
+
+\bibitem{Megiddo1981}
+N.~Megiddo, A.~Tamir, E.~Zemel, and R.~Chandrasekaran.
+\newblock An ${O}(n \log^2 n)$ algorithm for the k-th longest path in a tree
+  with applications to location problems.
+\newblock {\em SIAM J. Computing}, 10(2):328--337, 1981.
+
+\bibitem{Perl1981}
+Y.~Perl and S.R. Schach.
+\newblock Max-min tree partitioning.
+\newblock {\em J. ACM}, 28(1):5--15, 1981.
+
+\bibitem{DavidB.Shmoys1997}
+D.B. Shmoys, \'{E}. Tardos, and K.~Aardal.
+\newblock Approximation algorithms for facility location problems.
+\newblock In {\em STOC}, pages 265--274, 1997.
+
+\bibitem{Sleator1983}
+D.D. Sleator and R.E. Tarjan.
+\newblock A data structure for dynamic trees.
+\newblock {\em Journal of Computer and System Sciences}, 26(3):362–391, 1983.
+
+\bibitem{Vazirani2003}
+V.V. Vazirani.
+\newblock {\em Approximation Algorithms}.
+\newblock Springer, 2003.
+
+\bibitem{Wang1988}
+D.W. Wang and Y.~Kuo.
+\newblock A study on two geometric location problems.
+\newblock {\em Information Processing Letters}, 28(6):281--286, 1988.
+
+\end{thebibliography}
