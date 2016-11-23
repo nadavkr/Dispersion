@@ -148,8 +148,9 @@ Frederickson\cite{Frederickson1991}.
 Frederickson used his parametric search method to solve several problems on trees, in particular
 the max-min tree $k$-partitioning~\cite{Frederickson1991}. This is very similar to dispersion and it might
 seem that actually these two problems are equivalent. In fact, they are equivalent in the one-dimensional case,
-i.e., on a path. However, such equivalence seems problematic for general trees. %TODO explain equivalence
-Given that these two problems look similar, it should not be surprising that our solution uses similar
+i.e., on a path. The basic idea of this reduction, is to switch between the edges and vertices, i.e. create a new line, where each of the edges is a node in the original line, and each of the points is an edge originally. We assign the same weights, so now we have weights on the points, and run the $k$-partitioning algorithm.
+
+However, such equivalence seems problematic for general trees. Given that these two problems look similar, it should not be surprising that our solution uses similar
 ideas, at least at a high level. However, many details and tricks are actually different, and we believe
 that some of our techniques might be somehow simpler than his. %TODO explain more
 In particular, our algorithm is based on the (tweaked) micro-macro decomposition and the heavy path
