@@ -133,9 +133,6 @@ requires $\Omega(n\log n)$ time in the algebraic decision tree model. We
 also present a matching $\Oh(n\log n)$ time algorithm, which is then used
 to construct our $\Oh(n\log^2n)$ time solution for the weighted max-min
 tree $k$-dispersion using the standard parametric search paradigm of Fredrickson. 
-%TODO high level description  - technical overview of methods
-%natural way - binary search over the possible \lambda
-%but can't realy b.s. so we use frederickson
 
 \section{Preliminaries}
 
@@ -159,8 +156,9 @@ For a subset of nodes $P\subseteq V$, let $d(u,v)$ denote the distance between n
 %
 
 \section{Overview}
-Before presenting our optimal linear algorithm for the dispersion optimization problem, we first present $O(n\log \log n)$ and $O(n\log ^*n)$ algorithms. Each of these algorithms builds on the previous, and uses some new ideas to improve the complexity. All three algorithms are based on the sublinear algorithm we present for the feasibility test in Section \ref{sublinear f.t.}. This algorithm uses the simple linear algorithm presented in Section \ref{linear F.T.}, which is similar to the one presented in \cite{Bhattacharya1991}. We use a new technique for partitioning trees %TODO micro macro generalization?
-, in order to preprocess the resulting fragments in linear time, s.t. we are able to run feasibility tests in sublinear time. We use this sublinear feasibility test, and build upon a parametric search method presented by Frederickson, and used by him to solve several problems (e.g. the max-min tree $k$-partitioning \cite{Frederickson1991}), to solve the dispersion problem in $O(n)$ time. At a glance, it seems that the same technique used to provide an optimal algorithm for $k$-partitioning in \cite{Frederickson1991} might also work for the dispersion problem. Indeed, in the one dimensional case it does work and one can easily reduce the dispersion problem for a line to the $k$-partitioning problem for a line. Trying to implement this for the more difficult case of a tree fails. The reason for this is that in the $k$-partitioning problem, there is no tie between nodes in different segments of a partition (i.e. a solution for the partitioning problem), and this significantly simplifies the problem. We overcome this, by using some new techniques and tricks. alongside the useful searching method by Frederickson.
+Before presenting our optimal linear algorithm for the dispersion optimization problem, we first present $O(n\log \log n)$ and $O(n\log ^*n)$ algorithms. Each of these algorithms builds on the previous, and uses some new ideas to improve the complexity. All three algorithms are based on the sublinear algorithm we present for the feasibility test in Section \ref{sublinear f.t.}. This algorithm uses the simple linear algorithm presented in Section \ref{linear F.T.}, which is similar to the one presented in \cite{Bhattacharya1991}. We use a new technique for partitioning trees, in order to preprocess the resulting fragments in linear time, s.t. we are able to run feasibility tests in sublinear time. This partitioning is similar to the micro-macro decomposition, but our partitioning scheme takes only linear time overall for partitioning the tree into fragments of increasing sizes, which allows us to use a bootstrapping technique in linear time. %TODO add citation for micro-macro
+
+We use the sublinear feasibility test we create, and build upon a parametric search method presented by Frederickson, and used by him to solve several problems (e.g. the max-min tree $k$-partitioning \cite{Frederickson1991}), to solve the dispersion problem in $O(n)$ time. At a glance, it seems that the same technique used to provide an optimal algorithm for $k$-partitioning in \cite{Frederickson1991} might also work for the dispersion problem. Indeed, in the one dimensional case it does work and one can easily reduce the dispersion problem for a line to the $k$-partitioning problem for a line. Trying to implement this for the more difficult case of a tree fails. The reason for this is that in the $k$-partitioning problem, there is no tie between nodes in different segments of a partition (i.e. a solution for the partitioning problem), and this significantly simplifies the problem. We overcome this, by using some new techniques and tricks. alongside the useful searching method by Frederickson.
 
 
 
