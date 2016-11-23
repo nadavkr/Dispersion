@@ -117,7 +117,7 @@ While our final goal is an optimal linear time algorithm for the dispersion opti
 with a slower $O(n\log\log n)$ time solution, which we then improve first to $O(n\log^{*}n)$
 and then finally to $O(n)$ by gradually introducing new ideas.
 
-The starting point is a simple linear time solution for the decision problem presented in Section~\ref{linear F.T.}, 
+The starting point is a simple linear time solution for the decision problem, presented in Section~\ref{linear F.T.}, 
 which is similar to the one presented in \cite{Bhattacharya1991}.
 Once we have an efficient feasibility test, we can solve the optimization problem we binary searching for the
 answer. However, we do not want the running time to depend on the upper bound on the largest possible
@@ -138,7 +138,7 @@ of size $O(x)$, there are $O(n/x)$ fragments, and each fragments contains at mos
 incident to nodes in other fragments. We extend it to guarantee that one boundary node is always the
 root of the fragment and call the other boundary node the hole. Then we observe that the linear feasibility test
 can be seen as a bottom-up computation on the tree. Now we would like to simulate it by jumping over whole 
-fragments: after simulating on on the subtree rooted at the hole we would like to extend to the whole
+fragments: after simulating on the subtree rooted at the hole we would like to extend to the whole
 subtree rooted at the root of the fragment in $o(n)$ time. This requires preprocessing the fragments,
 in particular we need to narrow down the range of possible answers so that for any two nodes in the same
 fragment we know if they can be both included in an optimal solution. We are able to determine this
@@ -151,17 +151,17 @@ seem that actually these two problems are equivalent. In fact, they are equivale
 i.e., on a path. However, such equivalence seems problematic for general trees. %TODO explain equivalence
 Given that these two problems look similar, it should not be surprising that our solution uses similar
 ideas, at least at a high level. However, many details and tricks are actually different, and we believe
-the some of our techniques might be somehow simpler than his. %TODO explain more
+that some of our techniques might be somehow simpler than his. %TODO explain more
 In particular, our algorithm is based on the (tweaked) micro-macro decomposition and the heavy path
 decomposition, which are both very standard data structure tools, instead of the less standard
-decompositions.%TODO explain more?
+decompositions used by Frederickson.%TODO explain more?
 
 After the initial preprocessing, for any two nodes in most of the fragments we know if they can be
 both included in the solution. This allows us to prepare for every possible result of running the
 bottom-up computation in the subtree rooted at the hole so that we are able to jump over the whole
 fragment in $O(\log x)$ time. This is done by looking at the path from the hole to the root of the
-fragment and running the bottom-up computation to all subtrees hanging off from it. This allows
-us to conceptually trim the fragment and think that it is a caterpillar, that is, a path connecting
+fragment and running the bottom-up computation for all subtrees hanging off from it. This allows
+us to conceptually trim the fragment and think of it as a caterpillar, that is, a path connecting
 the hole with the root with some additional leaves attached to its nodes. Such caterpillars have
 sufficiently simple structure so that, with some additional simple precomputation, after receving
 the results of the bottom-up computation in the subtree rooted at the hole, essentially we need
@@ -181,7 +181,7 @@ used as previously.
 The main difficulty in obtaining the $O(n)$ time algorithm is that now we cannot afford construct each
 micro-macro decomposition separately. However, this can be overcome by making each decomposition
 a refinement of the previous one. With some care, all decomposition can be then constructed in
-$O(n)$ total time. We believe that this (simple) trick might of independent interest. Then, there
+$O(n)$ total time. We believe that this (simple) trick is of independent interest. Then, there
 are some additional details in how we preprocess every fragment. We cannot afford to touch
 every node of every fragment at every level. Therefore, we take a closer look at how a fragment
 decomposes into previous fragments. With some care, the results of preprocessing the previous
