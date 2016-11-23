@@ -113,11 +113,66 @@ For a subset of nodes $P\subseteq V$, let $d(u,v)$ denote the distance between n
 %
 
 \paragraph{Our techniques}
-Before presenting our optimal linear algorithm for the dispersion optimization problem, we first present $O(n\log \log n)$ and $O(n\log ^*n)$ algorithms. Each of these algorithms builds on the previous, and uses some new ideas to improve the complexity. All three algorithms are based on the sublinear algorithm we present for the feasibility test in Section \ref{sublinear f.t.}. This algorithm uses the simple linear algorithm presented in Section \ref{linear F.T.}, which is similar to the one presented in \cite{Bhattacharya1991}. We use a new technique for partitioning trees, which separates the tree to fragments with at most two boundary nodes that connect them to the rest of the tree. This allows us to preprocess the resulting fragments in linear time, s.t. we are able to run feasibility tests in sublinear time. This partitioning is similar to the micro-macro decomposition, but our partitioning scheme takes only linear time overall for partitioning the tree into fragments of increasing sizes, which allows us to use a bootstrapping technique in linear time. %TODO add citation for micro-macro
+While our final goal is an optimal linear time algorithm for the dispersion optimization problem, we start
+with a slower $O(n\log\log n)$ time solution, which we then improve first to $O(n\log^{*}n)$
+and then finally to $O(n)$ by gradually introducing new ideas.
 
-We use the sublinear feasibility test we create, and build upon a parametric search method presented by Frederickson, and used by him to solve several problems (e.g. the max-min tree $k$-partitioning \cite{Frederickson1991}), to solve the dispersion problem in $O(n)$ time. At a glance, it seems that the same technique used to provide an optimal algorithm for $k$-partitioning in \cite{Frederickson1991} might also work for the dispersion problem. Indeed, in the one dimensional case it does work and one can easily reduce the dispersion problem for a line to the $k$-partitioning problem for a line. Trying to implement this for the more difficult case of a tree fails. The reason for this is that in the $k$-partitioning problem, there is no tie between nodes in different segments of a partition (i.e. a solution for the partitioning problem), and this significantly simplifies the problem. We overcome this, by using some new techniques and tricks, enhancing the useful searching method by Frederickson. We use a more elaborate way of trimming the input tree, than what was previously presents. We reduce parts of our tree to caterpillar graphs, which are easier to handle and process.
+The starting point is a simple linear time solution for the decision problem presented in Section~\ref{linear F.T.}, 
+which is similar to the one presented in \cite{Bhattacharya1991}.
+Once we have an efficient feasibility test, we can solve the optimization problem we binary searching for the
+answer. However, we do not want the running time to depend on the upper bound on the largest possible
+distance between two nodes in the tree.  This can be mitigated by observing that the answer is always
+a distance between two nodes and constructing an implicit representation
+of all possible $O(n^{2})$ distances and binary searching over this representation. More precisely, the representation
+consists of $O(n)$ matrices $M_{i}$, where each $M_{i}$ is row- and column-monotone, the total side length
+of all the matrices is $O(n\log n)$, and we can provide constant-time access to any entry after $O(n\log n)$
+time preprocessing. Then it is not difficult to see that $O(\log n)$ calls to the feasibility test are enough to
+find the answer. This results in an $O(n\log n)$ time algorithm. There are two bottlenecks that make decreasing
+the running time challenging: we need to avoid the $O(n\log n)$ preprocessing for capturing all the relevant
+distances and also need a \emph{sublinear} feasibility test.
 
+We present a sublinear feasibility test in Section~\ref{sublinear f.t.}. The gist of it is a method for partitioning
+the tree into fragments, preprocessing every fragment, and then iterating over the fragments in the query.
+The standard method for such partitioning is the micro-macro decomposition, where every fragment is
+of size $O(x)$, there are $O(n/x)$ fragments, and each fragments contains at most two boundary nodes
+incident to nodes in other fragments. We extend it to guarantee that one boundary node is always the
+root of the fragment and call the other boundary node the hole. Then we observe that the linear feasibility test
+can be seen as a bottom-up computation on the tree. Now we would like to simulate it by jumping over whole 
+fragments: after simulating on on the subtree rooted at the hole we would like to extend to the whole
+subtree rooted at the root of the fragment in $o(n)$ time. This requires preprocessing the fragments,
+in particular we need to narrow down the range of possible answers so that for any two nodes in the same
+fragment we know if they can be both included in an optimal solution. We are able to determine this
+for \emph{most} of the fragments by plugging in the parametric search method of 
+Frederickson\cite{Frederickson1991}. 
 
+Frederickson used his parametric search method to solve several problems on trees, in particular
+the max-min tree $k$-partitioning~\cite{Frederickson1991}. This is very similar to dispersion and it might
+seem that actually these two problems are equivalent. In fact, they are equivalent in the one-dimensional case,
+i.e., on a path. However, such equivalence seems problematic for general trees. %TODO explain equivalence
+Given that these two problems look similar, it should not be surprising that our solution uses similar
+ideas, at least at a high level. However, many details and tricks are actually different, and we believe
+the some of our techniques might be somehow simpler than his. %TODO explain more
+In particular, our algorithm is based on the (tweaked) micro-macro decomposition and the heavy path
+decomposition, which are both very standard data structure tools, instead of the less standard
+decompositions.%TODO explain more?
+
+The bottleneck in the obtained $O(n\log^{*}n$) time algorithm is the preprocessing time necessary
+to construct a sublinear feasibility test. Therefore, we proceed to construct a sequence of
+faster and faster feasibility tests. The first of them is just the vanilla linear time feasibility test.
+Then, we iteratively use the current feasibility test to construct the next (faster) feasibility test.
+Every iteration uses an appropriately chosen parameter $x$ for the micro-macro decomposition
+as to guarantee that the construction time is $O(n)$. The parameters grow exponentially,
+so after $O(\log^{*}n)$ iterations we obtain the desired efficient feasibility test, which is then
+used as previously.
+
+The main difficulty in obtaining the $O(n)$ time algorithm is that now we cannot afford construct each
+micro-macro decomposition separately. However, this can be overcome by making each decomposition
+a refinement of the previous one. With some care, all decomposition can be then constructed in
+$O(n)$ total time. We believe that this (simple) trick might of independent interest. Then, there
+are some additional details in how we preprocess every fragment. We cannot afford to touch
+every node of every fragment at every level. Therefore, we take a closer look at how a fragment
+decomposes into previous fragments. With some care, the results of preprocessing the previous
+fragments can be reused while adding some extra work that amortizes to $O(n)$ over all decompositions.
 
 \section{Linear algorithm for the feasibility test}\label{linear F.T.}
 %\begin{algo} \label{unWeightedFeasibilityAlgo}
