@@ -156,7 +156,20 @@ In particular, our algorithm is based on the (tweaked) micro-macro decomposition
 decomposition, which are both very standard data structure tools, instead of the less standard
 decompositions.%TODO explain more?
 
-The bottleneck in the obtained $O(n\log^{*}n$) time algorithm is the preprocessing time necessary
+After the initial preprocessing, for any two nodes in most of the fragments we know if they can be
+both included in the solution. This allows us to prepare for every possible result of running the
+bottom-up computation in the subtree rooted at the hole so that we are able to jump over the whole
+fragment in $O(\log x)$ time. This is done by looking at the path from the hole to the root of the
+fragment and running the bottom-up computation to all subtrees hanging off from it. This allows
+us to conceptually trim the fragment and think that it is a caterpillar, that is, a path connecting
+the hole with the root with some additional leaves attached to its nodes. Such caterpillars have
+sufficiently simple structure so that, with some additional simple precomputation, after receving
+the results of the bottom-up computation in the subtree rooted at the hole, essentially we need
+to binary search over the caterpillar and then return the precomputed answer. By appropriately
+setting up $x$ to balance the preprocessing and the query time, we obtain an $O(n\log\log n)$
+time algorithm.
+
+The bottleneck in the obtained $O(n\log\log n$) time algorithm is the preprocessing time necessary
 to construct a sublinear feasibility test. Therefore, we proceed to construct a sequence of
 faster and faster feasibility tests. The first of them is just the vanilla linear time feasibility test.
 Then, we iteratively use the current feasibility test to construct the next (faster) feasibility test.
