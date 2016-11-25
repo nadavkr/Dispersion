@@ -459,13 +459,34 @@ We now have $O(\frac{n}{B^5})$ active small fragments in total. We declare each 
 a small active fragment as active. For each of the inactive large fragments, we are left with one large caterpillar
 which is the large fragment's spine, that consists of concatenated caterpillars from the smaller fragments. We want
 to process this caterpillar as we have processed the inactive fragments before, and have a large caterpillar that has
-the necessary properties: the leaves' distances from the root and hole need to be monotone, and there should be
-no collisions between candidate nodes and certain nodes in the caterpillar. Once we have these properties, we will
+the necessary properties: distances of the leaves from the root and the hole need to be monotone, and there
+should be no collisions between candidate nodes and certain nodes. Once we have these properties, we will
 be able to preprocess the caterpillar for every possible eliminated suffix.
 
-We start by pruning the large caterpillar so the candidate nodes' distances from the root and hole are monotone. Since the candidate nodes' distances are monotone inside each small caterpillar, we only have to check the last candidate node of a caterpillar against a consecutive subset of the candidates below it in the large caterpillar, starting from the closest node from below. We go over the large caterpillar from top to bottom, and for the last candidate of each small caterpillar we eliminate the appropriate candidates below   it. Now the distances of the candidates in the large fragment from the root are non-decreasing. We do the same process, this time from bottom to top, and check the first candidate node of each caterpillar against a continues set of leaves, starting from the closest leaf from above. Since we only had to check a continues part of the caterpillar each time, this step is done in time linear in the number of nodes eliminated, and $O(n)$ overall.
+We start by pruning the large caterpillar so that distances of the candidates from the root are
+monotone. Since the distances are monotone inside each small caterpillar, we only have to check the last
+candidate node of a small caterpillar against a range of consecutive candidates nodes below it in the large
+caterpillar, starting from the topmost candidate node in the next small caterpillar. 
+At this point we need to be more precise about how the fragments are represented. Each inactive small
+fragment has been reduced to a caterpillar. For each such caterpillar, we maintain a doubly-linked list containing
+all of its candidate nodes in the natural order, and additionally we store the first and the last certain
+node. Assuming such representation, we go over the large caterpillar from bottom to top while
+maintaining a stack with the already processed small caterpillar that still contain some candidate nodes.
+We retrieve the last candidate of the current small caterpillar and eliminate the appropriate candidate
+nodes below it. This is done by iteratively retrieving the top small caterpillar from the stack and then
+accessing it top candidate node. If its distance from the root is too small, we remove it from the
+doubly-linked list and repeat. Now the distances of the remaining candidates from the root are
+non-decreasing. We repeat the symmetric process from top to bottom to ensure that also the distances
+from the hole are non-decreasing. The whole procedure takes linear time in the number of eliminated
+candidate nodes plus the number of small fragments, which sums up to $O(n)$ overall.
 
-Now we need to eliminate all internal "collisions" inside the caterpillar (i.e. remove the candidate nodes that are too close to certain nodes). These collisions can occur between a candidate node of one small caterpillar, and a certain node of another small caterpillar. Each certain node eliminates candidate nodes that form a continuous part of the large caterpillar that is adjacent to the certain node's small caterpillar. Because of the monotonicity of distances of leaves inside each small caterpillar, we only need to consider the top-most and bottom-most certain nodes of each small caterpillar. We can create a matrix of dimension $1 \times B$ for each of these $O(\frac{n}{b^4})$ certain nodes (in the whole tree). Using Frederickson's method with $p$ set to $\frac{n}{B^5}$ costs us $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log B, \log(\frac{\frac{n}{b^4}}{p} \rbrace) = O(\max \lbrace \log B, \log(\frac{B^5}{b^4} \rbrace) = O(\log B)$ calls to tests and $O(\frac{n}{b^4} \times \log B) = O(\frac{n}{b})$ for processing exclusive of feasibility tests.
+Now we need to eliminate all internal "collisions" inside the caterpillar (i.e. remove candidate nodes that
+are too close to certain nodes). These collisions can occur between a candidate node of one small caterpillar
+and a certain node of another small caterpillar. Each certain node eliminates a range of consecutive
+candidates below and above its small caterpillar. Because 
+
+candidate nodes that form
+a continuous part of the large caterpillar that is adjacent to the certain node's small caterpillar. Because of the monotonicity of distances of leaves inside each small caterpillar, we only need to consider the top-most and bottom-most certain nodes of each small caterpillar. We can create a matrix of dimension $1 \times B$ for each of these $O(\frac{n}{b^4})$ certain nodes (in the whole tree). Using Frederickson's method with $p$ set to $\frac{n}{B^5}$ costs us $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log B, \log(\frac{\frac{n}{b^4}}{p} \rbrace) = O(\max \lbrace \log B, \log(\frac{B^5}{b^4} \rbrace) = O(\log B)$ calls to tests and $O(\frac{n}{b^4} \times \log B) = O(\frac{n}{b})$ for processing exclusive of feasibility tests.
 
 The problem with eliminating collisions in this way, is that we assume that the implicit matrices on which we search, and contain the distances from a certain node to all candidates above it or below it, can be randomly accessed. As we have mentioned before, given two nodes in the input tree we can calculate the distance between them in constant time. But, in order to perform a feasibility test with some value in one of these $1 \times B$ matrices, say the value in the middle, we need to know which node we need to compute the distance to. This is similar to trying to binary search over a linked list. We cannot store these caterpillars in arrays, because they would not fit the processing we have been doing so far (e.g. pruning would be difficult with arrays). In the previous $O(n \log \log n)$ and $O(n \log ^*n)$ algorithms, we had no such problem, as we could go over the caterpillar in linear time and insert the candidates we want into an array. Now, we cannot afford linear time processing in each iteration. Fortunately, we do not have to preform such random accesses in $O(1)$, and $O(\log B)$ will suffice. For this, we store each caterpillar in a balanced search tree (BST). Merging the small trees of size $b$ to large trees of size $B$ takes $O(\frac{n}{b^4} \times \log B)$ time, since merging BSTs is done in logarithmic time. Since the access to our BST is done in logarithmic time, we need to multiply the complexity we have shown for this step of eliminating collision by $O(\log B)$, but this is still good enough.
 
