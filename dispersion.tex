@@ -223,7 +223,7 @@ Thus we have proven that $P$ is of maximal cardinality. Now, assume for contradi
 \section{Sublinear feasibility test}\label{sublinear f.t.}
 The main idea here is partitioning the input tree into fragments and preprocessing them, so that in query time we can process fragments in sub-linear time. For this, we need to use a partitioning with some specific attributes, which we now present. We assume the tree is binary, and justify this assumption later.
 \subsection{Tree partitioning}\label{tree partitioning}
-We would like to partition the tree into fragments s.t. each fragment will be connected to the rest of the tree by at most two vertices. Each fragment will have at most $2b$ vertices, and there will be $O(n/b)$ fragments. Each fragment is defined by its border vertices $u$ and $v$, s.t. $v$ is a descendant of $u$. The fragment will consist of $u$'s subtree without $v$'s subtree ($v$ itself is not part of the fragment). We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. In the case where the fragment has only one border vertex, i.e. the fragment is a subtree of the input tree, we say the fragment has no hole. We call such a partition of the tree a \emph{good partition}.
+We would like to partition the tree into fragments s.t. each fragment will be connected to the rest of the tree by at most two vertices. Each fragment will have at most $b$ vertices, and there will be $O(n/b)$ fragments. Each fragment is defined by its border vertices $u$ and $v$, s.t. $v$ is a descendant of $u$. The fragment will consist of $u$'s subtree without $v$'s subtree ($v$ itself is not part of the fragment). We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. In the case where the fragment has only one border vertex, i.e. the fragment is a subtree of the input tree, we say the fragment has no hole. We call such a partition of the tree a \emph{good partition}.
 
 \begin{figure}
 \begin{center}
@@ -236,8 +236,25 @@ We would like to partition the tree into fragments s.t. each fragment will be co
 For any binary tree on $n$ nodes and a parameter $b$, there is a good partition of the tree.
 \end{lemma}
 \begin{proof}
-We prove the lemma by construction. Call a node \textit{large} if the size of its subtree is greater than $b$ and \textit{small} otherwise. Consider the tree $T_L$ induced by the large nodes of the original tree. Make each leaf in $T_L$ a new fragment with no hole. This creates $O(n/b)$ fragments since each leaf of $T_L$ is the root of a subtree of size at least $b$ in the original tree, and so we have at most $O(n/b)$ leaves in $T_L$. The size of each of these fragments is at most $2b$, since we assume that the tree is binary. Next, for every branching node in $T_L$, make it a fragment consisting of just one node. This also creates $O(n/b)$ fragments, since in any tree the number of branching nodes is at most the number of leaves. Notice that naively going up the tree and cutting fragments of size $b$, would not have worked, since this would create fragments with more than two boundary nodes. Ignoring the fragments we have already created, we are left with nodes that form unary chains in $T_L$. Each of these nodes might also have a child that is a small node. We have $O(n/b)$ of these subgraphs (because each of them is defined by two of the previously defined fragments). We scan each of these subgraphs' large nodes bottom-up, and greedily cut them into fragments of size at most $2b$. Denote the size of subgraph $i$, as $b_i$. The number of fragments we created in this phase is at most $$\sum_{i=1}^{n/b} \left\lceil \frac{b_i}{b} \right\rceil = O(n/b).$$
-In total we have created $O(n/b)$ fragments, each of which is of size at most $2b$.
+We prove the lemma by construction. Call a node \textit{large} if the size of its subtree is at least $b$
+and \textit{small} otherwise. Consider the tree $T_L$ induced by the large nodes of the original tree. 
+For each leaf $u\in T_{L}$, we make each of its children in the original tree a new fragment with no holes.
+Each leaf of leaf of $T_{L}$ is the root of a subtree of size at least $b$ in the original tree, and these subtrees
+are all disjoint, so we have at most $n/b$ leaves in $T_{L}$. Each of them creates up to two fragments
+since the tree is binary, and each of these fragments is of size at most $b$ by definition.
+The natural next step would be to keep cutting of maximal fragments of size $b$ from the remaining
+part of the tree. This does not quite work, as we might create fragments with multiple boundary
+nodes with such a method.
+Therefore, the next step is to consider every branching node in $T_{L}$ instead, and make it a fragment
+consisting of just one node. This also creates up to $n/b$ fragments, since in any tree the number of
+branching nodes is at most the number of leaves.
+Ignoring the already created fragments, we are left with large nodes that form unary chains in $T_{L}$.
+Each of these nodes might also have an off-chain child that is a small node. We have at most $n/b$ of these chains
+(because each of them corresponds to an edge of a binary tree on at most $n/b$ leaves).
+We scan each of these chains bottom-up and greedily cut them into fragments of size at most $b$.
+Denoting the size of the $i$-th chain by $b_{i}$, the number of fragments created in this phase is
+bounded by $$\sum_{i=1}^{n/b} \left\lceil \frac{b_i}{b} \right\rceil = O(n/b).$$
+In total we have created $O(n/b)$ fragments, and each of them is of size at most $b$.
 \end{proof}
 This partitioning is done in $O(n)$ time.
 
