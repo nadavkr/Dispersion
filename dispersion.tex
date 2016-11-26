@@ -259,7 +259,7 @@ By adjusting $b$ we can obtain up to $n/b$ fragments, each of size $O(n)$.
 \end{proof}
 This partitioning is done in $O(n)$ time.
 
-\subsection{Pre-Processing fragments} \label{Pre-Processing Fragments}
+\subsection{Pre-processing fragments} \label{Pre-Processing Fragments}
 We now would like to pre-process the fragments s.t. we can later check in constant time for any two nodes in a fragment, $u_1$ and $u_2$, if $d(u_1,u_2)\geq\lambda$, and if $d(u_1,u_2) \geq \frac{\lambda}{2}$, for any possible $\lambda$. The possible values of $\lambda$ in the beginning are of course all the pairwise distances in the input tree. We achieve the ability to perform such queries for most of the fragments, by using a parametric search method by Frederickson that allows us to eliminate some of the possible values of $\lambda$, using our existing feasibility test. By the end of this elimination process, most of the fragments will have the property that any pairwise distance inside them is either smaller then the smallest possible value of $\lambda$ or
  greater or equal to the largest possible value of $\lambda$. The same will hold for $\frac{\lambda}{2}$.
 For each fragment, we will implicitly construct matrices of total side length (number of rows and columns) $O(b \log b)$, that are row and column sorted, and contain all pairwise distances in the fragment.
@@ -298,15 +298,30 @@ Active fragments will be processed as in the linear algorithm described before, 
 \begin{enumerate}
 \item\textbf{Reduce the fragment to a caterpillar:}\\
 Observe that each fragment is comprised of its spine, and the subtrees hanging off of it. Using queries on pairwise distances as described above, we can use our linear feasibility test on the subtrees hanging off the spine, and get a candidate and a certain node for each of them. This is done in linear time.
-Our fragment is now reduced to a caterpillar with at most two children for each spine node, a candidate child and a certain child.
+Our fragment is now reduced to a caterpillar with at most leaves attached to each spine node: a candidate
+node and a certain node.
 \item\label{removing certain nodes}
 \textbf{Find the candidate nodes that will certainly not be taken:}\\ %TODO add drawing
 Let the $i$-th leaf of the caterpillar be connected by an edge of length $y_i$ to a spine node at distance $x_i$ from the root of the caterpillar. Order the leaves so that $x_1 < x_2 < ... < x_k$.
 Some of the candidate nodes can be ignored as they "collide" with certain nodes. We start by finding the closest certain node to each candidate node. We can do this in linear time by scanning the caterpillar bottom-up, while saving for each candidate node, the closest certain node below it and the distance to it. We then do the same scan from top to bottom, and from both scans combined, we get for each candidate node the closest certain node and the distance to it. Now we want to find the candidate nodes that are too close to a certain node. We can do this since we are looking at an inactive fragment, and so a pairwise distance in it must be either smaller than $\lambda_1$ or greater or equal to $\lambda_2$. Delete all candidate nodes for which the distance to the closest certain node is smaller than $\lambda_1$. 
-Now we are only left with some of the candidate nodes to consider, and for all of them it hold that $y_i < \lambda_1/2$ (otherwise they would be certain), and from this point we can ignore the certain nodes.
+Now we are only left with some of the candidate nodes to consider, and for all of them it hold that $y_i < \lambda_1/2$ (otherwise they would be certain), and from now on we can ignore the certain nodes.
 \item\label{making distances from the root monotone}
 \textbf{Prune the caterpillar so that the leaves' distances to the root are non-decreasing:}\\
-Traverse the caterpillar from bottom to top. Consider the $i$-th leaf, $u_i$, and the adjacent leaf above it, $u_{i-1}$. Assume $x_{i-1}+y_{i-1} > x_i+y_i$ (i.e. $u_{i-1}$ is farther from the root than $u_i$). We get that $x_i-x_{i-1}+y_i < y_{i-1}$. $d(u_i,u_{i-1}) = x_i-x_{i-1}+y_i+y_{i-1} < 2y_{i-1} < \lambda_1$. So an optimal solution cannot contain both $u_{i}$ and $u_{i-1}$. If $u_{i}$ is in the solution we can replace it with $u_{i-1}$. This can be done because $u_{i-1}$ is farther away from any node above it than $u_i$, and $u_i$ is closer to any node below it than $u_{i-1}$. Let $u_j$ be a leaf node above $u_{i-1}$ ($j<i-1$), then $d(u_j,u_{i-1}) - d(u_j,u_{i}) = y_{i-1}-(x_i-x_{i-1})-y_i = x_{i-1}+y_{i-1}-(x_i+y_i) > 0$. The reasoning for the second case (where $u_j$ is a leaf below $u_i$, i.e. $j>i$) is similar. So in fact, we can remove the $i$-th leaf from the caterpillar. We continue down the caterpillar in the same manner and remove leaves, until the distances of the leaves from the root non-decreasing.
+Consider the $i$-th leaf, $u_i$, and the adjacent leaf above it, $u_{i-1}$. Assume $x_{i-1}+y_{i-1} > x_i+y_i$
+(i.e. $u_{i-1}$ is farther from the root than $u_i$), then:
+$$ d(u_{i},u_{i-1}) = x_i-x_{i-1}+y_i+y_{i-1} = x_{i} + y_{i} - x_{i-1} + y_{i-1} < 2y_{i-1} < \lambda_1.$$
+So an optimal solution cannot contain both $u_{i}$ and $u_{i-1}$. We claim that if the solution contain
+$u_{i}$ then it can be replaced with $u_{i-1}$. To prove this, it is enough to argue that
+$u_{i-1}$ is farther away from any node above it than $u_i$, and $u_i$ is closer to any node below it than $u_{i-1}$.
+Consider a node $u_{j}$ that is above $u_{i-1}$ (so $j<j-1$), then:
+$$d(u_j,u_{i-1}) - d(u_j,u_{i}) = y_{i-1}-(x_i-x_{i-1})-y_i = x_{i-1}+y_{i-1}-(x_i+y_i) > 0.$$
+Now consider a node $u_{j}$ that is below $u_{i}$ (so $j>i$), then:
+$$d(u_j,u_{i-1}) - d(u_j,u_{i}) = y_{i-1}+(x_i-x_{i-1})-y_i > 2(x_i-x_{i-1}) > 0.$$
+So in fact, we can remove the $i$-th leaf from the caterpillar if $x_{i-1}+y_{i-1} > x_i+y_i$. 
+We traverse the caterpillar from bottom to top and decide if the current leaf $u_{i}$ should be removed.
+To this end, it is enough to compare its distance to the root with the most recently processed non-removed leaf,
+so the whole scan takes linear time in the number of candidate nodes. In the end, the distances of the
+remaining leaves from the root are non-decreasing.
 
 \begin{figure}
 \begin{center}
@@ -316,7 +331,7 @@ Traverse the caterpillar from bottom to top. Consider the $i$-th leaf, $u_i$, an
 \end{figure}
 
 \item \label{making distances from the hole monotone}
-\textbf{Prune the caterpillar so that the leaves' distances to the bottom are non-decreasing:}\\
+\textbf{Prune the caterpillar so that the leaves' distances to the hole are non-decreasing:}\\
 This is done as in the previous step.
 \item\textbf{Compute the solution for any possible distance of the hole's candidate node:}\\
 In query time we want to process each fragment after its hole has already been processed.
@@ -441,9 +456,10 @@ of nodes in the subtrees. If all of them were then reduced to at most two nodes,
 node for each subtree, this would take $O(n)$ time when summed over all the iterations. However, we have set
 the parameter $p$ to $\frac{n}{B^{5}}$ in the Frederickson's search, and thus considering all the levels there
 might be up to $\log B\times\frac{n}{B^{6}}\leq \frac{n}{B^{5}}$ large fragments in which we cannot fully reduce
-all the hanging  subtrees. The total number of nodes in all such active fragments is  at most
-$\frac{n}{B^5} \times O(B^4) = O(\frac{n}{B})$. We cannot amortize the time spent on active fragments by
-reducing them, but we can afford to separately pay $O(\frac{n}{B})$ per iteration for that.
+all the hanging subtrees. The total number of nodes in all such large fragments is at most
+$\frac{n}{B^5} \times O(B^4) = O(\frac{n}{B})$. We cannot amortize the time spent on processing the hanging
+subtrees there by simply saying that each such hanging subtree is reduced to at most
+two nodes, but we can afford to separately pay $O(\frac{n}{B})$ per iteration for this processing.
 
 Having processed the hanging subtrees, we now have to to deal with active small fragments that are on the spine
 of the large fragment. In the previous iteration we had $O(\frac{n}{b^5})$ active fragments, which is of course
@@ -480,10 +496,10 @@ non-decreasing. We repeat the symmetric process from top to bottom to ensure tha
 from the hole are non-decreasing. The whole procedure takes linear time in the number of eliminated
 candidate nodes plus the number of small fragments, which sums up to $O(n)$ overall.
 
-Now we need to eliminate all internal "collisions" inside the caterpillar (i.e. remove candidate nodes that
+Now we need to eliminate all internal "collisions" inside the large caterpillar (i.e. remove candidate nodes that
 are too close to certain nodes). These collisions can occur between a candidate node of one small caterpillar
 and a certain node of another small caterpillar. Each certain node eliminates a range of consecutive
-candidates below and above its small caterpillar. Because 
+candidates nodes below and above its small caterpillar. Therefore, we only need to consider the 
 
 candidate nodes that form
 a continuous part of the large caterpillar that is adjacent to the certain node's small caterpillar. Because of the monotonicity of distances of leaves inside each small caterpillar, we only need to consider the top-most and bottom-most certain nodes of each small caterpillar. We can create a matrix of dimension $1 \times B$ for each of these $O(\frac{n}{b^4})$ certain nodes (in the whole tree). Using Frederickson's method with $p$ set to $\frac{n}{B^5}$ costs us $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log B, \log(\frac{\frac{n}{b^4}}{p} \rbrace) = O(\max \lbrace \log B, \log(\frac{B^5}{b^4} \rbrace) = O(\log B)$ calls to tests and $O(\frac{n}{b^4} \times \log B) = O(\frac{n}{b})$ for processing exclusive of feasibility tests.
