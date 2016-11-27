@@ -28,6 +28,7 @@
 \newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
 \newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
 \newcommand{\poly}{\text{poly}}
+\newcommand{\jump}{\text{jump}}
 
 \newcommand{\Oh}{{O}}
 
@@ -545,7 +546,7 @@ in the already seen prefix.
 To apply Frederickson's search, we would like to create a matrix of dimension $1\times O(b^{5})$
 for each of the $O(\frac{n}{b^{4}})$ small caterpillars in the whole tree. The total size of all small
 caterpillars is $m=n$, so setting $p$ to $\frac{n}{B^9}$ would imply
-$O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log b^{5}, \log(\frac{n}{n/B^{9}} \rbrace) = O(\log B)$ calls to the $O(\frac{n}{b^{4}} \times \log b)$ time test.
+$O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (b^{5}), \log(\frac{n}{n/B^{9}} \rbrace) = O(\log B)$ calls to the $O(\frac{n}{b^{4}} \times \log b)$ time test.
 There two difficulties, though. Firstly, we cannot guarantee that the processing exclusive of feasibility tests
 would sum up to $O(n)$ over all iterations. Secondly, it is not clear how to provide constant time access
 to these matrices, as the candidates nodes inside every small caterpillar are stored on a doubly-linked list,
@@ -572,11 +573,41 @@ by the choice of $p$.
 We are now left with preprocessing every large caterpillar for every possible eliminated suffix.
 Because we have already pruned the large caterpillar and removed any collisions between a certain
 node and a candidate node there, we only have to consider the remaining candidate nodes.
-Recall that in the previous algorithm we stored at the bottom node of every prefix of the fragment
+Recall that in the previous algorithm we stored at the bottom node of every prefix of the caterpillar
 the following information: the number of chosen nodes, the candidate node, and the certain node for this fragment,
-assuming that the suffix of the caterpillar below this node is eliminated. Now, we cannot afford to explicitly
+assuming that the suffix below this node is eliminated. Now, we cannot afford to explicitly
 compute such information for every node in every iteration of the algorithm (i.e. for each fragment size),
-as this might take linear time per iteration. Hence we will only store, for each candidate node in a caterpillar,
+as this might take linear time per iteration. We start with reinterpreting this information in terms of
+\emph{jump pointers}. For each candidate node in a caterpillar, its jump pointers leads to the nearest
+candidate above (in the same caterpillar) that is at distance at least $\lambda^{*}$. Then, the information
+stored at the bottom node $u$ of every prefix can be computed by starting at $u$ and following
+the jump pointers as long as possible. The number of chosen nodes is simply the number of visited
+nodes. If the last visited node is at distance at least $\lambda^{*}/2$ from the root then it is
+the certain node, and otherwise the last visited node is the candidate node and its predecessor
+(if any) is the candidate node. Our goal will be to show how to maintain an implicit representation
+of all such pointers such that in the query time we are able to efficiently simulate the aforementioned
+traversal. Before we proceed, we need to state a few properties of the jump pointers.
+
+Recall that the distances of the leaves from the root and from the hole are monotone. Denote the
+leaves of the caterpillar by $u_{1},u_{2},\ldots,u_{k}$, where $u_{1}$ is the nearest to the root,
+and write $\jump(i)=j$ if the jump pointer of $u_{i}$ leads to $u_{j}$. If the jump pointer of $u_{i}$
+is not defined, we write $\jump(i)=-1$. From definition, $\jump(i)<i$, and due to the monotonicity
+$\jump(i)\leq\jump(i+1)$. The \emph{interesting prefix} of the caterpillar consists of all nodes
+$u_{i}$ such that $\jump(i)=-1$, and the \emph{interesting suffix} consists of the nodes
+$u_{\jump(k)},\ldots,u_{k}$. As a special case, if $\jump(k)=-1$ we call the caterpillar \emph{fresh}
+and do not define its interesting prefix and suffix. Otherwise, interesting prefix and interesting
+suffix are disjoint except possibly for the node $u_{\jump(k)}$ and the following properties
+hold:
+\begin{enumerate}
+\item In the query time we always start from a node in the interesting suffix.
+\item During the pruning and eliminating we always remove a
+prefix of the interesting prefix and a suffix of the interesting suffix.
+\end{enumerate}
+
+
+
+
+Hence we will only store, for each candidate node in a caterpillar,
 a \emph{jump pointer} to the closest candidate above (in the same caterpillar) that is at distance at least
 $\lambda ^*$.
 Assuming the jump pointers inside every small caterpillar have already been computed, we would like
@@ -587,7 +618,8 @@ large caterpillars), so in the end every node will pay just once. We do this in 
 of small caterpillars into one, that is we first pair adjacent small caterpillars and merge them, then
 pair the resulting caterpillars and merge them, and so on. There will be $O(\log B)$ such steps.
 
-Consider two adjacent caterpillars that we want to merge. Each such caterpillar is of size $x$, where $2b \leq x \leq 2B$. Notice that for the upper caterpillar we only need to look at a suffix of it s.t. the highest node in the suffix is the lowest node in the upper caterpillar that is at distance greater or equal to $\lambda ^*$ from any node below it in the upper caterpillar (i.e. the lowest node that has a jump pointer pointing to it). Call this suffix the \emph{interesting suffix} of the upper caterpillar. Of course the jump pointer of any node in the lower caterpillar, cannot point to a node higher than this suffix. Similarly, we are only interested in a prefix of the lower caterpillar s.t. the lowest node in the prefix is the lowest node that does not have its jump pointer pointing to a node in the lower caterpillar. Call this prefix the \emph{interesting prefix} of the lower caterpillar. We now update these jump pointers. We go over the interesting prefix of the lower caterpillar bottom-up. For each node, first check if its distance to the highest node of the upper caterpillar's interesting suffix is greater or equal to $\lambda ^*$. If not, stop (this can only happen if the interesting suffix is actually the whole upper caterpillar). Else, go over the interesting suffix bottom-up, and find the first node that is at distance greater or equal to $\lambda ^*$ from the current node. Save the node found in the jump pointer, and for the next node in the interesting prefix we can start searching from this node. The problem here is that we do not have $\lambda^*$, and we can not check if a node in the lower caterpillar is at distance smaller than $\lambda^*$ from a node in the upper caterpillar or not. For that we need to run the Frederickson method once more. Since we have pruned the large caterpillar s.t. the distances of leaves from the root and hole are monotone, we can now run the search method on the nodes of the interesting prefix and suffix. We are only interested in distances between nodes of the interesting prefix to nodes in the interesting suffix, so we have a matrix for each node of the interesting prefix of dimension $1 \times x$ in the worst case (i.e. the distances from a single node in the interesting prefix  to all the nodes in the interesting suffix). We do this for all pairs of adjacent caterpillars, so we have at most $O(\frac{n}{x^4} \times x)$ such matrices. We set $p$ to $\frac{n}{B^5}$ again, and we need only $O(\log B)$ feasibility tests. The search also requires $O(\frac{n}{x^3} \times \log x)$ time for processing exclusive of feasibility tests. We can now answer the necessary queries for updating jump pointers.
+Consider two adjacent caterpillars that we want to merge. Each such caterpillar is of size $x=O(B^{5})$.
+Notice that for the upper caterpillar we only need to look at a suffix of it s.t. the highest node in the suffix is the lowest node in the upper caterpillar that is at distance greater or equal to $\lambda ^*$ from any node below it in the upper caterpillar (i.e. the lowest node that has a jump pointer pointing to it). Call this suffix the \emph{interesting suffix} of the upper caterpillar. Of course the jump pointer of any node in the lower caterpillar, cannot point to a node higher than this suffix. Similarly, we are only interested in a prefix of the lower caterpillar s.t. the lowest node in the prefix is the lowest node that does not have its jump pointer pointing to a node in the lower caterpillar. Call this prefix the \emph{interesting prefix} of the lower caterpillar. We now update these jump pointers. We go over the interesting prefix of the lower caterpillar bottom-up. For each node, first check if its distance to the highest node of the upper caterpillar's interesting suffix is greater or equal to $\lambda ^*$. If not, stop (this can only happen if the interesting suffix is actually the whole upper caterpillar). Else, go over the interesting suffix bottom-up, and find the first node that is at distance greater or equal to $\lambda ^*$ from the current node. Save the node found in the jump pointer, and for the next node in the interesting prefix we can start searching from this node. The problem here is that we do not have $\lambda^*$, and we can not check if a node in the lower caterpillar is at distance smaller than $\lambda^*$ from a node in the upper caterpillar or not. For that we need to run the Frederickson method once more. Since we have pruned the large caterpillar s.t. the distances of leaves from the root and hole are monotone, we can now run the search method on the nodes of the interesting prefix and suffix. We are only interested in distances between nodes of the interesting prefix to nodes in the interesting suffix, so we have a matrix for each node of the interesting prefix of dimension $1 \times x$ in the worst case (i.e. the distances from a single node in the interesting prefix  to all the nodes in the interesting suffix). We do this for all pairs of adjacent caterpillars, so we have at most $O(\frac{n}{x^4} \times x)$ such matrices. We set $p$ to $\frac{n}{B^5}$ again, and we need only $O(\log B)$ feasibility tests. The search also requires $O(\frac{n}{x^3} \times \log x)$ time for processing exclusive of feasibility tests. We can now answer the necessary queries for updating jump pointers.
 
 %After we have updated jump pointers for every pair of adjacent small caterpillars, we join them, and make each such pair a new small caterpillar, and continue in the same manner, until we have updated all the jump pointers for every large caterpillar.
 We do $O(\log B)$ such iterations until we have updated all the jump pointers for every large caterpillar. For updating jump pointers, we only spend time linear in the number of nodes whose jump pointer was updated. Every such node will not be in an interesting prefix again in future iterations. Thus we spend $O(n)$ time over all iterations. After the last iteration, we use the jump pointers to also update for each candidate node in all inactive fragments, the fields of certain and candidate node in case this is the first node above the eliminated suffix of the fragment. This can easily be done in $O(n)$ time. %TODO add drawing
