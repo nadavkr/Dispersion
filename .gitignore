@@ -60,3 +60,6 @@ dispersion.log
 .texpadtmp/proposal.out
 .gitignore
 .texpadtmp/proposal.synctex.gz
+dispersion.bbl
+dispersion.bib.bak
+dispersion.blg
