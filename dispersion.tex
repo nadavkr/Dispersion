@@ -264,10 +264,10 @@ Now we are only left with some of the candidate nodes to consider, and for all o
 Consider the $i$-th leaf, $u_i$, and the adjacent leaf above it, $u_{i-1}$. Assume $x_{i-1}+y_{i-1} > x_i+y_i$
 (i.e. $u_{i-1}$ is farther from the root than $u_i$), then:
 $$ d(u_{i},u_{i-1}) = x_i-x_{i-1}+y_i+y_{i-1} = x_{i} + y_{i} - x_{i-1} + y_{i-1} < 2y_{i-1} < \lambda_1.$$
-So an optimal solution cannot contain both $u_{i}$ and $u_{i-1}$. We claim that if the solution contain
+So an optimal solution cannot contain both $u_{i}$ and $u_{i-1}$. We claim that if the solution contains
 $u_{i}$ then it can be replaced with $u_{i-1}$. To prove this, it is enough to argue that
 $u_{i-1}$ is farther away from any node above it than $u_i$, and $u_i$ is closer to any node below it than $u_{i-1}$.
-Consider a node $u_{j}$ that is above $u_{i-1}$ (so $j<j-1$), then:
+Consider a node $u_{j}$ that is above $u_{i-1}$ (so $j<i-1$), then:
 $$d(u_j,u_{i-1}) - d(u_j,u_{i}) = y_{i-1}-(x_i-x_{i-1})-y_i = x_{i-1}+y_{i-1}-(x_i+y_i) > 0.$$
 Now consider a node $u_{j}$ that is below $u_{i}$ (so $j>i$), then:
 $$d(u_j,u_{i-1}) - d(u_j,u_{i}) = y_{i-1}+(x_i-x_{i-1})-y_i > 2(x_i-x_{i-1}) > 0.$$
@@ -383,7 +383,7 @@ $\log ^*n$ iterations, this time with only one fragment of size $n$).
 Our linear algorithm is based on the $O(n \log ^*n)$ algorithm we have presented. In order to achieve linear time
 in total we cannot partition the input tree to fragments independently for each fragment size, as we need
 the total time for all $\log^{*}n$ decompositions to be $O(n)$. We relax the definition of a good partition
-so that in a partition into $n/b$ the fragments can consists of more than $O(b)$ nodes.
+so that in a partition into $n/b$ fragments, a fragment can consist of more than $O(b)$ nodes.
 Let $\alpha$ be the constant hidden in the statement of Lemma~\ref{basic partitioning lemma}.
 
 \begin{lemma}\label{good partition refinement lemma}
@@ -394,7 +394,7 @@ such that every small fragment is fully contained inside a large fragment.
 \begin{proof}
 Define $T'$ by the tree received by collapsing each small fragment (of the given partition) to a single node. Apply 
 Lemma \ref{basic partitioning lemma} to $T'$, with the parameter set to $B:= \frac{(2^{b})^{4}}{b^{4}}$. We obtain
-$\frac{n/b}{B}=n/(2^{b})^{4}$ fragments. Each of them corresponds to a fragment of the original tree of size at
+$\frac{n/b^4}{B}=n/(2^{b})^{4}$ fragments. Each of them corresponds to a fragment of the original tree of size at
 most $\alpha\cdot \alpha^{\ell}\cdot b^{4}\cdot B = \alpha^{\ell+1}\cdot (2^{b})^{4}$.
 \end{proof}
 
@@ -406,14 +406,14 @@ After every application, we construct the corresponding $O(\frac{n}{(b_{\ell+1})
 test given the previous $O(\frac{n}{(b_{\ell})^{4}}\times \log b_{\ell})$ time test and a good partition of the tree
 into up to $n/b_{\ell+1}$ fragments of size $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$.
 Observe that, for large enough $\ell$, $\alpha^{\ell}\leq 2^{2^{\ell}}$, and $b_{\ell}\geq 2^{2^{\ell}}$,
-so $\alpha^{\ell}\cdot (b_{\ell})^{4} = O((b_{\ell})^{5})$.%TODO check this!!!
+so $\alpha^{\ell}\cdot (b_{\ell})^{4} = O((b_{\ell})^{5})$. %TODO check this!!!
 We now describe a single iteration of this procedure, and for conciseness write $b=b_{\ell}$ and $B=b_{\ell+1}$.
 
 Consider a large fragment (of size $O(B^5)$) containing some small fragments
 (of size $O(b^5)$). Notice that some of these small fragments are active fragments, i.e. have not
 been reduced to caterpillars in the previous iteration, but almost all are inactive fragments, which have
-been reduced to caterpillars. We require that the number of active small fragments
-is bounded by $O(\frac{n}{b^{9}})$.
+been reduced to caterpillars. We require the number of active small fragments
+to be bounded by $O(\frac{n}{b^{9}})$.
 The large fragment contains some small fragments whose roots and holes are spine nodes of the large fragment,
 and other fragments that form subtrees hanging off of the large fragment's spine (each hanging subtree may
 contain several small fragments), see Figure \ref{figure of small fragments inside a large fragment}.
@@ -431,7 +431,7 @@ size is bounded by $O(B^5)$, and so we have at most $O(\log B)$ levels in the he
 path decompositions. On each level we run Frederickson's search (similarly to what we have presented before).
 We run this search in parallel, for all heavy paths from all these hanging subtrees in all large fragments.
 The number of  nodes in the current level for all the heavy path trees together is at most $m=n$ and we set
-the parameter $p$ to $\frac{n}{B^10}$, so the number of calls to the $(\frac{n}{b^4} \times \log b)$ time test
+the parameter $p$ to $\frac{n}{B^{10}}$, so the number of calls to the $(\frac{n}{b^4} \times \log b)$ time test
 is $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (B^{5}), \log(\frac{n}{n/B^{10}} \rbrace) = O(\log B)$ per level, so
 $O(\frac{n}{b^4} \times \log b \times \log^{2} B) = O(\frac{n}{b})$ for every iteration.
 Summing over all $\log^{*}n$ iterations, this is $O(\sum_{\ell}\frac{n}{b_\ell}) = O(n)$.
@@ -450,7 +450,7 @@ Having processed the hanging subtrees, we now have to to deal with active small 
 of the large fragment. In the previous iteration we had $O(\frac{n}{b^9})$ active fragments, which is of course
 too many for the current level. We take the remaining active small fragments (which are on the spines of large 
 fragments), and reduce them to caterpillars (again by constructing the heavy path decomposition and running
-Frederickson's search with $p$ set to $\frac{n}{B^10}$). In each fragment we have $O(\log b)$ levels of the heavy
+Frederickson's search with $p$ set to $\frac{n}{B^{10}}$). In each fragment we have $O(\log b)$ levels of the heavy
 path decomposition, and for each level we need $O(\log B)$ calls to the feasibility test, which takes
 $O(\frac{n}{b^4} \times \log b \times \log B \times \log b) = O(\frac{n}{b})$ time in total. We also do linear
 work exclusive of feasibility tests. This processing of small active fragments takes $O(n)$ time over all
@@ -465,7 +465,7 @@ should be no collisions between candidate nodes and certain nodes. Once we have 
 be able to preprocess the caterpillar for every possible eliminated suffix.
 
 We start by pruning the large caterpillar so that distances of the candidates from the root are
-monotone. Since the distances are monotone inside each small caterpillar, we only have to check the last
+monotone. Since the distances are monotone inside each small caterpillar, we only have to check the last (bottom most) 
 candidate node of a small caterpillar against a range of consecutive candidates nodes below it in the large
 caterpillar, starting from the top candidate node in the next small caterpillar. 
 At this point we need to be more precise about how the fragments are represented. Each inactive small
@@ -476,7 +476,7 @@ the large caterpillar from bottom to top while
 maintaining a stack with the already processed small caterpillars that still contain some candidate nodes.
 We retrieve the last candidate of the current small caterpillar and eliminate the appropriate candidate
 nodes below it. This is done by iteratively retrieving the top small caterpillar from the stack and then
-accessing it top remaining candidate node $u$. If the distance of $u$ from the root is too small, we
+accessing its top remaining candidate node $u$. If the distance of $u$ from the root is too small, we
 remove $u$ from the front of its doubly-linked list, pop the list from the stack if it becomes empty,
 and repeat. Now the distances of the remaining candidates from the root are
 non-decreasing. We repeat the symmetric process from top to bottom to ensure that also the distances
@@ -501,28 +501,28 @@ in the already seen prefix.
 
 To apply Frederickson's search, we would like to create a matrix of dimension $1\times O(b^{5})$
 for each of the $O(\frac{n}{b^{4}})$ small caterpillars in the whole tree. The total size of all small
-caterpillars is $m=n$, so setting $p$ to $\frac{n}{B^9}$ would imply
+caterpillars is at most $m=n$, so setting $p$ to $\frac{n}{B^9}$ would imply
 $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (b^{5}), \log(\frac{n}{n/B^{9}} \rbrace) = O(\log B)$ calls to the $O(\frac{n}{b^{4}} \times \log b)$ time test.
-There two difficulties, though. Firstly, we cannot guarantee that the processing exclusive of feasibility tests
+There are two difficulties, though. Firstly, we cannot guarantee that the processing exclusive of feasibility tests
 would sum up to $O(n)$ over all iterations. Secondly, it is not clear how to provide constant time access
-to these matrices, as the candidates nodes inside every small caterpillar are stored on a doubly-linked list,
+to these matrices, as the candidates nodes inside every small caterpillar are stored in a doubly-linked list,
 so we are not able to retrieve any of them in constant time. We could have maintained the candidate
 nodes in an array, but then after the whole pruning and eliminating we would need to merge the arrays
 of all small caterpillars to obtain the array of the large caterpillar, which is does not seem possible
 in constant time (and we cannot afford to spend much more per a small caterpillar).
 
-We mitigate both difficulties with the same trick. We proceed in $O(\log b)$ steps that, intuitively, corresponds
-to binary searching for how long should be the eliminated prefix. In the $i$-th step we
+We mitigate both difficulties with the same trick. We proceed in $O(\log b)$ steps that, intuitively, correspond
+to binary searching for how long should the eliminated prefix be. In the $i$-th step we
 create a matrix of dimension $1\times 2^{i}$ for each of the still remaining small caterpillars.
 The matrix is stored explicitly, that is we extract the top $2^{i}$ candidates nodes from the doubly-linked
 list and store them in an array. Then we set $p$ to $\frac{n}{B^{10}}$ and run Frederickson's search
 on these matrices. The total time for all feasibility tests is then
 $O(\frac{n}{b^{4}}\times \log b \times \log b \times \log b) = O(\frac{n}{b})$. 
-Then, if all $2^{i}$ candidate nodes have been eliminated, the small caterpillar proceeds to the next
-step. Otherwise we have already determined its prefix that should be eliminated.
+Then, if all $2^{i}$ candidate nodes have been eliminated, we proceed to the next
+step. Otherwise we have already determined the small caterpillar's prefix that should be eliminated.
 Observe that the total length of all arrays constructed during this procedure is bounded by the number
 of eliminated candidate nodes multiplied by 4. Consequently, both the time necessary
-to extract the top candidate nodes and the time exclusive of feasibility tests sums up to $O(n)$
+to extract the top candidate nodes (and arrange them in an array) and the time exclusive of feasibility tests sums up to $O(n)$
 over all iterations. During this process we might declare another $O(\frac{n}{B^9})$ large fragments active
 by the choice of $p$.
 
@@ -540,8 +540,8 @@ stored at the bottom node $u$ of every prefix can be computed by starting at $u$
 the jump pointers as long as possible. The number of chosen nodes is simply the number of visited
 nodes. If the last visited node is at distance at least $\frac{\lambda^{*}}{2}$ from the root then it is
 the certain node, and otherwise the last visited node is the candidate node and its predecessor
-(if any) is the candidate node. We would like to maintain such information for all nodes $u$
-such that $u$ might be accessed in the query time. Recall that in the query time we specify
+(if any) is the candidate node. We would like to maintain such information for all nodes $u$,
+such that $u$ might be accessed in query time. Recall that in query time we specify
 a node $v$ attached to the hole of the fragment and binary search for the first node $u$ that
 is at distance at least $\lambda^{*}$ from $v$. Therefore, we only need to maintain the information
 for a suffix consisting of nodes that (informally) are not too far from the hole. However, it is not
@@ -567,8 +567,8 @@ belongs to the unstable prefix or to the unstable suffix.
 Because of symmetry, it is enough to consider a small caterpillar and all the subsequent
 small caterpillars. If a candidate node $u_{i}$ of the former is pruned then there is a top candidate node
 $v$ of one of the subsequent caterpillars such that $d(h,u_{i}) < d(h,v)$, where $h$ is the hole
-of the large caterpillar. But distance of $v$ from the spine is less than $\frac{\lambda^{*}}{2}$
-and then it follows that the distance of $u_{i}$ to the hole of its small caterpillar is also less
+of the large caterpillar. But the distance of $v$ from the spine is less than $\frac{\lambda^{*}}{2}$ (since it is a candidate node),
+ and it follows that the distance of $u_{i}$ to the hole of its small caterpillar is also less
 than $\frac{\lambda^{*}}{2}$. If $u_{i}$ collides with a certain node $v$ of one of the subsequent
 caterpillars then $d(u_{i},v)<\lambda^{*}$. But distance of $v$ from the spine is at least
 $\frac{\lambda^{*}}{2}$, so the distance of $u_{i}$ to the hole of its small caterpillar must be
@@ -580,13 +580,13 @@ trees that allow split and merge in logarithmic time (in the number of stored el
 in the natural order, that is distance to the root.
 The stable infix is maintained in a separate structure to be described in detail later. This
 structure allows us to simulate navigating the jump pointers inside the stable infix efficiently.
-In the query time, we first use the balanced search tree storing the unstable suffix to locate the first node
+In query time, we first use the balanced search tree storing the unstable suffix to locate the first node
 $u_{i}$ there that is sufficiently far away. Then, we observe that after taking $u_{i}$ we cannot
 take any further nodes from the unstable suffix, as they are all within distance less than
 $\lambda^{*}$ from each other. Hence we need to continue in the stable infix (it can also
 happen than no $u_{i}$ from the unstable suffix can be taken, and we directly start in the stable
 infix). Then we use the structure maintained for the stable infix, which gives us the last
-node there that we would reach by following the jump pointers, and then continue in the
+node there, that we would reach by following the jump pointers, and then continue in the
 unstable prefix. By the same argument as before, we can visit at most one node there.
 Therefore, if we can efficiently answer a query in the stable infix, then answering a query in
 the whole caterpillar requires only additional logarithmic time (in the size of the caterpillar).
@@ -618,7 +618,7 @@ query time, we always consider some node $u$ attached to the hole such that $d(r
 (because either $u$ is a certain node and then its distance from the hole is at least
 $\frac{\lambda^{*}}{2}$, or $u$ is a subsequent candidate node from the same caterpillar,
 or we start the query with comparing these two distances).
-Recall that, for each candidate node there, its jump points leads to the closest candidate node above
+Recall that, for each candidate node there, its jump pointers lead to the closest candidate node above it
 (in the same caterpillar) that is at distance at least $\lambda ^*$. We need a structure
 that allows us to find, given a node $u$ attached to $h$, the nearest candidate node $u_{i}$
 at distance at least $\lambda^{*}$ from $u$, and then follow the jump pointers from $u_{i}$.
@@ -655,7 +655,7 @@ be $\frac{n}{B^{9}}$, using $O(\frac{n}{b^{4}}\times \log b \times \log B)=O(\fr
 total time for the feasibility tests and creating up to $O(\frac{n}{B^{9}})$ additional active large
 fragments. If a large caterpillar is fresh, there is nothing to update. Otherwise,
 we gather all candidate nodes belonging to
-an interesting prefix or suffix (or being a new node) and call them relevant. In particular,
+an interesting prefix or suffix (or being a new node) and call them \emph{relevant}. In particular,
 all nodes of a fresh small caterpillar are relevant.
 We arrange all relevant nodes in an array and apply Frederickson's search to determine the missing jump
 pointers using the array to facilitate constant time access to any relevant node. We again
@@ -676,7 +676,7 @@ number of relevant nodes. It remains to bound this quantity. We claim that it
 amortizes to $O(n)$. To this end, we maintain the following invariant: every node
 of an interesting prefix and suffix has one credit. If a caterpillar is fresh
 then every node $u_{1},u_{2},\ldots,u_{k}$ has two credits. Initially, every node of the tree
-has two credits. When a node becomes a part of a stable infix we treat it a small fresh
+has two credits. When a node becomes a part of a stable infix we treat it as a small fresh
 caterpillar in the analysis. The number of relevant nodes is bounded by the total number
 of nodes in all fresh small caterpillars and the total number of nodes in the interesting
 prefixes and suffixes in the remaining small caterpillars. Furthermore,
