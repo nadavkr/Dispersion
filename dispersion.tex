@@ -214,8 +214,8 @@ By adjusting $b$ we can obtain up to $n/b$ fragments, each of size $O(n)$.
 \end{proof}
 This partitioning is done in $O(n)$ time.
 
-\subsection{Pre-processing fragments} \label{Pre-Processing Fragments}
-We now would like to pre-process the fragments s.t. we can later check in constant time for any two nodes in a fragment, $u_1$ and $u_2$, if $d(u_1,u_2)\geq\lambda$, and if $d(u_1,u_2) \geq \frac{\lambda}{2}$, for any possible $\lambda$. The possible values of $\lambda$ in the beginning are of course all the pairwise distances in the input tree. We achieve the ability to perform such queries for most of the fragments, by using a parametric search method by Frederickson that allows us to eliminate some of the possible values of $\lambda$, using our existing feasibility test. By the end of this elimination process, most of the fragments will have the property that any pairwise distance inside them is either smaller then the smallest possible value of $\lambda$ or
+\subsection{Preprocessing fragments} \label{Pre-Processing Fragments}
+We now would like to preprocess the fragments s.t. we can later check in constant time for any two nodes in a fragment, $u_1$ and $u_2$, if $d(u_1,u_2)\geq\lambda$, and if $d(u_1,u_2) \geq \frac{\lambda}{2}$, for any possible $\lambda$. The possible values of $\lambda$ in the beginning are of course all the pairwise distances in the input tree. We achieve the ability to perform such queries for most of the fragments, by using a parametric search method by Frederickson that allows us to eliminate some of the possible values of $\lambda$, using our existing feasibility test. By the end of this elimination process, most of the fragments will have the property that any pairwise distance inside them is either smaller then the smallest possible value of $\lambda$ or
  greater or equal to the largest possible value of $\lambda$. The same will hold for $\frac{\lambda}{2}$.
 For each fragment, we will implicitly construct matrices of total side length (number of rows and columns) $O(b \log b)$, that are row and column sorted, and contain all pairwise distances in the fragment.
 
@@ -234,7 +234,7 @@ and then recursing on every connected component of $T\setminus\{v\}$ called \emp
 
 Apply the centroid decomposition on each fragment. This take linear time. Since we assume our input tree is binary, the centroid at each level of the recursion will split the tree into three pieces. Now, run the following recursive routine: at each level of the recursion, we are given the three pieces of the decomposition, and for each of them a sorted list of the distances to their inner centroid. We would like to compute a sorted list of distances of the nodes in all three pieces, to the current centroid. This would give us the ability to compute, in constant time, the distance between any two nodes that are in different pieces (since the path between them goes through the centroid). Let us look at one of the three pieces we have already processed. It contains three pieces of its own. For two of these pieces, it holds that the path from every node inside them to the outer centroid passes through the inner centroid. We call the third piece, for which this does not hold a \textit{problematic} piece. For the two pieces that are not problematic, we can add to all the entries of the lists we have, the distance from the inner centroid to the outer centroid, and then merge the two sorted lists. This is all done in linear time.
 
-Our only problem now is the piece where the paths to the outer centroid do not go through the inner one. But notice that if we go one step deeper in the recursion we can see that inside the problematic piece there are two pieces that are not problematic, as the paths from all their nodes to the outer centroid pass through their inner centroid. We can do the same kind of merging for their two list, and then look deeper inside the remaining problematic piece, and so on. This recursive routine will also take linear time. Altogether we have $O(\log b)$ levels of recursion, and spend linear time on each one, so we get a running time of $O(b \log b)$ per fragment. For now, we set $b$ to $\log ^2 n$ and get a running time of $O(\frac{n}{b} \times b\log b) = O(n \log \log n)$ for all fragments.
+Our only problem now is the piece where the paths to the outer centroid do not go through the inner one. But notice that if we go one step deeper in the recursion we can see that inside the problematic piece there are two pieces that are not problematic, as the paths from all their nodes to the outer centroid pass through their inner centroid. We can do the same kind of merging for their two list, and then look deeper inside the remaining problematic piece, and so on. This recursive routine will also take linear time. Altogether we have $O(\log b)$ levels of recursion, and spend linear time on each one, so we get a running time of $O(b \log b)$ per fragment. For now, we set $b$ to $\log ^2 n$ and get a running time of $O(\frac{n}{b} \cdot b\log b) = O(n \log \log n)$ for all fragments.
 
 Now we have for level $i$ of the recursion $3^i$ centroids, and for each of them a sorted list of the distances to all nodes in the appropriate pieces. We can find any pairwise distance in a piece by adding two entries of this list. Since the lists are sorted, we can look at the situation as if we have $3^i$ matrices of and their total side length is $n$ \footnote{We cannot actually afford to explicitly store these matrices, but that is not needed.}. The matrices from all levels of the recursion, contain all the pairwise distances inside all the fragments. Note that we also have some entries in the matrices that do not actually represent pairwise distances in the tree, because some entries in the matrix represent the length of a path between two nodes that passes through the centroid of the piece, but the shortest path between these two nodes does not pass through the centroid. This does not matter, since it just means we will do some unnecessary eliminations.
 
@@ -242,13 +242,13 @@ Now, we can use a parametric search algorithm by Frederickson to eliminate entri
 For this search, we use the following theorem of \cite{Frederickson1991}:
 \begin{theorem}[\cite{Frederickson1991}]\label{Frederickson's theorem}
 Let $M$ be a collection of $N$ sorted matrices ${M_l, M_2, . . . , M_N}$ in which matrix $M_j$ is of dimension $m_j \times n_j$, $m_j \leq n_j$, and $\sum_{j=1}^{N} m_j = m$.
-Let p be nonnegative. The number of feasibility tests needed to discard all but at most p of the elements is $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace)$, and the total running time exclusive of feasibility tests is $O(\sum_{j=1}^{N} m_j \times \log (2n_j/m_j))$.
+Let p be nonnegative. The number of feasibility tests needed to discard all but at most p of the elements is $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace)$, and the total running time exclusive of feasibility tests is $O(\sum_{j=1}^{N} m_j \cdot \log (2n_j/m_j))$.
 \end{theorem}
-In our case $m=b \log b \times \frac{n}{b} = n \log b$ (since for each of the $\frac{n}{b}$ fragments, we have $\log b$ levels of the centroid decomposition, and at each level we have the distance of every node to a centroid) and we set $p$ to be $n/b^2$. The theorem implies that we can use $O(\log b)$ feasibility tests and discard all but $n/b^2$ elements of the matrices. We also pay $O(n \log b)$ exclusive of the feasibility tests. This means that we have at most $n/b^2$ active fragments (out of all $n/b$ fragments). 
+In our case $m=b \log b \cdot \frac{n}{b} = n \log b$ (since for each of the $\frac{n}{b}$ fragments, we have $\log b$ levels of the centroid decomposition, and at each level we have the distance of every node to a centroid) and we set $p$ to be $n/b^2$. The theorem implies that we can use $O(\log b)$ feasibility tests and discard all but $n/b^2$ elements of the matrices. We also pay $O(n \log b)$ exclusive of the feasibility tests. This means that we have at most $n/b^2$ active fragments (out of all $n/b$ fragments). 
 
-For inactive fragment, it is clear that we can now answer queries checking whether some pairwise distance inside the fragment is at least $\lambda$, or if it is less than $\frac{\lambda}{2}$ \footnote{We can easily compute any pairwise distance in the tree in $O(1)$ time by pre-computing all distances to the root of the tree, and using LCA queries \cite{Bender2000}, \cite{Djidjev1991}.}.
+For inactive fragment, it is clear that we can now answer queries checking whether some pairwise distance inside the fragment is at least $\lambda$, or if it is less than $\frac{\lambda}{2}$ \footnote{We can easily compute any pairwise distance in the tree in $O(1)$ time by precomputing all distances to the root of the tree, and using LCA queries \cite{Bender2000}, \cite{Djidjev1991}.}.
 
-Active fragments will be processed as in the linear algorithm described before, so we can ignore them for now. We refer to the certain node which is closest to the root simply as \textit{the certain node}. We now do the following pre-processing for each inactive fragment:
+Active fragments will be processed as in the linear algorithm described before, so we can ignore them for now. We refer to the certain node which is closest to the root simply as \textit{the certain node}. We now do the following preprocessing for each inactive fragment:
 \begin{enumerate}
 \item\textbf{Reduce the fragment to a caterpillar:}\\
 Observe that each fragment is comprised of its spine, and the subtrees hanging off of it. Using queries on pairwise distances as described above, we can use our linear feasibility test on the subtrees hanging off the spine, and get a candidate and a certain node for each of them. This is done in linear time.
@@ -291,20 +291,20 @@ This is done as in the previous step.
 In query time we want to process each fragment after its hole has already been processed.
 We call a set of consecutive leaves of the caterpillar, that contains the closest leaf to the hole, a \emph{suffix} of the caterpillar. Similarly we can define the caterpillar's \emph{prefix}.
 Assuming we know what is the closest chosen node in the fragment's hole, we can eliminate an entire suffix of the caterpillar (because of the monotonicity of the distances of candidate nodes from the hole). We can compute in preprocessing, for any possible eliminated suffix, which nodes in the fragment should be chosen, and also which nodes are the candidate and certain node we need to pass to the next fragment.
-In order to pre-compute this, scan the caterpillar from top to bottom. For every possible prefix of the caterpillar we would like to store the numbers of nodes chosen, the certain node and the candidate node, assuming all nodes that are not in the prefix are eliminated as they are too close to the hole. Consider the bottom node of the current prefix. If the distance of this node to the fragment's root is less than $\frac{\lambda}{2}$\footnote{We do not actually know $\lambda$ in preprocessing, but due to the previous steps, such a query of a node inside the fragment would produce the same result for any possible $\lambda$.}, store it as the candidate node, zero as the number of chosen nodes, and NULL as the certain node (if this fragment has a hole, we will consider its candidate and certain node in query time). Else, (the node's distance to the root is greater or equal to $\frac{\lambda}{2}$), write it as the certain node. Then, use binary search to find the closest node above it, that is at distance of at least $\lambda$. Add 1 to the number of chosen nodes stored in the node we found, and either store it as the candidate node, or copy the candidate node stored there. This would take $O(b \log b)$ time. We can improve this by not binary searching for the first node far enough, but instead saving it for each prefix, and then only going down from the previous node found. This would only take $O(b)$ time.
+In order to precompute this, scan the caterpillar from top to bottom. For every possible prefix of the caterpillar we would like to store the numbers of nodes chosen, the certain node and the candidate node, assuming all nodes that are not in the prefix are eliminated as they are too close to the hole. Consider the bottom node of the current prefix. If the distance of this node to the fragment's root is less than $\frac{\lambda}{2}$\footnote{We do not actually know $\lambda$ in preprocessing, but due to the previous steps, such a query of a node inside the fragment would produce the same result for any possible $\lambda$.}, store it as the candidate node, zero as the number of chosen nodes, and NULL as the certain node (if this fragment has a hole, we will consider its candidate and certain node in query time). Else, (the node's distance to the root is greater or equal to $\frac{\lambda}{2}$), write it as the certain node. Then, use binary search to find the closest node above it, that is at distance of at least $\lambda$. Add 1 to the number of chosen nodes stored in the node we found, and either store it as the candidate node, or copy the candidate node stored there. This would take $O(b \log b)$ time. We can improve this by not binary searching for the first node far enough, but instead saving it for each prefix, and then only going down from the previous node found. This would only take $O(b)$ time.
 \end{enumerate}
 
 \subsection{Feasibility test}
 We now scan the whole tree, and for each inactive fragment we would like to produce in $O(\log b)$ time: the number of chosen nodes in the fragment, the candidate node, and the certain node. In this procedure we use the caterpillars we have created in the preprocessing. We run this procedure bottom-up, so we assume that the fragment rooted at the hole of the current one has already been processed. Notice that now we are given $\lambda$. Denote the root of the fragment by $r$, and the current fragment's leaf which is farthest from $r$, by $v$.
 
-If the hole does not have a candidate node, denote its certain node by $u$. We compute the suffix of the fragment that cannot be taken. We can do this by binary searching for the first node of the fragment that is at distance at least $\lambda$ (which is given now) from $u$. We have pre-computed all we need to know once we have the relevant prefix (i.e. the nodes we choose in the current fragment, including the certain and candidate nodes).
+If the hole does not have a candidate node, denote its certain node by $u$. We compute the suffix of the fragment that cannot be taken. We can do this by binary searching for the first node of the fragment that is at distance at least $\lambda$ (which is given now) from $u$. We have precomputed all we need to know once we have the relevant prefix (i.e. the nodes we choose in the current fragment, including the certain and candidate nodes).
 
 If the hole does have a candidate node, denote it by $u$. Assume $d(u,v) \geq \lambda$, then $u$ does not eliminate any suffix of the current fragment (due to the monotonicity of distances from the hole). Thus, we can take the nodes chosen so far, including the hole's candidate, $u$, and add to them the nodes we stored in preprocessing for the case that no suffix is eliminated. If $u$ and $v$ "collide" (i.e. $d(u,v) < \lambda$), we have the following two cases:
 \begin{enumerate}
 \item $d(r,v) > d(r,u)$: In this case, $v$ is farther from the root than $u$, which is possible since the monotonicity only holds inside each fragment. In this case we do not take $u$ into the solution, and only take the certain nodes we have so far. Because any certain node does not "collide" with $u$, it is also far enough from $v$, and so no suffix is eliminated and we take the appropriate nodes from the current fragment.
 \item $d(r,v) \leq d(r,u)$: In this case we need to consider the suffixes of the current fragment, as in the case where the hole does not have a candidate.
 \end{enumerate}
-Each feasibility test costs us $O(\log b)$ for each inactive fragment, and $O(b)$ for each active one. In total $O(\frac{n}{b} \times \log b) + O(\frac{n}{b^2} \times b) = O(\frac{n \log \log n}{\log ^2n})$.
+Each feasibility test costs us $O(\log b)$ for each inactive fragment, and $O(b)$ for each active one. In total $O(\frac{n}{b} \cdot \log b) + O(\frac{n}{b^2} \cdot b) = O(\frac{n \log \log n}{\log ^2n})$.
 
 
 \subsection{\boldmath$O(n\log\log n)$ Preprocessing} 
@@ -344,16 +344,16 @@ we can specify if it can be included in a solution).
 $O(n\log^{*}n)$ Preprocessing} \label{sectionlog*}
 The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test (or test for short) to get a sublinear one. In order to get the complexity down to $O(n \log ^*n)$ we will use a similar process, iteratively, with growing fragments size, improving in each iteration the performance of our test.
 We start with $n/c^{3}$ fragments of size $O(c^3)$ for some constant $c$.
-We pay $O(n)$ time for preprocessing and get an $O(\frac{n}{c^3} \times \log c)$ time test.
+We pay $O(n)$ time for preprocessing and get an $O(\frac{n}{c^3} \cdot \log c)$ time test.
 We use this test to do the same preprocessing again, this time with $n/(2^{c})^{3}$ fragments of size $O((2^c)^3)$.
-We will now construct an $O(\frac{n}{2^{3c}} \times c)$ time test.
+We will now construct an $O(\frac{n}{2^{3c}} \cdot c)$ time test.
 We do this for $\log ^*n$ iterations until we get to $n/\log^{3}n$ fragments of size $O(\log ^3n)$, and have
 an $O(\frac{n \log \log n}{\log ^3n})$ time test. Since we do $\log ^*n$ iterations and linear time work for each
 iteration, the total preprocessing is in $O(n \log ^*n)$ time.
 
-We now describe one iteration of this process. Assuming we have obtained an $O(\frac{n}{b^3} \times \log b)$ time 
+We now describe one iteration of this process. Assuming we have obtained an $O(\frac{n}{b^3} \cdot \log b)$ time 
 test from the previous step, we now find a good partition of the tree with $n/B^{3}$ fragments of size $O(B^3)$, 
-where $B:=2^b$. We perform a heavy path decomposition on each fragment, and process all the heavy
+where $B=2^b$. We perform a heavy path decomposition on each fragment, and process all the heavy
 path decompositions bottom up and in parallel. The paths at lower levels have been processed so that each of them is
 reduced to a candidate and a certain node, and so each current path is a caterpillar, that we will now reduce to
 two nodes using Frederickson's method. As we have seen in Section \ref{sublinear f.t.}, we can create a matrix 
@@ -365,35 +365,35 @@ test $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rb
 of the heavy path decompositions, until we are left with only the top heavy path of each fragment.
 Since $p>0$, during this preprocessing some fragments become active. Once a fragment becomes active we stop
 its preprocessing. Accounting for all the levels, we use $O(\log^{2}B)$ calls to the previous tests,
-which costs $(\log ^2B \times \frac{n}{b^3} \times \log b)=O(\frac{n}{b} \times \log b)$. This sums to $O(n)$
+which costs $(\log ^2B \cdot \frac{n}{b^3} \cdot \log b)=O(\frac{n}{b} \cdot \log b)$. This sums to $O(n)$
 over all iterations.
 Additionally, in every iteration we spend extra linear time to construct a good partition, then find all heavy
 path decompositions, and finally for the Frederickson's search, so in total $O(n \log ^*n)$. 
 
-After the preprocessing is done, we have at most $\log B \times \frac{n}{B^7}\leq \frac{n}{B^{6}}$ active fragments (because we have not eliminated at most $p$ pairwise distances for each level), which we will process in $O(B^{3})$
-time each in the new test. For all other fragments we have obtained a pruned caterpillar, so that we can, in linear time, pre-compute the required information for any possible eliminated suffix as described in Subsection \ref{Pre-Processing Fragments}. We will process these inactive fragments in logarithmic time in the new test. Thus we have obtained an $O(\frac{n}{B^3} \times \log B)$ time test.
+After the preprocessing is done, we have at most $\log B \cdot \frac{n}{B^7}\leq \frac{n}{B^{6}}$ active fragments (because we have not eliminated at most $p$ pairwise distances for each level), which we will process in $O(B^{3})$
+time each in the new test. For all other fragments we have obtained a pruned caterpillar, so that we can, in linear time, precompute the required information for any possible eliminated suffix as described in Subsection \ref{Pre-Processing Fragments}. We will process these inactive fragments in logarithmic time in the new test. Thus we have obtained an $O(\frac{n}{B^3} \cdot \log B)$ time test.
 
-We do this iteratively until we have an $O(\frac{n}{\log ^3n} \times \log \log n)$ time test, and then use it to
+We do this iteratively until we have an $O(\frac{n}{\log ^3n} \cdot \log \log n)$ time test, and then use it to
 solve the dispersion optimization problem in linear time (in the same manner as in each of the previous
 $\log ^*n$ iterations, this time with only one fragment of size $n$).
 
 
 \section{A Sublinear Feasibility Test with \boldmath
 \boldmath$O(n)$ Preprocessing}\label{sectionLinear}
-Our linear algorithm is based on the $O(n \log ^*n)$ algorithm we have presented. In order to achieve linear time
+Our linear-time preprocessing is based on the $O(n \log ^*n)$ preprocessing presented in the previous section. In order to achieve linear time
 in total we cannot partition the input tree to fragments independently for each fragment size, as we need
 the total time for all $\log^{*}n$ decompositions to be $O(n)$. We relax the definition of a good partition
 so that in a partition into $n/b$ fragments, a fragment can consist of more than $O(b)$ nodes.
 Let $\alpha$ be the constant hidden in the statement of Lemma~\ref{basic partitioning lemma}.
 
 \begin{lemma}\label{good partition refinement lemma}
-Given a good partition of a binary tree into $n/b^{4}$ fragments of size at most $\alpha^{\ell}\cdot b^{4}$, there
-exists a good partition of the tree into $n/(2^b)^{4}$ fragments of size at most $\alpha^{\ell+1}\cdot (2^{b})^{4}$,
+Given a good partition of a binary tree into $n/b^{4}$ fragments each of size at most $\alpha^{\ell}\cdot b^{4}$, there
+exists a good partition of the tree into $n/(2^b)^{4}$ fragments each of size at most $\alpha^{\ell+1}\cdot (2^{b})^{4}$,
 such that every small fragment is fully contained inside a large fragment.
 \end{lemma}
 \begin{proof}
-Define $T'$ by the tree received by collapsing each small fragment (of the given partition) to a single node. Apply 
-Lemma \ref{basic partitioning lemma} to $T'$, with the parameter set to $B:= \frac{(2^{b})^{4}}{b^{4}}$. We obtain
+Define $T'$ as the tree obtained by collapsing each small fragment (of the given partition) to a single node. Apply 
+Lemma \ref{basic partitioning lemma} to $T'$, with the parameter set to $B= {(2^{b})^{4}}/{b^{4}}$. We obtain
 $\frac{n/b^4}{B}=n/(2^{b})^{4}$ fragments. Each of them corresponds to a fragment of the original tree of size at
 most $\alpha\cdot \alpha^{\ell}\cdot b^{4}\cdot B = \alpha^{\ell+1}\cdot (2^{b})^{4}$.
 \end{proof}
@@ -401,9 +401,9 @@ most $\alpha\cdot \alpha^{\ell}\cdot b^{4}\cdot B = \alpha^{\ell+1}\cdot (2^{b})
 We apply Lemma~\ref{good partition refinement lemma} $\log^{*}n$ times. Denote by $b_{\ell}$ the value of
 the parameter $b$ in the $\ell$-th application.
 The time to construct the $(\ell+1)$-th good partition is $O(n/(b_{\ell})^{4})=O(n/b_{\ell})$,
-which can be bounded as follows: $$ O(\sum_{\ell} \frac{n}{b_{\ell}}) = O(\sum_{\ell} \frac{n}{2^{\ell}}) = O(n).$$
-After every application, we construct the corresponding $O(\frac{n}{(b_{\ell+1})^{4}}\times \log b_{\ell+1})$ time
-test given the previous $O(\frac{n}{(b_{\ell})^{4}}\times \log b_{\ell})$ time test and a good partition of the tree
+which can be bounded by: $$ O(\sum_{\ell} \frac{n}{b_{\ell}}) = O(\sum_{\ell} \frac{n}{2^{\ell}}) = O(n).$$
+After every application, we construct the corresponding $O(\frac{n}{(b_{\ell+1})^{4}}\cdot \log b_{\ell+1})$ time
+test given the previous $O(\frac{n}{(b_{\ell})^{4}}\cdot \log b_{\ell})$ time test and a good partition of the tree
 into up to $n/b_{\ell+1}$ fragments of size $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$.
 Observe that, for large enough $\ell$, $\alpha^{\ell}\leq 2^{2^{\ell}}$, and $b_{\ell}\geq 2^{2^{\ell}}$,
 so $\alpha^{\ell}\cdot (b_{\ell})^{4} = O((b_{\ell})^{5})$. %TODO check this!!!
@@ -418,51 +418,73 @@ The large fragment contains some small fragments whose roots and holes are spine
 and other fragments that form subtrees hanging off of the large fragment's spine (each hanging subtree may
 contain several small fragments), see Figure \ref{figure of small fragments inside a large fragment}.
 
-\begin{figure}\label{figure of small fragments inside a large fragment}
+\begin{figure}[h]
 \begin{center}
 \includegraphics[scale=1]{refinement}
 \end{center}
-\caption{A large fragment containing a number of smaller fragments. The small fragments on the spine are gray, and the subtrees hanging off of the spine are black. We start by reducing the hanging subtrees to just two nodes, then handle the small active fragments on the spine, and finally reduce the entire large fragment to one caterpillar and process it.}
+\caption{A large fragment containing a number of smaller fragments. The small fragments on the spine are gray, and the subtrees hanging off of the spine are black. We start by reducing the hanging subtrees to just two nodes, then handle the small active fragments on the spine, and finally reduce the entire large fragment to one caterpillar and process it. \label{figure of small fragments inside a large fragment}}
 \end{figure}
 
-We first reduce each of these hanging subtrees to at most two nodes, one candidate and one certain. To do this, we 
-perform a heavy path decomposition on each of them. Since each such subtree is contained in a large fragment, its 
+
+We start by reducing the hanging subtrees to at most two nodes, one candidate and one certain (Lemma~\ref{lemma1}), then we handle the small active fragments on the spine (Lemma~\ref{lemma2}), and finally we reduce the entire large fragment to one caterpillar and process it (Lemma~\ref{lemma3}). 
+
+\begin{lemma}\label{lemma1}
+	The hanging subtrees of all large fragments can be reduced to at most two nodes (one candidate and one certain) in total $O(n)$ time. 
+\end{lemma}
+\begin{proof}
+We 
+perform a heavy path decomposition on each hanging subtree. Since each such subtree is contained in a large fragment, its 
 size is bounded by $O(B^5)$, and so we have at most $O(\log B)$ levels in the heavy 
 path decompositions. On each level we run Frederickson's search (similarly to what we have presented before).
 We run this search in parallel, for all heavy paths from all these hanging subtrees in all large fragments.
-The number of  nodes in the current level for all the heavy path trees together is at most $m=n$ and we set
-the parameter $p$ to $\frac{n}{B^{10}}$, so the number of calls to the $(\frac{n}{b^4} \times \log b)$ time test
+The number of  nodes in each level for all the heavy paths together is at most $m=n$ and we set
+the parameter $p$ to $\frac{n}{B^{10}}$, so the number of calls to the $(\frac{n}{b^4} \cdot \log b)$ time test
 is $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (B^{5}), \log(\frac{n}{n/B^{10}} \rbrace) = O(\log B)$ per level, so
-$O(\frac{n}{b^4} \times \log b \times \log^{2} B) = O(\frac{n}{b})$ for every iteration.
+$O(\frac{n}{b^4} \cdot \log b \cdot \log^{2} B) = O(\frac{n}{b})$ for every iteration.
 Summing over all $\log^{*}n$ iterations, this is $O(\sum_{\ell}\frac{n}{b_\ell}) = O(n)$.
 
 Constructing the heavy path decompositions and then running Frederickson's search takes linear time in the number
 of nodes in the subtrees. If all of them were then reduced to at most two nodes, one candidate and one certain
 node for each subtree, this would take $O(n)$ time when summed over all the iterations. However, we have set
 the parameter $p$ to $\frac{n}{B^{10}}$ in the Frederickson's search, and thus considering all the levels there
-might be up to $\log B\times\frac{n}{B^{10}}\leq \frac{n}{B^{9}}$ large fragments in which we cannot fully reduce
+might be up to $\log B\cdot\frac{n}{B^{10}}\leq \frac{n}{B^{9}}$ large fragments in which we cannot fully reduce
 all the hanging subtrees. The total number of nodes in all such active large fragments is at most
-$\frac{n}{B^9} \times O(B^5) = O(\frac{n}{B^{4}})$. We cannot amortize the time spent on processing the hanging
+$\frac{n}{B^9} \cdot O(B^5) = O(\frac{n}{B^{4}})$. We cannot amortize the time spent on processing the hanging
 subtrees there by simply saying that each such hanging subtree is reduced to at most
 two nodes, but we can easily afford to separately pay $O(\frac{n}{B^{4}})$ per iteration for this processing.
+\end{proof}
 
 Having processed the hanging subtrees, we now have to to deal with active small fragments that are on the spine
-of the large fragment. In the previous iteration we had $O(\frac{n}{b^9})$ active fragments, which is of course
+of the large fragment. 
+
+\begin{lemma}\label{lemma2}
+	The small active fragments on the spines of all large fragments can be reduced to catterpillars in total $O(n)$ time. 
+\end{lemma}
+\begin{proof}
+
+In the previous iteration we had $O(\frac{n}{b^9})$ active fragments, which is of course
 too many for the current level. We take the remaining active small fragments (which are on the spines of large 
 fragments), and reduce them to caterpillars (again by constructing the heavy path decomposition and running
 Frederickson's search with $p$ set to $\frac{n}{B^{10}}$). In each fragment we have $O(\log b)$ levels of the heavy
 path decomposition, and for each level we need $O(\log B)$ calls to the feasibility test, which takes
-$O(\frac{n}{b^4} \times \log b \times \log B \times \log b) = O(\frac{n}{b})$ time in total. We also do linear
+$O(\frac{n}{b^4} \cdot \log b \cdot \log B \cdot \log b) = O(\frac{n}{b})$ time in total. We also do linear
 work exclusive of feasibility tests. This processing of small active fragments takes $O(n)$ time over all
 $\log ^*n$ iterations, by the same reasoning as for the hanging subtrees.
+\end{proof}
+
 
 We now have $O(\frac{n}{B^9})$ active small fragments in total. We declare each large fragment that contains
 a small active fragment as active. For each of the inactive large fragments, we are left with one large caterpillar
 which is the large fragment's spine, that consists of concatenated caterpillars from the smaller fragments. We want
 to process this caterpillar as we have processed the inactive fragments before, and have a large caterpillar that has
-the necessary properties: distances of the leaves from the root and the hole need to be monotone, and there
-should be no collisions between candidate nodes and certain nodes. Once we have these properties, we will
+the following properties.  Once we have these properties, we will
 be able to preprocess the caterpillar for every possible eliminated suffix.
+
+
+\begin{lemma}\label{lemma3}
+	The inactive large fragments can be processed in overall $O(n)$ time so that each of them is a caterpillar, the distances of the leaves from the root and the hole are monotone, and there are no collisions between candidate nodes and certain nodes.
+\end{lemma}
+\begin{proof}
 
 We start by pruning the large caterpillar so that distances of the candidates from the root are
 monotone. Since the distances are monotone inside each small caterpillar, we only have to check the last (bottom most) 
@@ -502,7 +524,7 @@ in the already seen prefix.
 To apply Frederickson's search, we would like to create a matrix of dimension $1\times O(b^{5})$
 for each of the $O(\frac{n}{b^{4}})$ small caterpillars in the whole tree. The total size of all small
 caterpillars is at most $m=n$, so setting $p$ to $\frac{n}{B^9}$ would imply
-$O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (b^{5}), \log(\frac{n}{n/B^{9}} \rbrace) = O(\log B)$ calls to the $O(\frac{n}{b^{4}} \times \log b)$ time test.
+$O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (b^{5}), \log(\frac{n}{n/B^{9}} \rbrace) = O(\log B)$ calls to the $O(\frac{n}{b^{4}} \cdot \log b)$ time test.
 There are two difficulties, though. Firstly, we cannot guarantee that the processing exclusive of feasibility tests
 would sum up to $O(n)$ over all iterations. Secondly, it is not clear how to provide constant time access
 to these matrices, as the candidates nodes inside every small caterpillar are stored in a doubly-linked list,
@@ -517,7 +539,7 @@ create a matrix of dimension $1\times 2^{i}$ for each of the still remaining sma
 The matrix is stored explicitly, that is we extract the top $2^{i}$ candidates nodes from the doubly-linked
 list and store them in an array. Then we set $p$ to $\frac{n}{B^{10}}$ and run Frederickson's search
 on these matrices. The total time for all feasibility tests is then
-$O(\frac{n}{b^{4}}\times \log b \times \log b \times \log b) = O(\frac{n}{b})$. 
+$O(\frac{n}{b^{4}}\cdot \log b \cdot \log b \cdot \log b) = O(\frac{n}{b})$. 
 Then, if all $2^{i}$ candidate nodes have been eliminated, we proceed to the next
 step. Otherwise we have already determined the small caterpillar's prefix that should be eliminated.
 Observe that the total length of all arrays constructed during this procedure is bounded by the number
@@ -525,6 +547,8 @@ of eliminated candidate nodes multiplied by 4. Consequently, both the time neces
 to extract the top candidate nodes (and arrange them in an array) and the time exclusive of feasibility tests sums up to $O(n)$
 over all iterations. During this process we might declare another $O(\frac{n}{B^9})$ large fragments active
 by the choice of $p$.
+\end{proof}
+
 
 We are now left with preprocessing every large caterpillar for every possible eliminated suffix.
 Because we have already pruned the large caterpillar and removed any collisions between a certain
@@ -599,7 +623,7 @@ We describe these two steps separately.
 Consider the unstable suffix of the large caterpillar (the situation for the unstable prefix is
 symmetric). It is easy to see that all of its nodes are contained in unstable suffixes of
 the small caterpillars. We merge the binary search trees storing all these unstable suffixes.
-This takes $O(\log (b^{5}))$ time per small caterpillar, so $O(\frac{n}{b^{4}}\times \log b)=O(\frac{n}{b})$ in total.
+This takes $O(\log (b^{5}))$ time per small caterpillar, so $O(\frac{n}{b^{4}}\cdot \log b)=O(\frac{n}{b})$ in total.
 Then, we binary search among the nodes in the resulting binary search trees to determine
 how many of them are actually sufficiently close to the hole of the large caterpillar, and
 then split the binary search tree to leave only nodes belonging to the unstable suffix
@@ -609,7 +633,7 @@ do not know $\lambda^{*}$ yet. Therefore, we perform all these binary searches i
 that is we proceed in $O(\log (B^{5}))$ rounds. In every step we apply Frederickson's search
 with parameter $p$ set to $\frac{n}{B^{10}}$ to determine outcome of the comparison for all
 but $\frac{n}{B^{10}}$ binary searches. This needs
-$O(\frac{n}{b^{4}}\times\log b\times\log B\times\log B)=O(\frac{n}{b})$ additional time for
+$O(\frac{n}{b^{4}}\cdot\log b\cdot\log B\cdot\log B)=O(\frac{n}{b})$ additional time for
 all the feasibility tests and creates another $O(\frac{n}{B^{9}})$ active large fragments.
 
 Now we describe the structure maintained for the stable infix of a caterpillar consisting of
@@ -624,13 +648,13 @@ that allows us to find, given a node $u$ attached to $h$, the nearest candidate 
 at distance at least $\lambda^{*}$ from $u$, and then follow the jump pointers from $u_{i}$.
 We are interested in the number of traversed jump pointers and the last visited node
 (because of the unstable prefix, we do not need to retrieve both the last node
-and its predecessor). During the pre-processing, we need to merge multiple stable infixes
+and its predecessor). During the preprocessing, we need to merge multiple stable infixes
 into one, while possibly inserting some nodes in-between (these new nodes have previously
 belonged to some unstable prefixes and suffixes). To find $u_{i}$, we keep all candidate
 nodes of a caterpillar in a mergeable balanced search tree. This allows us to locate $u_{i}$
 in logarithmic time (in the size of the caterpillar), and the total time to construct the balanced
 search trees for all stable infixes by merging the smaller balanced search trees
-is $O(\frac{n}{b^{4}}\times \log (B^{5}))=O(\frac{n}{b})$. Note that the smaller balanced search
+is $O(\frac{n}{b^{4}}\cdot \log (B^{5}))=O(\frac{n}{b})$. Note that the smaller balanced search
 trees could either be associated with a stable infix of a small caterpillar or be obtained
 by splitting a balanced search tree stored for an unstable prefix or an unstable suffix of
 a small caterpillar.
@@ -651,7 +675,7 @@ need to set up the jump pointers in the interesting prefixes of the small caterp
 must lead either to a node in the interesting suffix of some small caterpillar
 (or to some new node). We start with checking if the large caterpillar is fresh. This can be
 done by applying Frederickson's search in parallel for all large caterpillars with $p$ set to
-be $\frac{n}{B^{9}}$, using $O(\frac{n}{b^{4}}\times \log b \times \log B)=O(\frac{n}{b})$
+be $\frac{n}{B^{9}}$, using $O(\frac{n}{b^{4}}\cdot \log b \cdot \log B)=O(\frac{n}{b})$
 total time for the feasibility tests and creating up to $O(\frac{n}{B^{9}})$ additional active large
 fragments. If a large caterpillar is fresh, there is nothing to update. Otherwise,
 we gather all candidate nodes belonging to
@@ -659,7 +683,7 @@ an interesting prefix or suffix (or being a new node) and call them \emph{releva
 all nodes of a fresh small caterpillar are relevant.
 We arrange all relevant nodes in an array and apply Frederickson's search to determine the missing jump
 pointers using the array to facilitate constant time access to any relevant node. We again
-set $p$ to be $\frac{n}{B^{9}}$, need $O(\frac{n}{b^{4}}\times \log b \times \log B)=O(\frac{n}{b})$
+set $p$ to be $\frac{n}{B^{9}}$, need $O(\frac{n}{b^{4}}\cdot \log b \cdot \log B)=O(\frac{n}{b})$
 time for the feasibility tests, and create $O(\frac{n}{B^{9}})$ additional active large fragments.
 The time exclusive of the feasibility tests is bounded by the number of relevant nodes.
 We claim that once we know all the missing jump pointers we can actually update the answers
@@ -685,12 +709,12 @@ consists of nodes belonging to fresh small caterpillars and the interesting pref
 some small caterpillar. So to pay for all relevant nodes and then make sure that the invariant
 still holds we only need additional $O(b^{5})$ credits (to pay for the interesting prefix
 of some small caterpillar and the interesting suffix of some small caterpillar) per large
-caterpillar. This sums up to $O(\frac{n}{B^{4}}\times b^{5}) = O(\frac{n}{b})$ per iteration.
+caterpillar. This sums up to $O(\frac{n}{B^{4}}\cdot b^{5}) = O(\frac{n}{b})$ per iteration.
 
 We showed how to obtain an $O(\frac{n}{B^{4}}\log B)$ time test given an $O(\frac{n}{b^{4}}\log b)$
-time test. The pre-processing time is $O(\frac{n}{b})$ per iteration plus amortized constant per
-node of the tree. After $\log ^*n$ iterations, we have a $O(\frac{n}{\log ^4n} \times \log \log n)$ test,
-which we use to solve the dispersion optimization problem in linear time. All iterations of the pre-processing
+time test. The preprocessing time is $O(\frac{n}{b})$ per iteration plus amortized constant per
+node of the tree. After $\log ^*n$ iterations, we have a $O(\frac{n}{\log ^4n} \cdot \log \log n)$ test,
+which we use to solve the dispersion optimization problem in linear time. All iterations of the preprocessing
 cost $O(n)$ time altogether.
 % why do we stop at fragments of size polylog(n)? Can't we get one large fragment?
 
