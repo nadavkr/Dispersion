@@ -733,14 +733,23 @@ First let us formally present the problems:
 Reminder: $f(P)=\min_{u,v\in P} \{d(u,v)\}$.
 
 \subsection{\boldmath$O(n\log n)$ lower bound for the weighted feasibility test}
-\begin{definition} \textbf{The Set Disjointness Problem }
-Given two sets of real numbers, $X=\lbrace x_1,x_2,...,x_n \rbrace, Y=\lbrace y_1,y_2,...,y_n \rbrace$ return true iff $X \cap Y = \emptyset$
-\end{definition}
-We will assume that the elements of $X$ and $Y$ are non-negative. If there are negative numbers in the sets we can just find the minimum element, and add to all the elements the absolute value of the minimum.
 
-\cite{Ben-Or1983} presents a $\Omega(n \log n)$ lower bound for set disjointness in the algebraic computation tree model.
+To prove a lower bound on the weighted feasibility test, we reduce the set disjointness problms:
+
+\begin{definition} {\em The Set Disjointness Problem}
+Given two sets of real numbers, $X=\lbrace x_1,x_2,...,x_n \rbrace, Y=\lbrace y_1,y_2,...,y_n \rbrace$ return true iff $X \cap Y = \emptyset$.
+\end{definition}
+
+Without losing the generality, the elements of $X$ and $Y$ are non-negative, as otherwise
+we can just find the minimum element, and subtract the minimum from all the elements.
+It is known that solving the set disjointness problem requires $\Omega(n \log n)$ operations in the algebraic
+computation tree model~\cite{BenOr} (this subsumes the well-known lower bound in the decision tree
+model), where $|X|=|Y|=n$.
 We present a reduction from the set disjointness problem to the weighted feasibility test problem.
-Given the two sets $X$ and $Y$, we construct a tree $T$, as follows. Let $K=2 \times ( \max \{ \max_i \{ x_i \} , \max_j \{ y_j \} \}) +3$. $T$ contains two vertices of weight zero, $u$ and $v$, that are connected by an edge of length $\frac{K}{2}$. In addition, for each element $x_i \in X$, we have a node of weight $x_i+1$, which is connected to $u$ by an edge of length $\frac{K}{2} - x_i -1$. For each element $y_i \in Y$, we have a node of weight $K - y_i -1$, which is connected to $v$ by an edge of length $y_i+1$.
+
+Given the two sets $X$ and $Y$, we construct a tree $T$, as follows. We first compute and set
+$K := 2 ( \max \{ \max_i \{ x_i \} , \max_j \{ y_j \} \}) +3$.
+$T$ contains two vertices of weight zero, $u$ and $v$, that are connected by an edge of length $\frac{K}{2}$. In addition, for each element $x_i \in X$, we have a node of weight $x_i+1$, which is connected to $u$ by an edge of length $\frac{K}{2} - x_i -1$. For each element $y_i \in Y$, we have a node of weight $K - y_i -1$, which is connected to $v$ by an edge of length $y_i+1$.
 \begin{lemma}
 $X$ and $Y$ are disjoint iff the weighted feasibility test returns false for $T$, with the parameters $W=K$ and $\lambda =K$.
 \end{lemma}
