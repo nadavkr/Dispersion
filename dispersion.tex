@@ -360,7 +360,7 @@ two nodes using Frederickson's method. As we have seen in Section \ref{sublinear
 with linear number of rows and columns, that contains all pairwise distances of a path at the current level. We 
 construct each matrix by pruning the caterpillars so that the distances of leaves from the root and the hole are monotone, thus achieving a matrix that is row and column sorted. For each level of the heavy path decomposition
 we have $O(n/B^3)$ matrices, each of size at most $B^{3}$ and of total size at most $n$.
-We use Frederickson's search with $m=n$ and the parameter $p$ set to $\frac{n}{B^7}$. We thus need to use the
+We use Frederickson's search (Theorem~\ref{Frederickson's theorem}) with $m=n$ and the parameter $p$ set to $\frac{n}{B^7}$. We thus need to use the
 test $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (B^{3}), \log(\frac{n}{n/B^{7}} \rbrace) = O(\log B)$ times, and spend extra linear processing time exclusive of the feasibility tests. We compute the candidate and certain node of each path as we did before, and continue with the next level
 of the heavy path decompositions, until we are left with only the top heavy path of each fragment.
 Since $p>0$, during this preprocessing some fragments become active. Once a fragment becomes active we stop
@@ -403,7 +403,7 @@ contain several small fragments), see Figure \ref{figure of small fragments insi
 \end{figure}
 
 
-\noindent In Subsection~\ref{section:lemma1} we show how to reduce the hanging subtrees to at most two nodes, one candidate and one certain. Then, in Subsection~\ref{section:lemma2} we handle the small active fragments on the spine, and finally in Subsection~\ref{section:lemma3} we reduce the entire large fragment into one caterpillar and process it. 
+\noindent In Subsection~\ref{section:lemma1} we show how to reduce the hanging subtrees to at most two nodes, one candidate and one certain. Then, in Subsection~\ref{section:lemma2} we reduce the small active fragments on the spine to caterpillars. This turns the entire fragment into a large caterpillar. In Subsection~\ref{section:lemma3} we prune this large caterpillar so that it becomes monotone and without collisions. Finally, in Subsection~\ref{section:lemma4} we preprocess the resulting large caterpillar for eliminated suffix queries. 
 
 \subsection{Partitioning into fragments}\label{section:partioioning}
 Our partitioning is obtained by repeatedly applying the following lemma. Let $\alpha$ be the constant hidden in the statement of Lemma~\ref{basic partitioning lemma}.
@@ -432,7 +432,7 @@ Observe that the size of a (large) fragment in the $(\ell+1)$-th partition is at
 
 
 
-\subsection{Reducing the hanging subtrees}\label{section:lemma1}
+\subsection{Reducing each hanging subtree into two nodes}\label{section:lemma1}
 The first step in reducing a large fragment into a caterpillar is reducing the hanging subtrees of the large fragment into at most two nodes. The following lemma shows that this can be done in total $O(n)$ time for all fragments in all the $\log^* n$ partitions.
 
 
@@ -448,34 +448,35 @@ size is bounded by $O(B^5)$, and so we have at most $O(\log B)$ levels in the he
 path decompositions. On each level we run Frederickson's search (similarly to what we have presented before).
 We run this search in parallel, for all heavy paths from all these hanging subtrees in all large fragments.
 The number of  nodes in each level for all the heavy paths together is at most $m=n$ and we set
-the parameter $p$ to $\frac{n}{B^{10}}$, so the number of calls to the $(\frac{n}{b^4} \cdot \log b)$ time test
+the parameter $p$ (in Theorem~\ref{Frederickson's theorem}) to $\frac{n}{B^{10}}$, so the number of calls to the $(\frac{n}{b^4} \cdot \log b)$ time feasibility test
 is $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (B^{5}), \log(\frac{n}{n/B^{10}} \rbrace) = O(\log B)$ per level, so
 $O(\frac{n}{b^4} \cdot \log b \cdot \log^{2} B) = O(\frac{n}{b})$ for every iteration.
 Summing over all $\log^{*}n$ iterations, this is $O(\sum_{\ell}\frac{n}{b_\ell}) = O(n)$.
 
 Constructing the heavy path decompositions and then running Frederickson's search takes linear time in the number
 of nodes in the subtrees. If all of them were then reduced to at most two nodes, one candidate and one certain
-node for each subtree, this would take $O(n)$ time when summed over all the iterations. However, we have set
-the parameter $p$ to $\frac{n}{B^{10}}$ in the Frederickson's search, and thus considering all the levels there
+node for each subtree, this would take $O(n)$ time when summed over all the $\log^{*}n$  iterations. However, we have set
+the parameter $p$ to $\frac{n}{B^{10}}$. Thus, considering all the levels, there
 might be up to $\log B\cdot\frac{n}{B^{10}}\leq \frac{n}{B^{9}}$ large fragments in which we cannot fully reduce
-all the hanging subtrees. The total number of nodes in all such active large fragments is at most
-$\frac{n}{B^9} \cdot O(B^5) = O(\frac{n}{B^{4}})$. We cannot amortize the time spent on processing the hanging
-subtrees there by simply saying that each such hanging subtree is reduced to at most
-two nodes, but we can easily afford to separately pay $O(\frac{n}{B^{4}})$ per iteration for this processing.
+all the hanging subtrees. These are the active large fragments. We preprocess such fragments naively in time linear in their size. 
+This requires only $O(\frac{n}{B^{4}})$ per iteration (and so $O(n)$ overall) since the total size of all active large fragments is at most
+$\frac{n}{B^9} \cdot O(B^5)$. 
+%We cannot amortize the time spent on processing their hanging
+%subtrees  by simply saying that each such hanging subtree is reduced to at most
+%two nodes, but we can easily afford to separately pay $O(\frac{n}{B^{4}})$ per iteration for this processing.
 \end{proof}
 
-Having processed the hanging subtrees, we now have to to deal with active small fragments that are on the spine
-of the large fragment. 
 
-\subsection{Reducing the small active fragments}\label{section:lemma2}
+\subsection{Reducing each small active fragment into a caterpillar}\label{section:lemma2}
+Having processed the hanging subtrees, we now deal with the active small fragments the spine of the large fragment. 
 
 \begin{lemma}\label{lemma2}
-	The small active fragments on the spines of all large fragments can be reduced to catterpillars in total $O(n)$ time. 
+	The small active fragments on the spines of all large fragments can be reduced to caterpillars in total $O(n)$ time. 
 \end{lemma}
 \begin{proof}
 
 In the previous iteration we had $O(\frac{n}{b^9})$ active fragments, which is of course
-too many for the current level. We take the remaining active small fragments (which are on the spines of large 
+too many for the current level. We take the remaining active small fragments (the ones on spines of large 
 fragments), and reduce them to caterpillars (again by constructing the heavy path decomposition and running
 Frederickson's search with $p$ set to $\frac{n}{B^{10}}$). In each fragment we have $O(\log b)$ levels of the heavy
 path decomposition, and for each level we need $O(\log B)$ calls to the feasibility test, which takes
@@ -485,14 +486,13 @@ $\log ^*n$ iterations, by the same reasoning as for the hanging subtrees.
 \end{proof}
 
 
-We now have $O(\frac{n}{B^9})$ active small fragments in total. We declare each large fragment that contains
-a small active fragment as active. For each of the inactive large fragments, we are left with one large caterpillar
-which is the large fragment's spine, that consists of concatenated caterpillars from the smaller fragments. We want
-to process this caterpillar as we have processed the inactive fragments before, and have a large caterpillar that has
+We now have $O(\frac{n}{B^9})$ active small fragments in total. We declare each large fragment that contains a small active fragment as active. 
+
+\subsection{Pruning the resulting large catterpillar}\label{section:lemma3}
+So far, each inactive large fragment was reduced to one large caterpillar which is the concatenation of caterpillars from the smaller fragments. We want
+to process this caterpillar (as we have processed the inactive fragments before) in order to ensure
 the following properties.  Once we have these properties, we will
 be able to preprocess the caterpillar for every possible eliminated suffix.
-
-\subsection{Reducing the large inactive fragments}\label{section:lemma3}
 
 \begin{lemma}\label{lemma3}
 	The inactive large fragments can be processed in overall $O(n)$ time so that each of them is a caterpillar, the distances of the leaves from the root and the hole are monotone, and there are no collisions between candidate nodes and certain nodes.
@@ -562,6 +562,8 @@ over all iterations. During this process we might declare another $O(\frac{n}{B^
 by the choice of $p$.
 \end{proof}
 
+
+\subsection{Preprocess the resulting large caterpillar for every eliminated suffix}\label{section:lemma4}
 
 We are now left with preprocessing every large caterpillar for every possible eliminated suffix.
 Because we have already pruned the large caterpillar and removed any collisions between a certain
