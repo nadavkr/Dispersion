@@ -381,8 +381,13 @@ $\log ^*n$ iterations, this time with only one fragment of size $n$).
 \section{A Sublinear Feasibility Test with \boldmath
 \boldmath$O(n)$ Preprocessing}\label{sectionLinear}
 
-In the previous section, we partitioned the input tree into fragments independently for each fragment size. This resulted in $\log^{*}n$ partitions, each preprocessed in $O(n)$ time. In order to obtain overall $O(n)$ time, we first introduce a dependency between the partitions: The fragments of the $(\ell+1)$-th partition are composed of fragments of the $\ell$-th partition. To this end, we relax the definition of a {\em good partition} so that, in a partition into $n/b$ fragments, a fragment can consist of more than $O(b)$ nodes. The partitioning is simple and is given in Subsection~\ref{section:partioioning}.  
-The main challenge of this section is to extend the feasibility tests on the fragments of the $\ell$-th partition (small fragments) to feasibility tests on the fragments of the $(\ell+1)$-th partition (large fragments), such that all iterations take overall $O(n)$ time.
+
+In this section, given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with $O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
+After $\log ^*n$ iterations requiring a total of $O(n)$ time, we will have a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time
+which we use to solve the dispersion optimization problem in $O(n)$. 
+
+
+In the previous section, we partitioned the input tree into fragments independently for each fragment size. This resulted in $\log^{*}n$ partitions, each preprocessed in $O(n)$ time. In order to obtain overall $O(n)$ time, we first introduce a dependency between the partitions: The fragments of the $(\ell+1)$-th partition (called large fragments) are composed of fragments of the $\ell$-th partition (called small fragments). To this end, we relax the definition of a {\em good partition} so that, in a partition into $n/b$ fragments, a fragment can consist of more than $O(b)$ nodes. The partitioning is simple and is given in Subsection~\ref{section:partioioning}.  
 
 Consider a large fragment. It is composed of small fragments. Notice that some of these small fragments are active fragments, i.e. have not been reduced to caterpillars in the previous iteration, but most are inactive fragments, which have
 been reduced to caterpillars. The large fragment contains some small fragments whose roots and holes are spine nodes of the large fragment,
@@ -421,10 +426,6 @@ $$ O(\sum_{\ell} {n}/{b_{\ell}}) = O(\sum_{\ell} {n}/{2^{\ell}}) = O(n).$$
 Observe that the size of a (large) fragment in the $(\ell+1)$-th partition is at most $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$ which is at most $O((b_{\ell+1})^5)$ for a large enough $\ell$.\footnote{For sufficiently large $\ell$ we have that $\alpha^{\ell+1}\leq 2^{2^{\ell+1}}$ and $b_{\ell+1}\geq 2^{2^{\ell+1}}$.}  Denoting by $b=b_{\ell}$ and $B=b_{\ell+1}$  we get that every large fragment is of size $O(B^5)$ and is composed of (small) fragments of the $\ell$-th partition (each of size $O(b^5)$). 
 
 
-In the rest of this section, we will show how to obtain in amortized $O(\frac{n}{b_\ell})$ time a feasibility test with $O(\frac{n}{(b_{\ell+1})^{4}}\log (b_{\ell+1}))$ query-time given a feasibility test with $O(\frac{n}{(b_{\ell})^{4}}\log (b_{\ell}))$  query-time.
-% 
-After $\log ^*n$ iterations requiring a total of $O(n)$ time, we will have a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time
-which we use to solve the dispersion optimization problem in $O(n)$. 
 
 
 
