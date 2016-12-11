@@ -380,41 +380,12 @@ $\log ^*n$ iterations, this time with only one fragment of size $n$).
 
 \section{A Sublinear Feasibility Test with \boldmath
 \boldmath$O(n)$ Preprocessing}\label{sectionLinear}
-Our linear-time preprocessing is based on the $O(n \log ^*n)$ preprocessing presented in the previous section. In order to achieve linear time
-in total we cannot partition the input tree to fragments independently for each fragment size, as we need
-the total time for all $\log^{*}n$ decompositions to be $O(n)$. We relax the definition of a good partition
-so that in a partition into $n/b$ fragments, a fragment can consist of more than $O(b)$ nodes.
-Let $\alpha$ be the constant hidden in the statement of Lemma~\ref{basic partitioning lemma}.
 
-\begin{lemma}\label{good partition refinement lemma}
-Given a good partition of a binary tree into $n/b^{4}$ fragments each of size at most $\alpha^{\ell}\cdot b^{4}$, there
-exists a good partition of the tree into $n/(2^b)^{4}$ fragments each of size at most $\alpha^{\ell+1}\cdot (2^{b})^{4}$,
-such that every small fragment is fully contained inside a large fragment.
-\end{lemma}
-\begin{proof}
-Define $T'$ as the tree obtained by collapsing each small fragment (of the given partition) to a single node. Apply 
-Lemma \ref{basic partitioning lemma} to $T'$, with the parameter set to $B= {(2^{b})^{4}}/{b^{4}}$. We obtain
-$\frac{n/b^4}{B}=n/(2^{b})^{4}$ fragments. Each of them corresponds to a fragment of the original tree of size at
-most $\alpha\cdot \alpha^{\ell}\cdot b^{4}\cdot B = \alpha^{\ell+1}\cdot (2^{b})^{4}$.
-\end{proof}
+In the previous section, we partitioned the input tree into fragments independently for each fragment size. This resulted in $\log^{*}n$ partitions, each preprocessed in $O(n)$ time. In order to obtain overall $O(n)$ time, we first introduce a dependency between the partitions: The fragments of the $(\ell+1)$-th partition are composed of fragments of the $\ell$-th partition. To this end, we relax the definition of a {\em good partition} so that, in a partition into $n/b$ fragments, a fragment can consist of more than $O(b)$ nodes. The partitioning is simple and is given in Subsection~\ref{section:partioioning}.  
+The main challenge of this section is to extend the feasibility tests on the fragments of the $\ell$-th partition (small fragments) to feasibility tests on the fragments of the $(\ell+1)$-th partition (large fragments), such that all iterations take overall $O(n)$ time.
 
-We apply Lemma~\ref{good partition refinement lemma} $\log^{*}n$ times. Denote by $b_{\ell}$ the value of
-the parameter $b$ in the $\ell$-th application.
-The time to construct the $(\ell+1)$-th good partition is $O(n/(b_{\ell})^{4})=O(n/b_{\ell})$,
-which can be bounded by: $$ O(\sum_{\ell} \frac{n}{b_{\ell}}) = O(\sum_{\ell} \frac{n}{2^{\ell}}) = O(n).$$
-After every application, we construct the corresponding $O(\frac{n}{(b_{\ell+1})^{4}}\cdot \log b_{\ell+1})$ time
-test given the previous $O(\frac{n}{(b_{\ell})^{4}}\cdot \log b_{\ell})$ time test and a good partition of the tree
-into up to $n/b_{\ell+1}$ fragments of size $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$.
-Observe that, for large enough $\ell$, $\alpha^{\ell}\leq 2^{2^{\ell}}$, and $b_{\ell}\geq 2^{2^{\ell}}$,
-so $\alpha^{\ell}\cdot (b_{\ell})^{4} = O((b_{\ell})^{5})$. %TODO check this!!!
-We now describe a single iteration of this procedure, and for conciseness write $b=b_{\ell}$ and $B=b_{\ell+1}$.
-
-Consider a large fragment (of size $O(B^5)$) containing some small fragments
-(of size $O(b^5)$). Notice that some of these small fragments are active fragments, i.e. have not
-been reduced to caterpillars in the previous iteration, but almost all are inactive fragments, which have
-been reduced to caterpillars. We require the number of active small fragments
-to be bounded by $O(\frac{n}{b^{9}})$.
-The large fragment contains some small fragments whose roots and holes are spine nodes of the large fragment,
+Consider a large fragment. It is composed of small fragments. Notice that some of these small fragments are active fragments, i.e. have not been reduced to caterpillars in the previous iteration, but most are inactive fragments, which have
+been reduced to caterpillars. The large fragment contains some small fragments whose roots and holes are spine nodes of the large fragment,
 and other fragments that form subtrees hanging off of the large fragment's spine (each hanging subtree may
 contain several small fragments), see Figure \ref{figure of small fragments inside a large fragment}.
 
@@ -422,14 +393,52 @@ contain several small fragments), see Figure \ref{figure of small fragments insi
 \begin{center}
 \includegraphics[scale=1]{refinement}
 \end{center}
-\caption{A large fragment containing a number of smaller fragments. The small fragments on the spine are gray, and the subtrees hanging off of the spine are black. We start by reducing the hanging subtrees to just two nodes, then handle the small active fragments on the spine, and finally reduce the entire large fragment to one caterpillar and process it. \label{figure of small fragments inside a large fragment}}
+\caption{A large fragment containing a number of smaller fragments. The small fragments on the spine are gray, and the subtrees hanging off of the spine are black (each of them may contain many small fragments). %We start by reducing the hanging subtrees to just two nodes, then handle the small active fragments on the spine, and finally reduce the entire large fragment to one caterpillar and process it. 
+\label{figure of small fragments inside a large fragment}}
 \end{figure}
 
 
-We start by reducing the hanging subtrees to at most two nodes, one candidate and one certain (Lemma~\ref{lemma1}), then we handle the small active fragments on the spine (Lemma~\ref{lemma2}), and finally we reduce the entire large fragment to one caterpillar and process it (Lemma~\ref{lemma3}). 
+\noindent In Subsection~\ref{section:lemma1} we show how to reduce the hanging subtrees to at most two nodes, one candidate and one certain. Then, in Subsection~\ref{section:lemma2} we handle the small active fragments on the spine, and finally in Subsection~\ref{section:lemma3} we reduce the entire large fragment into one caterpillar and process it. 
+
+\subsection{Partitioning into fragments}\label{section:partioioning}
+Our partitioning is obtained by repeatedly applying the following lemma. Let $\alpha$ be the constant hidden in the statement of Lemma~\ref{basic partitioning lemma}.
+
+\begin{lemma}\label{good partition refinement lemma}
+Given a good partition of a binary tree into $n/b^{4}$ fragments each of size at most $\alpha^{\ell}\cdot b^{4}$, there
+exists a good partition of the tree into $n/(2^b)^{4}$ fragments each of size at most $\alpha^{\ell+1}\cdot (2^{b})^{4}$,
+where every fragment in the first partition is contained inside a fragment in the second partition.
+\end{lemma}
+\begin{proof}
+Define $T'$ as the tree obtained by collapsing each fragment of the given partition into a single node. Apply 
+Lemma \ref{basic partitioning lemma} to $T'$, with the parameter set to $B= {(2^{b})^{4}}/{b^{4}}$. We obtain
+$\frac{n/b^4}{B}=n/(2^{b})^{4}$ fragments. Each of them corresponds to a fragment of the original tree of size at
+most $\alpha\cdot \alpha^{\ell}\cdot b^{4}\cdot B = \alpha^{\ell+1}\cdot (2^{b})^{4}$.
+\end{proof}
+
+\noindent The entire partition is obtained by applying Lemma~\ref{good partition refinement lemma} $\log^{*}n$ times. 
+If $b_{\ell}$ denotes the value of the parameter $b$ in the $\ell$-th application, then  $b_{\ell+1}=2^{b_{\ell}}$. The time to construct the $(\ell+1)$-th partition is $O(n/(b_{\ell})^{4})=O(n/b_{\ell})$. The overall time to construct all partitions is therefore 
+$$ O(\sum_{\ell} {n}/{b_{\ell}}) = O(\sum_{\ell} {n}/{2^{\ell}}) = O(n).$$
+Observe that the size of a (large) fragment in the $(\ell+1)$-th partition is at most $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$ which is at most $O((b_{\ell+1})^5)$ for a large enough $\ell$.\footnote{For sufficiently large $\ell$ we have that $\alpha^{\ell+1}\leq 2^{2^{\ell+1}}$ and $b_{\ell+1}\geq 2^{2^{\ell+1}}$.}  Denoting by $b=b_{\ell}$ and $B=b_{\ell+1}$  we get that every large fragment is of size $O(B^5)$ and is composed of (small) fragments of the $\ell$-th partition (each of size $O(b^5)$). 
+
+
+In the rest of this section, we will show how to obtain in amortized $O(\frac{n}{b_\ell})$ time a feasibility test with $O(\frac{n}{(b_{\ell+1})^{4}}\log (b_{\ell+1}))$ query-time given a feasibility test with $O(\frac{n}{(b_{\ell})^{4}}\log (b_{\ell}))$  query-time.
+% 
+After $\log ^*n$ iterations requiring a total of $O(n)$ time, we will have a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time
+which we use to solve the dispersion optimization problem in $O(n)$. 
+
+
+
+
+
+
+\subsection{Reducing the hanging subtrees}\label{section:lemma1}
+The first step in reducing a large fragment into a caterpillar is reducing the hanging subtrees of the large fragment into at most two nodes. The following lemma shows that this can be done in total $O(n)$ time for all fragments in all the $\log^* n$ partitions.
+
+
+
 
 \begin{lemma}\label{lemma1}
-	The hanging subtrees of all large fragments can be reduced to at most two nodes (one candidate and one certain) in total $O(n)$ time. 
+	The hanging subtrees of the large fragments in all the partitions can be reduced to at most two nodes (one candidate and one certain) in total $O(n)$ time. 
 \end{lemma}
 \begin{proof}
 We 
@@ -457,6 +466,8 @@ two nodes, but we can easily afford to separately pay $O(\frac{n}{B^{4}})$ per i
 Having processed the hanging subtrees, we now have to to deal with active small fragments that are on the spine
 of the large fragment. 
 
+\subsection{Reducing the small active fragments}\label{section:lemma2}
+
 \begin{lemma}\label{lemma2}
 	The small active fragments on the spines of all large fragments can be reduced to catterpillars in total $O(n)$ time. 
 \end{lemma}
@@ -480,6 +491,7 @@ to process this caterpillar as we have processed the inactive fragments before, 
 the following properties.  Once we have these properties, we will
 be able to preprocess the caterpillar for every possible eliminated suffix.
 
+\subsection{Reducing the large inactive fragments}\label{section:lemma3}
 
 \begin{lemma}\label{lemma3}
 	The inactive large fragments can be processed in overall $O(n)$ time so that each of them is a caterpillar, the distances of the leaves from the root and the hole are monotone, and there are no collisions between candidate nodes and certain nodes.
