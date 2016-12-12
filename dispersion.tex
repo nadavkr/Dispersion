@@ -468,7 +468,7 @@ $\frac{n}{B^9} \cdot O(B^5)$.
 
 
 \subsection{Reducing each small active fragment into a caterpillar}\label{section:lemma2}
-Having processed the hanging subtrees, we now deal with the active small fragments the spine of the large fragment. 
+Having processed the hanging subtrees, we now deal with the active small fragments on the spine of the large fragment. 
 
 \begin{lemma}\label{lemma2}
 	The small active fragments on the spines of all large fragments can be reduced to caterpillars in total $O(n)$ time. 
@@ -486,12 +486,12 @@ $\log ^*n$ iterations, by the same reasoning as for the hanging subtrees.
 \end{proof}
 
 
-We now have $O(\frac{n}{B^9})$ active small fragments in total. We declare each large fragment that contains a small active fragment as active. 
+We now have $O(\frac{n}{B^9})$ small active fragments in total. We declare each large fragment that contains a small active fragment as active. 
 
 \subsection{Pruning the resulting large catterpillar}\label{section:lemma3}
-So far, each inactive large fragment was reduced to one large caterpillar which is the concatenation of caterpillars from the smaller fragments. We want
-to process this caterpillar (as we have processed the inactive fragments before) in order to ensure
-the following properties.  Once we have these properties, we will
+So far, each inactive large fragment was reduced to one large caterpillar consisting of the concatenation of caterpillars from the smaller fragments on its spine. We want
+to prune this large caterpillar (as we have done to the inactive fragments before) in order to ensure
+that it is monotone and contains no collisions.   Then, we will
 be able to preprocess the caterpillar for every possible eliminated suffix.
 
 \begin{lemma}\label{lemma3}
@@ -518,7 +518,7 @@ non-decreasing. We repeat the symmetric process from top to bottom to ensure tha
 from the hole are non-decreasing. The whole procedure takes linear time in the number of eliminated
 candidate nodes plus the number of small fragments, which sums up to $O(n)$ overall.
 
-Now we need to eliminate all internal "collisions" inside the large caterpillar (i.e. remove candidate nodes that
+Now we need to eliminate all internal ``collisions'' inside the large caterpillar (i.e. remove candidate nodes that
 are too close to certain nodes). These collisions can occur between a candidate node of one small caterpillar
 and a certain node of another small caterpillar. Each certain node eliminates a range of consecutive
 candidates nodes below and above its small caterpillar. Therefore, we only need to consider the 
@@ -538,19 +538,20 @@ To apply Frederickson's search, we would like to create a matrix of dimension $1
 for each of the $O(\frac{n}{b^{4}})$ small caterpillars in the whole tree. The total size of all small
 caterpillars is at most $m=n$, so setting $p$ to $\frac{n}{B^9}$ would imply
 $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (b^{5}), \log(\frac{n}{n/B^{9}} \rbrace) = O(\log B)$ calls to the $O(\frac{n}{b^{4}} \cdot \log b)$ time test.
-There are two difficulties, though. Firstly, we cannot guarantee that the processing exclusive of feasibility tests
-would sum up to $O(n)$ over all iterations. Secondly, it is not clear how to provide constant time access
+There are two difficulties, though. First, we cannot guarantee that the processing exclusive of feasibility tests
+would sum up to $O(n)$ over all iterations. Second, it is not clear how to provide constant time access
 to these matrices, as the candidates nodes inside every small caterpillar are stored in a doubly-linked list,
-so we are not able to retrieve any of them in constant time. We could have maintained the candidate
-nodes in an array, but then after the whole pruning and eliminating we would need to merge the arrays
-of all small caterpillars to obtain the array of the large caterpillar, which is does not seem possible
-in constant time (and we cannot afford to spend much more per a small caterpillar).
+so we are not able to retrieve any of them in constant time. 
+%We could have maintained the candidate
+%nodes in an array, but then after the whole pruning and eliminating we would need to merge the arrays
+%of all small caterpillars to obtain the array of the large caterpillar, which  does not seem possible
+%in constant time (and we cannot afford to spend much more per a small caterpillar).
 
 We mitigate both difficulties with the same trick. We proceed in $O(\log b)$ steps that, intuitively, correspond
 to binary searching for how long should the eliminated prefix be. In the $i$-th step we
 create a matrix of dimension $1\times 2^{i}$ for each of the still remaining small caterpillars.
 The matrix is stored explicitly, that is we extract the top $2^{i}$ candidates nodes from the doubly-linked
-list and store them in an array. Then we set $p$ to $\frac{n}{B^{10}}$ and run Frederickson's search
+list and store them in an array. We set $p$ to $\frac{n}{B^{10}}$ and run Frederickson's search
 on these matrices. The total time for all feasibility tests is then
 $O(\frac{n}{b^{4}}\cdot \log b \cdot \log b \cdot \log b) = O(\frac{n}{b})$. 
 Then, if all $2^{i}$ candidate nodes have been eliminated, we proceed to the next
@@ -565,12 +566,12 @@ by the choice of $p$.
 
 \subsection{Preprocess the resulting large caterpillar for every eliminated suffix}\label{section:lemma4}
 
-We are now left with preprocessing every large caterpillar for every possible eliminated suffix.
+Having reduced a large fragment to a large caterpillar, we are now left only with preprocessing these large caterpillar for every possible eliminated suffix.
 Because we have already pruned the large caterpillar and removed any collisions between a certain
-node and a candidate node there, we only have to consider the remaining candidate nodes.
-Recall that in the previous algorithm we stored at the bottom node of every prefix of the caterpillar
+node and a candidate node, we only have to consider the remaining candidate nodes.
+Recall that, in the previous algorithm, we stored at the bottom node of every prefix of the caterpillar
 the following information: the number of chosen nodes, the candidate node, and the certain node for this fragment,
-assuming that the suffix below this node is eliminated. Now, we cannot afford to explicitly
+assuming that the suffix below this node is eliminated. Now however, we cannot afford to explicitly
 compute such information for every node in every iteration of the algorithm (i.e. for each fragment size),
 as this might take linear time per iteration. We start with reinterpreting it in terms of
 \emph{jump pointers}. For each candidate node in a caterpillar, its jump pointers leads to the nearest
