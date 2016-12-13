@@ -7,7 +7,7 @@
 \usepackage[usenames,dvipsnames]{xcolor}
 \urlstyle{same}
 
-\usepackage{amsthm,amsmath,amssymb,mathabx}
+\usepackage{amsthm,amsmath,amssymb}
 \usepackage{fullpage}
 \usepackage[ruled,noend,linesnumbered]{algorithm2e}     
 \usepackage{enumerate,comment}
@@ -88,7 +88,7 @@ A related problem, also suggested in the early 80's  \cite{Becker1982,Perl1981},
 %
 Finally, and the focus of this paper, is the  {\em $k$-dispersion} problem. In this problem we wish to designate $k$ nodes as facilities so as to maximize the distances among the facilities.  In other words, we wish to select $k$ nodes that are as spread-apart as possible. This can be seen as a generalization of the classical maximum independent set problem (that can be solved by binary searching for the largest value of $k$ for which the minimum distance is at least 2).  
 %
-It turns out that the $k$-dispersion and the $k$-partitioning problems are actually equivalent in the one-dimensional case (i.e., when the tree is a path).\footnote{The reduction simply creates a new path, whose edges correspond to nodes in the original path and vice versa. The original edge weights are now assigned to the nodes so we can run the $k$-partitioning solution.} However, such equivalence does not apply to general trees, on which $k$-dispersion seems more difficult than $k$-partitioning. In particular, until the present work, no linear solution for $k$-dispersion was known and the fastest solution was the $O(n \log n)$ solution given in the early 90's by Bhattacharya and Houle \cite{Bhattacharya1991}. Bhattacharya and Houle also considered the case where nodes have weights and the goal is to select nodes with total weight at least $k$. For the weighted case, they gave an $\Oh(n\log^4 n)$ time solution. Both their solutions also rely on the framework of Fredrickson.
+It turns out that the $k$-dispersion and the $k$-partitioning problems are actually equivalent in the one-dimensional case (i.e. when the tree is a path).\footnote{The reduction simply creates a new path, whose edges correspond to nodes in the original path and vice versa. The original edge weights are now assigned to the nodes so we can run the $k$-partitioning solution.} However, such equivalence does not apply to general trees, on which $k$-dispersion seems more difficult than $k$-partitioning. In particular, until the present work, no linear solution for $k$-dispersion was known and the fastest solution was the $O(n \log n)$ solution given in the early 90's by Bhattacharya and Houle \cite{Bhattacharya1991}. Bhattacharya and Houle also considered the case where nodes have weights and the goal is to select nodes with total weight at least $k$. For the weighted case, they gave an $\Oh(n\log^4 n)$ time solution. Both their solutions also rely on the framework of Fredrickson.
 
 \vspace{-0.1in}
 \paragraph{Fredrickson's framework.}
@@ -118,32 +118,29 @@ of all the matrices is $O(n\log n)$, and we can provide constant-time access to 
 %decompositions used by Frederickson.%TODO explain more?
 
 \paragraph{Our feasibility test.}
-We define a variant of micro-macro decomposition that partitions the input tree $T$ into $O(n/x)$ {\em fragments}, each containing $O(x)$ nodes and at most two {\em boundary nodes} incident to nodes in other fragments. Our variant is unique in the sense that it guarantees that one boundary node is always the root of the fragment (the other boundary node is called the {\em hole}). We use this to
+We define a variant of micro-macro decomposition that partitions the input tree $T$ into $O(n/b)$ {\em fragments}, each containing $O(b)$ nodes and at most two {\em boundary nodes} incident to nodes in other fragments. Our variant is unique in the sense that it guarantees that one boundary node is always the root of the fragment (the other boundary node is called the {\em hole}). We use this to
  simulate a bottom-up feasibility test by jumping over whole 
-fragments. I.e., knowing $\lambda$, we would like to extend in $O(\log x)$ time a solution for a subtree of $T$ rooted at a hole to a subtree of $T$ rooted at the fragment's root. This is achieved by a rather complicated preprocessing which we next highlight.
+fragments. i.e. knowing $\lambda$, we would like to extend in $O(\log b)$ time a solution for a subtree of $T$ rooted at a hole to a subtree of $T$ rooted at the fragment's root. This is achieved by a rather complicated preprocessing which we next highlight.
 
-The first step of the preprocessing computes values $\lambda_1$ and  $\lambda_2$ such that (1) there is no solution to the decision problem on $T$ for any $\lambda > \lambda_2$, (2) there is a solution to the decision problem on $T$ for $\lambda = \lambda_1$ (hence also for any $\lambda < \lambda_1$), and (3) for {\em most} of the fragments, the distance between any two nodes in $F$ is either smaller than $\lambda_1$ or larger than $\lambda_2$. This is achieved with a recursive procedure that uses centroid decomposition in order to obtain the implicit monotone matrices required for Frederickson's parametric search. The (few) fragments that do not satisfy property (3) are handled naively in linear $O(x)$ time during query time. The fragments that do satisfy property (3) are handled in the second step of the preprocessing: The goal here is to eliminate from such fragments nodes that are guaranteed to be included or excluded from an optimal solution for any $\lambda \in [\lambda_1,\lambda_2]$. This is done by looking at the path from the hole to the root of the fragment and running the linear-time feasibility test for all subtrees hanging off from it (all contained in the fragment). It turns out that we can run this feasibility test without knowing $\lambda$ as long as we can determine for any two nodes if their distance is smaller than $\lambda_1$ or larger than $\lambda_2$ (which we can, in constant time). This allows us to conceptually trim the fragment and think of it as a caterpillar. The spine of the caterpillar is the hole-to-root path and each spine node has two leaf children - a \emph{certain} node (that is guaranteed to be included in an optimal solution for any $\lambda$, and a \emph{candidate} node (whose inclusion in an optimal solution depends on $\lambda$). Finally, we perform additional pruning of some caterpillar leaves that results in a highly structured caterpillar where the leaves are in monotonically increasing distance from both the hole and the root. This structure enables us to precompute for each candidate node, assuming this node is the bottom-most node in the solution, what are all the other nodes in the solution. Upon query, we can then extend in $O(\log x)$ time a solution from the subtree rooted at the hole to the subtree rooted at the root by  binary searching for this bottom-most node. 
+The first step of the preprocessing computes values $\lambda_1$ and  $\lambda_2$ such that (1) there is no solution to the decision problem on $T$ for any $\lambda > \lambda_2$, (2) there is a solution to the decision problem on $T$ for $\lambda = \lambda_1$ (hence also for any $\lambda < \lambda_1$), and (3) for {\em most} of the fragments, the distance between any two nodes in $F$ is either smaller than $\lambda_1$ or larger than $\lambda_2$. This is achieved with a recursive procedure that uses centroid decomposition in order to obtain the implicit monotone matrices required for Frederickson's parametric search. The (few) fragments that do not satisfy property (3) are handled naively in linear $O(x)$ time during query time. The fragments that do satisfy property (3) are handled in the second step of the preprocessing: The goal here is to eliminate from such fragments nodes that are guaranteed to be included or excluded from an optimal solution for any $\lambda \in [\lambda_1,\lambda_2]$. This is done by looking at the path from the hole to the root of the fragment and running the linear-time feasibility test for all subtrees hanging off from it (all contained in the fragment). It turns out that we can run this feasibility test without knowing $\lambda$ as long as we can determine for any two nodes if their distance is smaller than $\lambda_1$ or larger than $\lambda_2$ (which we can, in constant time). This allows us to conceptually trim the fragment and think of it as a caterpillar. The spine of the caterpillar is the hole-to-root path and each spine node has two leaf children - a \emph{certain} node (that is guaranteed to be included in an optimal solution for any $\lambda$, and a \emph{candidate} node (whose inclusion in an optimal solution depends on $\lambda$). Finally, we perform additional pruning of some caterpillar leaves that results in a highly structured caterpillar where the leaves are in monotonically increasing distance from both the hole and the root. This structure enables us to precompute for each candidate node, assuming this node is the bottom-most node in the solution, what are all the other nodes in the solution. Upon query, we can then extend in $O(\log b)$ time a solution from the subtree rooted at the hole to the subtree rooted at the root by  binary searching for this bottom-most node. 
 
-The above feasibility test is presented in Section~\ref{sublinear f.t.}. By appropriately setting up $x$ to balance the preprocessing and the query time, the overall preprocessing time is $O(n\log\log n)$. The bottleneck of this preprocessing are its calls to the vanilla linear-time feasibility test.  
+The above feasibility test is presented in Section~\ref{sublinear f.t.}. By appropriately setting up $b$ to balance the preprocessing and the query time, the overall preprocessing time is $O(n\log\log n)$. The bottleneck of this preprocessing are its calls to the vanilla linear-time feasibility test.  
 We next improve this gradually to $O(n\log^* n)$ by constructing a sequence of faster and faster feasibility tests. 
 We iteratively use the current feasibility test to construct the next (faster) feasibility test.
-Every iteration uses an appropriately chosen parameter $x$ for the micro-macro decomposition
+Every iteration uses an appropriately chosen parameter $b$ for the micro-macro decomposition
 as to guarantee that the construction time is $O(n)$. The parameters grow exponentially,
 so after $O(\log^{*}n)$ iterations we obtain the desired  feasibility test with sublinear query and $O(n\log^* n)$ preprocessing (see Section~\ref{sectionlog*}). 
 
-Finally, in Section~\ref{sectionLinear}, we improve the preprocessing from $O(n\log^* n)$ to $O(n)$. 
-The main difficulty here is that now we cannot afford to construct each micro-macro decomposition separately. We overcome this by making each decomposition
-a refinement of the previous one. With some care, all decompositions can be then constructed in
-$O(n)$ total time. We believe that this (simple) micro-macro construction is of independent interest. Then, there
-are some additional details in how we preprocess every fragment. We cannot afford to touch
-every node of every fragment at every level. Therefore, we take a closer look at how a fragment
-decomposes into previous fragments. With some care, the results of preprocessing the previous
-fragments can be reused while adding some extra work that amortizes to $O(n)$ over all decompositions.
-\todo{Feels like this last paragraph should be extended a bit. Also, need to add description of the weighted case}
+Finally, in Section~\ref{sectionLinear}, we improve the preprocessing from $O(n\log^* n)$ to $O(n)$. This means we cannot afford to construct each micro-macro decomposition separately. We overcome this by making each decomposition a refinement of the previous one. This requires relaxing the decomposition so that a fragment may contain more than $O(b)$ nodes. 
+We believe that this (simple) micro-macro variant is of independent interest. 
+%
+The main difficulty remaining is how to preprocess the fragments. We cannot afford to touch very node of every fragment at every decomposition level. Therefore, we take a closer look at how a (large) fragment decomposes into smaller fragments. 
+We show that a large fragment can be reduced to a concatenation of small caterpillars, each corresponding to a small fragment that we have already preprocessed. We then very carefully tailor these small fragments while reusing the results of their preprocessing. We show that this tailoring amortizes to $O(n)$ over all decompositions. This turns out to be quite technical. 
+
 
 \section{A Linear Feasibility Test}\label{linear F.T.}
 %\begin{algo} \label{unWeightedFeasibilityAlgo}
-We show a recursive linear algorithm. At each step of the recursion, we would like to provide a valid solution with maximal cardinality for the current subtree, given some $\lambda$, i.e., the algorithm will maintain the following invariant:
+We show a recursive linear algorithm. At each step of the recursion, we would like to provide a valid solution with maximal cardinality for the current subtree, given some $\lambda$, i.e. the algorithm will maintain the following invariant:
 \begin{invariant}\label{Maximality of P and distance of closest node invariant}
 For every node of the tree, $r$, the algorithm produces $P$, a subset of the vertices of the subtree rooted at $r$, s.t. $f(P)\geq\lambda$ and $|P|$ is maximal. Out of all such valid subsets with maximal cardinality, the distance between $r$ and the node closest to it is maximized in $P$.
 \end{invariant}
@@ -432,7 +429,7 @@ Observe that the size of a (large) fragment in the $(\ell+1)$-th partition is at
 
 
 
-\subsection{Reducing each hanging subtree into two nodes}\label{section:lemma1}
+\subsection{Reducing a hanging subtree into two nodes}\label{section:lemma1}
 The first step in reducing a large fragment into a caterpillar is reducing the hanging subtrees of the large fragment into at most two nodes. The following lemma shows that this can be done in total $O(n)$ time for all fragments in all the $\log^* n$ partitions.
 
 
@@ -467,7 +464,7 @@ $\frac{n}{B^9} \cdot O(B^5)$.
 \end{proof}
 
 
-\subsection{Reducing each small active fragment into a caterpillar}\label{section:lemma2}
+\subsection{Reducing a small active fragment into a caterpillar}\label{section:lemma2}
 Having processed the hanging subtrees, we now deal with the active small fragments on the spine of the large fragment. 
 
 \begin{lemma}\label{lemma2}
@@ -488,7 +485,7 @@ $\log ^*n$ iterations, by the same reasoning as for the hanging subtrees.
 
 We now have $O(\frac{n}{B^9})$ small active fragments in total. We declare each large fragment that contains a small active fragment as active. 
 
-\subsection{Pruning the resulting large catterpillar}\label{section:lemma3}
+\subsection{Pruning the resulting large caterpillar}\label{section:lemma3}
 So far, each inactive large fragment was reduced to one large caterpillar consisting of the concatenation of caterpillars from the smaller fragments on its spine. We want
 to prune this large caterpillar (as we have done to the inactive fragments before) in order to ensure
 that it is monotone and contains no collisions.   Then, we will
@@ -564,42 +561,46 @@ by the choice of $p$.
 \end{proof}
 
 
-\subsection{Preprocess the resulting large caterpillar for every eliminated suffix}\label{section:lemma4}
+\subsection{Preprocessing the large caterpillar for every possible eliminated suffix}\label{section:lemma4}
 
-Having reduced a large fragment to a large caterpillar, we are now left only with preprocessing these large caterpillar for every possible eliminated suffix.
+Having reduced a large fragment to a large caterpillar, we are now left only with preprocessing this large caterpillar for every possible eliminated suffix.
 Because we have already pruned the large caterpillar and removed any collisions between a certain
 node and a candidate node, we only have to consider the remaining candidate nodes.
-Recall that, in the previous algorithm, we stored at the bottom node of every prefix of the caterpillar
+Recall that in the previous algorithm we stored at the bottom node of every prefix of the caterpillar
 the following information: the number of chosen nodes, the candidate node, and the certain node for this fragment,
 assuming that the suffix below this node is eliminated. Now however, we cannot afford to explicitly
-compute such information for every node in every iteration of the algorithm (i.e. for each fragment size),
+compute such information for every node in every iteration,
 as this might take linear time per iteration. We start with reinterpreting it in terms of
-\emph{jump pointers}. For each candidate node in a caterpillar, its jump pointers leads to the nearest
+\emph{jump pointers}. 
+
+\paragraph{Jump pointers.} For each candidate node in a caterpillar, its jump pointers leads to the nearest
 candidate above (in the same caterpillar) that is at distance at least $\lambda^{*}$. Then, the information
 stored at the bottom node $u$ of every prefix can be computed by starting at $u$ and following
-the jump pointers as long as possible. The number of chosen nodes is simply the number of visited
+the jump pointers as long as possible. The number of nodes chosen for the solution is simply the number of visited
 nodes. If the last visited node is at distance at least $\frac{\lambda^{*}}{2}$ from the root then it is
 the certain node, and otherwise the last visited node is the candidate node and its predecessor
 (if any) is the candidate node. We would like to maintain such information for all nodes $u$,
 such that $u$ might be accessed in query time. Recall that in query time we specify
 a node $v$ attached to the hole of the fragment and binary search for the first node $u$ that
 is at distance at least $\lambda^{*}$ from $v$. Therefore, we only need to maintain the information
-for a suffix consisting of nodes that (informally) are not too far from the hole. However, it is not
-completely trivial to update such information after merging multiple small caterpillars into
-one. This is mostly because we might remove some nodes, more precisely a prefix and a suffix
-of every small caterpillar, before the merge. To overcome this, we divide every caterpillar into
+for a suffix consisting of nodes that are not too far from the hole (i.e. at distance at most $\lambda^{*}$). However, it is not
+ trivial to update such information after merging multiple small caterpillars into
+one. This is because we might remove some nodes (a prefix and a suffix)
+from every small caterpillar before the merge. To overcome this, we divide every caterpillar into
 three parts as described below.
 
-Consider a caterpillar with root $r$ and hole $h$, and let $u_{i}$ denote its $i$-th candidate node, for
-every $i=1,2,\ldots,k$. During the execution of our algorithm we make sure that $d(r,u_{i}) < d(r,u_{i+1})$
-and also $d(h,u_{i}) > d(h,u_{i+1})$ for every $i=1,2,\ldots,k-1$. Then, its \emph{unstable prefix}
-consists of all nodes $u_{i}$ such that $d(r,u_{i})\leq \frac{\lambda^{*}}{2}$, and similarly its
-\emph{unstable suffix} of all nodes $u_{i}$ such that $d(h,u_{i})\leq \frac{\lambda^{*}}{2}$.
-The \emph{stable infix} consists of all the remaining nodes $u_{i}$.  We have the following property.
+\paragraph{The unstable prefix,  unstable  suffix, and stable infix.} 
+
+
+Consider a caterpillar with root $r$ and hole $h$, and let $u_{i}$ denote its $i$-th candidate node. In Lemma~\ref{lemma3} we have already made sure that $d(r,u_{i}) < d(r,u_{i+1})$
+and that $d(h,u_{i}) > d(h,u_{i+1})$. We define the \emph{unstable prefix} to
+consist of all nodes $u_{i}$ such that $d(r,u_{i})\leq \frac{\lambda^{*}}{2}$, and similarly the
+\emph{unstable suffix} consists of all nodes $u_{i}$ such that $d(h,u_{i})\leq \frac{\lambda^{*}}{2}$.
+The remaining nodes $u_{i}$ are called the \emph{stable infix}.  We have the following property.
 
 \begin{lemma}
 \label{stable infix}
-If a node of a small caterpillar is removed due to the pruning or eliminating internal collisions then it
+If a node of a small caterpillar is removed due to the pruning or collision elimination then it
 belongs to the unstable prefix or to the unstable suffix.
 \end{lemma}
 
@@ -610,61 +611,59 @@ $v$ of one of the subsequent caterpillars such that $d(h,u_{i}) < d(h,v)$, where
 of the large caterpillar. But the distance of $v$ from the spine is less than $\frac{\lambda^{*}}{2}$ (since it is a candidate node),
  and it follows that the distance of $u_{i}$ to the hole of its small caterpillar is also less
 than $\frac{\lambda^{*}}{2}$. If $u_{i}$ collides with a certain node $v$ of one of the subsequent
-caterpillars then $d(u_{i},v)<\lambda^{*}$. But distance of $v$ from the spine is at least
+caterpillars then $d(u_{i},v)<\lambda^{*}$. But the distance of $v$ from the spine is at least
 $\frac{\lambda^{*}}{2}$, so the distance of $u_{i}$ to the hole of its small caterpillar must be
 less than $\frac{\lambda^{*}}{2}$. Hence, $u_{i}$ belongs to the unstable suffix.
 \end{proof}
 
-We maintain the unstable prefix and the unstable suffix of every caterpillar in balanced search
-trees that allow split and merge in logarithmic time (in the number of stored elements), sorted
-in the natural order, that is distance to the root.
-The stable infix is maintained in a separate structure to be described in detail later. This
-structure allows us to simulate navigating the jump pointers inside the stable infix efficiently.
-In query time, we first use the balanced search tree storing the unstable suffix to locate the first node
-$u_{i}$ there that is sufficiently far away. Then, we observe that after taking $u_{i}$ we cannot
+We maintain the unstable prefix and the unstable suffix  in a balanced search
+tree (sorted by the distance to the root) that allows split and merge in logarithmic time.
+The stable infix is maintained in a separate structure that allows us to efficiently simulate traversing jump pointers inside the stable infix. 
+%
+In query time, we first use the balanced search tree storing the unstable suffix to locate the bottom-most node
+$u_{i}$ that is sufficiently far away. Observe that after taking $u_{i}$ we cannot
 take any further nodes from the unstable suffix, as they are all within distance less than
-$\lambda^{*}$ from each other. Hence we need to continue in the stable infix (it can also
+$\lambda^{*}$ from each other. Hence, we need to continue in the stable infix (it can also
 happen than no $u_{i}$ from the unstable suffix can be taken, and we directly start in the stable
-infix). Then we use the structure maintained for the stable infix, which gives us the last
-node there, that we would reach by following the jump pointers, and then continue in the
-unstable prefix. By the same argument as before, we can visit at most one node there.
+infix). Then, we use the structure maintained for the stable infix, which gives us the top-most
+node that we would reach by following up the jump pointers. Finally, we  continue in the unstable prefix. 
+
+By the same argument as before, we can visit at most one node in the unstable prefix.
 Therefore, if we can efficiently answer a query in the stable infix, then answering a query in
 the whole caterpillar requires only additional logarithmic time (in the size of the caterpillar).
 Additionally, after merging multiple small caterpillars into one, we need to determine the unstable
 prefix and the unstable suffix of the resulting large caterpillar and make sure that we have
 their corresponding binary search trees available.
 Then we have to construct the structure for the stable infix of the large caterpillar.
-We describe these two steps separately.
+We next describe these two steps.
 
+\paragraph{Maintaining the unstable suffixes.}
 Consider the unstable suffix of the large caterpillar (the situation for the unstable prefix is
 symmetric). It is easy to see that all of its nodes are contained in unstable suffixes of
-the small caterpillars. We merge the binary search trees storing all these unstable suffixes.
-This takes $O(\log (b^{5}))$ time per small caterpillar, so $O(\frac{n}{b^{4}}\cdot \log b)=O(\frac{n}{b})$ in total.
-Then, we binary search among the nodes in the resulting binary search trees to determine
-how many of them are actually sufficiently close to the hole of the large caterpillar, and
-then split the binary search tree to leave only nodes belonging to the unstable suffix
-of the large caterpillar there in $O(\log (B^{5}))$ time. To implement binary search, we need to
+the small caterpillars. We merge all the binary search trees storing these unstable suffixes.
+This takes $O(\log (B^5))$ time per merge, so $O(\frac{n}{b^{4}}\cdot \log (B^5))=O(\frac{n}{b})$ in total.
+Then, we binary search to determine how many nodes are actually sufficiently close to the hole of the large caterpillar, and
+ split the binary search tree accordingly in $O(\log (B^{5}))$ time. To implement binary search, we need to
 check if a distance from a node to the hole is at least $\frac{\lambda^{*}}{2}$, but of course we
-do not know $\lambda^{*}$ yet. Therefore, we perform all these binary searches in parallel,
-that is we proceed in $O(\log (B^{5}))$ rounds. In every step we apply Frederickson's search
-with parameter $p$ set to $\frac{n}{B^{10}}$ to determine outcome of the comparison for all
+do not know $\lambda^{*}$ yet. Therefore, we perform all these binary searches in parallel. We proceed in $O(\log (B^{5}))$ rounds. In every round we apply Frederickson's search
+with parameter $p$ set to $\frac{n}{B^{10}}$ to determine  the outcome of the comparison for all
 but $\frac{n}{B^{10}}$ binary searches. This needs
 $O(\frac{n}{b^{4}}\cdot\log b\cdot\log B\cdot\log B)=O(\frac{n}{b})$ additional time for
-all the feasibility tests and creates another $O(\frac{n}{B^{9}})$ active large fragments.
+all the feasibility tests and creates additional $O(\frac{n}{B^{9}})$ active large fragments.
 
-Now we describe the structure maintained for the stable infix of a caterpillar consisting of
-candidate nodes $u_{1},u_{2},\ldots,u_{k}$ with root $r$ and hole $h$. Observe that in the
-query time, we always consider some node $u$ attached to the hole such that $d(r,u)\geq d(r,u_{k})$
-(because either $u$ is a certain node and then its distance from the hole is at least
+\paragraph{Maintaining the stable infixes.}
+We now describe the structure for maintaining the stable infix of a caterpillar consisting of candidate nodes $u_{1},u_{2},\ldots,u_{k}$ with root $r$ and hole $h$. 
+Recall that, for each candidate node $u_i$, its jump pointers lead to the closest candidate node above it (in the same caterpillar) that is at distance at least $\lambda ^*$. 
+We need a structure that allows us to query, given a node $u$ attached to $h$, for the nearest candidate node $u_{i}$ at distance at least $\lambda^{*}$ from $u$, and then follow the jump pointers from $u_{i}$.
+%
+Observe that we only consider $u$ such that $d(r,u)\geq d(r,u_{k})$. This is because either $u$ is a certain node and then its distance from the hole is at least
 $\frac{\lambda^{*}}{2}$, or $u$ is a subsequent candidate node from the same caterpillar,
-or we start the query with comparing these two distances).
-Recall that, for each candidate node there, its jump pointers lead to the closest candidate node above it
-(in the same caterpillar) that is at distance at least $\lambda ^*$. We need a structure
-that allows us to find, given a node $u$ attached to $h$, the nearest candidate node $u_{i}$
-at distance at least $\lambda^{*}$ from $u$, and then follow the jump pointers from $u_{i}$.
-We are interested in the number of traversed jump pointers and the last visited node
-(because of the unstable prefix, we do not need to retrieve both the last node
-and its predecessor). During the preprocessing, we need to merge multiple stable infixes
+or we start the query with comparing these two distances.
+
+We are interested in the number of traversed jump pointers and in the last visited node.
+%(because of the unstable prefix, we do not need to retrieve both the last node
+%and its predecessor). 
+During the preprocessing, we need to merge multiple stable infixes
 into one, while possibly inserting some nodes in-between (these new nodes have previously
 belonged to some unstable prefixes and suffixes). To find $u_{i}$, we keep all candidate
 nodes of a caterpillar in a mergeable balanced search tree. This allows us to locate $u_{i}$
@@ -679,8 +678,8 @@ last visited node, explicitly for every $u_{i}$ that could be queried.
 
 We write $\jump(i)=j$ if the jump pointer of $u_{i}$ points to $u_{j}$, where $j<i$, and $\jump(i)=-1$
 if the jump pointer of $u_{i}$ is not defined, that is $d(u_{1},u_{i})<\lambda^{*}$.
-Then the interesting prefix of the caterpillar consists of all nodes $u_{i}$ such that $\jump(i)=-1$,
-and the interesting suffix consists of the nodes $u_{\jump(k)},u_{\jump(k+1)},\ldots,u_{k}$.
+The {\em interesting prefix} of the caterpillar consists of all nodes $u_{i}$ such that $\jump(i)=-1$,
+and the {\em interesting suffix} consists of the nodes $u_{\jump(k)},u_{\jump(k+1)},\ldots,u_{k}$.
 Because we always query with a node $u$ such that $d(r,u) \geq d(r,u_{k})$, we only
 need to maintain the answer for the nodes in the interesting suffix. As a special case,
 if $\jump(k)=-1$ we call the caterpillar \emph{fresh}.
@@ -689,7 +688,7 @@ However, once a jump pointer has been set, it will never change. Therefore, we m
 need to set up the jump pointers in the interesting prefixes of the small caterpillars
 (and the new nodes inserted in-between). We also observe that these new jump pointers
 must lead either to a node in the interesting suffix of some small caterpillar
-(or to some new node). We start with checking if the large caterpillar is fresh. This can be
+or to some new node. We start with checking if the large caterpillar is fresh. This can be
 done by applying Frederickson's search in parallel for all large caterpillars with $p$ set to
 be $\frac{n}{B^{9}}$, using $O(\frac{n}{b^{4}}\cdot \log b \cdot \log B)=O(\frac{n}{b})$
 total time for the feasibility tests and creating up to $O(\frac{n}{B^{9}})$ additional active large
@@ -727,7 +726,7 @@ still holds we only need additional $O(b^{5})$ credits (to pay for the interesti
 of some small caterpillar and the interesting suffix of some small caterpillar) per large
 caterpillar. This sums up to $O(\frac{n}{B^{4}}\cdot b^{5}) = O(\frac{n}{b})$ per iteration.
 
-We showed how to obtain an $O(\frac{n}{B^{4}}\log B)$ time test given an $O(\frac{n}{b^{4}}\log b)$
+To conclude, we have shown how to obtain an $O(\frac{n}{B^{4}}\log B)$ time test given an $O(\frac{n}{b^{4}}\log b)$
 time test. The preprocessing time is $O(\frac{n}{b})$ per iteration plus amortized constant per
 node of the tree. After $\log ^*n$ iterations, we have a $O(\frac{n}{\log ^4n} \cdot \log \log n)$ test,
 which we use to solve the dispersion optimization problem in linear time. All iterations of the preprocessing
