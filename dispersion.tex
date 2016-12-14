@@ -258,8 +258,7 @@ Some of the candidate nodes can be ignored as they "collide" with certain nodes.
 Now we are only left with some of the candidate nodes to consider, and for all of them it hold that $y_i < \frac{\lambda_1}{2}$ (otherwise they would be certain), and from now on we can ignore the certain nodes.
 \item\label{making distances from the root monotone}
 \textbf{Prune the caterpillar so that the leaves' distances to the root are non-decreasing:}\\
-Consider the $i$-th leaf, $u_i$, and the adjacent leaf above it, $u_{i-1}$. Assume $x_{i-1}+y_{i-1} > x_i+y_i$
-(i.e. $u_{i-1}$ is farther from the root than $u_i$), then:
+Consider the $i$-th leaf, $u_i$, and the adjacent leaf above it, $u_{i-1}$. See Figure~\ref{fig:pruning}. Suppose that $u_{i-1}$ is farther from the root than $u_i$ (i.e. $x_{i-1}+y_{i-1} > x_i+y_i$), then:
 $$ d(u_{i},u_{i-1}) = x_i-x_{i-1}+y_i+y_{i-1} = x_{i} + y_{i} - x_{i-1} + y_{i-1} < 2y_{i-1} < \lambda_1.$$
 So an optimal solution cannot contain both $u_{i}$ and $u_{i-1}$. We claim that if the solution contains
 $u_{i}$ then it can be replaced with $u_{i-1}$. To prove this, it is enough to argue that
@@ -276,9 +275,9 @@ remaining leaves from the root are non-decreasing.
 
 \begin{figure}
 \begin{center}
-\includegraphics[scale=1]{caterpillar}
+\includegraphics[scale=0.5]{caterpillar}
 \end{center}
-\caption{Pruning the caterpillar so that the distances of leaves from the root are non-decreasing. $d(u_i,r)<d(u_{i-1},r)$ and so we remove $u_{i}$. We can do this because any node from from above or below (e.g. $u_j$) is farther from $u_{i-1}$ than from $u_i$.}
+\caption{Pruning the caterpillar so that the distances of leaves from the root are non-decreasing: If $d(u_i,r)<d(u_{i-1},r)$ then  we can remove $u_{i}$ since (1) an optimal solution cannot contain both $u_{i}$ and $u_{i-1}$ (the distance between them is too small), and (2) if an optimal solution contains $u_{i}$ then it can be replaced with $u_{i-1}$ (every leaf $u_j$ is farther from $u_{i-1}$ than from $u_i$). \label{fig:pruning}}
 \end{figure}
 
 \item \label{making distances from the hole monotone}
