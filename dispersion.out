@@ -1,0 +1,12 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{A Linear Feasibility Test}{}% 2
+\BOOKMARK [1][-]{section.3}{A Sublinear Feasibility Test with O\(nloglogn\) Preprocessing}{}% 3
+\BOOKMARK [2][-]{subsection.3.1}{Tree partitioning}{section.3}% 4
+\BOOKMARK [2][-]{subsection.3.2}{Preprocessing fragments}{section.3}% 5
+\BOOKMARK [2][-]{subsection.3.3}{Feasibility test}{section.3}% 6
+\BOOKMARK [2][-]{subsection.3.4}{O\(nloglogn\) Preprocessing}{section.3}% 7
+\BOOKMARK [1][-]{section.4}{A Sublinear Feasibility Test with O\(nlog*n\) Preprocessing}{}% 8
+\BOOKMARK [1][-]{section.5}{A Sublinear Feasibility Test with O\(n\) Preprocessing}{}% 9
+\BOOKMARK [1][-]{section.6}{The Weighted Dispersion Problem}{}% 10
+\BOOKMARK [2][-]{subsection.6.1}{ \(nlogn\) lower bound for the weighted feasibility test}{section.6}% 11
+\BOOKMARK [2][-]{subsection.6.2}{O\(n log2 n\) Algorithm for the weighted feasibility test}{section.6}% 12
