@@ -776,17 +776,44 @@ Observe that it is also not possible for $P$ to contain only one node, since the
 \end{proof}
 
 \subsection{An \boldmath$O(n \log ^2 n)$ Algorithm for the weighted feasibility test}
-Similarly to the unweighted case, we would like to compute for each node of the tree, the subset of nodes in its subtree, $P$, s.t. $f(P) \geq \lambda$ and $W(P)$ is maximized. We compute this by going over the nodes of the tree bottom-up. Previously, the situation was simpler, as we had just one candidate node that we were not sure would be in the solution for the whole input tree. This was true, because only a node that is closer to the root could be at distance less than $\lambda$ from a certain node, and we could always take the node that is farthest from the root between the two, since nodes were of uniform weight.
-Now, we must have a solution ($P$) inside the subtree for any possible distance of the closest chosen node outside the subtree (up to $\lambda$, since if the closest node is farther, it does not affect nodes inside the subtree). This can be viewed as a monotone polyline, since the size of $P$ only increases as the distance of the closest node (denoted by $d(c)$) increases from zero to $\lambda$. The size of $P$ only changes at certain points, i.e. the breakpoint of the polyline. We store these polylines in binary search trees, so we can answer queries in logarithmic time, using predecessor queries. Each node of a binary search will store $d(c)$ as its key, and the size of $P$ when this is the distance of the closest chosen node.  %TODO add figure
+Similarly to the unweighted case, we would like to compute for each node of the tree, the subset of nodes in its subtree, $P$, s.t. $f(P) \geq \lambda$ and $W(P)$ is maximized. We compute this by going over the nodes of the tree bottom-up. Previously, the situation was simpler, as for any subtree we had just one candidate node that we were not sure would be in the solution for the whole input tree. This was true, because only a node that is closer to the root could be at distance less than $\lambda$ from a certain node, and we could always take the node that is farthest from the root between the two, since nodes were of uniform weight.
+Now, we must store a solution ($P$) inside the subtree for any possible distance of the closest chosen node in the subtree from its root (up to $\lambda$, since if the closest node is farther, it does not affect nodes outside the subtree). This can be viewed as a monotone polyline, since the weight of $P$ only decreases as the distance of the closest node (denoted by $h$) increases from zero to $\lambda$. The size of $P$ only changes at certain points, i.e. the breakpoint of the polyline.
 
-We now present a single step of the algorithm. Denote the root of the subtree by $v$, its left child by $u_1$, and its right child by $u_2$. We have two polylines that represent the solutions inside the subtrees rooted at $u_1$ and $u_2$, and we would like to create the polyline for the subtree rooted at $v$.
-Assume w.l.o.g. that the number of breakpoints in $u_1$'s polyline (denoted by $p_1$), is greater or equal to the number of breakpoints in $u_2$'s polyline (denoted by $p_2$). We consider three cases, for each of them construct a polyline, and then merge them into one polyline.
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.35]{polyline}
+\end{center}
+\caption{The polyline represents the weight of the solution, $P$, as a function of the distance of closest chosen node in the subtree. $v$ is the root of the subtree, and $h$ is the chosen node closest to $v$ in its subtree. The weight of $P$ only decreases at certain points, which are the breakpoints of the polyline.
+\label{figure of a polyline}}
+\end{figure}
+
+We now present a single step of the algorithm. Denote the root of the subtree by $v$, its left child by $u_1$, and its right child by $u_2$ \footnote{If $v$ only has one child we can simply build the new polyline by querying the previous one for the case that $v$ is in the solution and for the case where it isn't.}. We have two polylines that represent the solutions inside the subtrees rooted at $u_1$ and $u_2$, and we would like to create the polyline for the subtree rooted at $v$.
+Assume w.l.o.g. that the number of breakpoints in $u_1$'s polyline (denoted by $p_1$), is smaller or equal to the number of breakpoints in $u_2$'s polyline (denoted by $p_2$). We consider three cases, for each of them construct a polyline, and then merge them into one polyline.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.4]{polyline_step}
+\end{center}
+\caption{A single step of the weighted feasibility test merges two polylines in order to get the polyline for the current subtree. $v$ is the root of the subtree, $u_1$ and $u_2$ are its children, $h_1$ and $h_2$ are the closest chosen nodes to $v$ inside the smaller subtrees.
+\label{figure of a single step of the weighted feasibility test}}
+\end{figure}
+
 \begin{enumerate}
 \item \emph{$v$ is in the solution for its subtree: } In this case we simply query $p_1$ and $p_2$ for their values with distances of the closest node being $d(v,u_1)$ and $d(v,u_2)$, add them together with the weight of $v$, and get the size of the solution for $v$'s subtree in case $v$ is in the solution.
 \item \emph{The chosen node closest to $v$ inside its subtree, is in $u_1$'s subtree: }
+We start by shifting $p_1$ to the right by $d(u_1,v)$, since we are now constructing a polyline where the horizontal axis signifies the distance from $v$, not from $u_1$. We then need to increase the value of points in the polyline to account for the weight of the chosen nodes in the subtree rooted at $u_2$. In order to do this we need to query $P_2$ so as to maintain that $d(h_1,h_2) \geq \lambda$ and that $d(h_1,v) \leq d(h_2,v)$. For this, we consider two cases, first, when $2 \cdot d(h_1,u_1) + d(u_1,v) + d(v,u_2) \geq \lambda$ we must query $P_2$ with $d(h_1,u_1)$ and second, when $2 \cdot d(h_1,u_1) + d(u_1,v) + d(v,u_2) < \lambda$ we must query $P_2$ with $\lambda - [d(h_1,u_1) + d(u_1,v) + d(v,u_2)]$.
+
+We go over the breakpoints of $P_1$ and for each of them query $P_2$ as described (considering the value of $d(h_1,u_1)$ at the breakpoints themselves). This may result in a non-monotone polyline, since for some values of $d(h,v)$ the optimal solution isn't one where the closest chosen node is in the subtree rooted at $u_1$. We "smooth" the polyline to be monotone by simply iterating over all the breakpoints of the new polyline and erasing some of them.
 \item \emph{The chosen node closest to $v$ inside its subtree, is in $u_2$'s subtree: }
+In this case we do not want to query $P_1$ for every breakpoint in $P_2$ (which has more breakpoints than $P_1$).
 \end{enumerate}
 
+We now need to consider which data structure we will use to store our polylines. The interface we require is:
+\begin{enumerate}
+\item query the weight of $P$ for a certain value of $d(h,v)$
+\end{enumerate}
+
+We store these polylines in binary search trees, so we can answer queries in logarithmic time, using predecessor queries. Each node of a binary search will store $d(c)$ as its key, and the size of $P$ when this is the distance of the closest chosen node.
 
 \bibliographystyle{abbrv}
 \bibliography{dispersion}

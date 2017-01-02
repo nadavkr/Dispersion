@@ -7,6 +7,11 @@
 \BOOKMARK [2][-]{subsection.3.4}{O\(nloglogn\) Preprocessing}{section.3}% 7
 \BOOKMARK [1][-]{section.4}{A Sublinear Feasibility Test with O\(nlog*n\) Preprocessing}{}% 8
 \BOOKMARK [1][-]{section.5}{A Sublinear Feasibility Test with O\(n\) Preprocessing}{}% 9
-\BOOKMARK [1][-]{section.6}{The Weighted Dispersion Problem}{}% 10
-\BOOKMARK [2][-]{subsection.6.1}{ \(nlogn\) lower bound for the weighted feasibility test}{section.6}% 11
-\BOOKMARK [2][-]{subsection.6.2}{O\(n log2 n\) Algorithm for the weighted feasibility test}{section.6}% 12
+\BOOKMARK [2][-]{subsection.5.1}{Partitioning into fragments}{section.5}% 10
+\BOOKMARK [2][-]{subsection.5.2}{Reducing a hanging subtree into two nodes}{section.5}% 11
+\BOOKMARK [2][-]{subsection.5.3}{Reducing a small active fragment into a caterpillar}{section.5}% 12
+\BOOKMARK [2][-]{subsection.5.4}{Pruning the resulting large caterpillar}{section.5}% 13
+\BOOKMARK [2][-]{subsection.5.5}{Preprocessing the large caterpillar for every possible eliminated suffix}{section.5}% 14
+\BOOKMARK [1][-]{section.6}{The Weighted Dispersion Problem}{}% 15
+\BOOKMARK [2][-]{subsection.6.1}{An \040\(nlogn\) lower bound for the weighted feasibility test}{section.6}% 16
+\BOOKMARK [2][-]{subsection.6.2}{An O\(n log2 n\) Algorithm for the weighted feasibility test}{section.6}% 17
