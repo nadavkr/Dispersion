@@ -803,7 +803,17 @@ Let us consider the case where $v$ is in the solution. In this case we simply qu
 We now construct the rest of the polyline. Notice that we need to maintain that $d(h1,h2) \geq \lambda$. First, we need to shift $p_1$ and $p_2$ right by $d(v,u_1)$ and $d(v,u_2)$ respectively, as we now measure the weight of the solution as a function of the distance of the closest chosen node to $v$, and not $u_1$ or $u_2$. We proceed in two steps:
 
 \begin{enumerate}
-\item We construct the second part of the polyline, where $d(h,v) \geq \frac{\lambda}{2}$. In this case we query both polylines with the same value, as $d(h_1,v) \geq \frac{\lambda}{2}$ and $d(h_2,v) \geq \frac{\lambda}{2}$ implies that $d(h_1,h_2) \geq \lambda$. So, we go over all the breakpoints of $p_1$ (the smaller of the polylines) for values of $d(h_1,v)$ that are greater or equal to $\frac{\lambda}{2}$ and insert each of them to $p_2$, with the value ($W(P)$) increased by the value of $p_2$ at the same point (i.e. store the weight of the solution for the entire subtree of $v$, by adding the weight gained in the subtrees rooted at $u_1$ and $u_2$). This may result in a non-monotone polyline, which we smoothen by iterating over all the breakpoints in the new polyline and removing the ones who are followed by breakpoints with higher values of $W(P)$.
+\item We construct the second part of the polyline, where $d(h,v) \geq \frac{\lambda}{2}$. In this case we query both polylines ($p_1$ and $p_2$) with the same value, since $d(h_1,v) \geq \frac{\lambda}{2}$ and $d(h_2,v) \geq \frac{\lambda}{2}$ implies that $d(h_1,h_2) \geq \lambda$. So, we go over all the breakpoints of $p_1$ (the smaller of the polylines) for values of $d(h_1,v)$ that are greater or equal to $\frac{\lambda}{2}$. These breakpoints induce intervals of $p_2$. For each of these intervals we increase the value of $W(P)$ by the value in theses intervals in $p_1$. For this we might need to insert some of the breakpoints from $p_1$ (where there is no breakpoint already in $p_2$). Now the new polyline stores the weight of the solution for the entire subtree of $v$, as we summed up the weight gained in the subtrees rooted at $u_1$ and $u_2$ (for $d(h,v) \geq \frac{\lambda}{2}$). 
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.4]{new_polyline_second_half}
+\end{center}
+\caption{Constructing the second half of the polyline. The black polyline is $p_2$. The breakpoints inserted from $p_1$ are in red. In each interval we raise the polyline up by the value in $p_1$ (which is constant, as each interval is between breakpoints of $p_1$).
+\label{figure of constructing the second half of the polyline}}
+\end{figure}
+
+%This may result in a non-monotone polyline, which we smoothen by iterating over all the breakpoints in the new polyline and removing the ones who are followed by breakpoints with higher values of $W(P)$.
 \item We now need to handle values of $d(h,v)$ which are smaller than $\frac{\lambda}{2}$. This is done by iterating over all the breakpoints of $p_1$, while querying $p_2$ with $\lambda - d(h_1,v)$. This basically means that we go over $p_1$ from left to right, while going over $p_2$ from right to left. Notice that as we do this the distance of one of the nodes ($h_1$ and $h_2$) is at most $\frac{\lambda}{2}$. Similarly to before, we increase $W(P)$ at the relevant points, and once more smoothen the polyline.
 
 %\item \emph{The chosen node closest to $v$ inside its subtree, is in $u_1$'s subtree: }
@@ -819,10 +829,10 @@ We now need to consider which data structure we will use to store our polylines.
 \item Query the weight of $P$ for a certain value of $d(h,v)$.
 \item Shift the polyline right by some value.
 \item Query predecessor.
-\item increase the value of $W(P)$ for some breakpoint. 
+\item increase the value of $W(P)$ for some interval of the polyline (this may require introducing new breakpoints). 
 \end{enumerate}
 
-In order to implement these queries efficiently, we store these polylines in standard balanced binary search trees (such as Red Black Trees), so we can answer queries in logarithmic time. Each node of the trees will store $d(h,v)$ as its key, and $W(P)$ for this key.
+In order to implement these queries efficiently, we store these polylines in augmented balanced search trees, so we can answer queries in logarithmic time. Each node of the trees will store $d(h,v)$ as its key, and $W(P)$ for this key.
 
 Each such step, where we merge two polyline will cost $m \log n$, where $m$ is the number of breakpoints in $p_1$ and $n$ is the number of breakpoints in $p_2$ (so $m \leq n$). This sums up to $n \log^2 n$ overall. Removing breakpoint in order to smoothen the polyline costs linear time overall, since any breakpoint that is removed, will not be processed in the future.
 
