@@ -836,7 +836,7 @@ We now consider the second case, where $d(h_1,v) < d(h_2,v)$ (and $d(h,v) < \fra
 %and shift it right by $\lambda$ (since we are interested in $\lambda - d(h_1,v)$)
 \end{enumerate}
 
-We now need to build one polyline for the first half of the polyline, taking into account both cases. This is done by taking the maximum of the values of the polylines we just built , for any point (s.t. $0 \leq d(h,v) \leq \frac{\lambda}{2}$).
+We now need to build one polyline for the first half of the polyline, taking into account both cases. This is done by taking the maximum of the values of the polylines we just built (denoted by $p_a$ and $p_b$), for any point (s.t. $0 \leq d(h,v) \leq \frac{\lambda}{2}$). We iterate over the smaller of the two resulting polylines (assume w.l.o.g. it is $p_a$), and for every pair of consecutive breakpoints, we check which polyline is higher at the points (i.e. for which polyline $W(P)$ is larger). If the answer for both points is the same, we carry on. Otherwise, we binary search over the breakpoints of $p_b$ in this interval (defined by the two consecutive breakpoints of $p_a$), for the breakpoint at which the two polylines intersect. In the end of this iteration we know which polyline gives us the best solution for every point between zero and $\frac{\lambda}{2}$, and where are the intersection points where this changes. We can now build the new polyline by doing split and merge operations, according to the intersection points. Since the two polylines are monotone decreasing, the intersection points can only at the breakpoints of $p_a$, and at most at one breakpoint of $p_b$ between two consecutive breakpoints of $p_a$, and thus the number of intersection points is linear in the number of breakpoints of $p_a$ (which is linear in the number of breakpoints of $p_1$). In total, the number of split and merge operations is linear in the number of breakpoints of $p_1$. Merging this polyline with the polyline we got for $d(h,v) \geq \frac{\lambda}{2}$, will give us the polyline representing the solution $P$, for every possible distance of the closest chosen node in $v$'s subtree.
 
 We now need to consider which data structure we will use to store our polylines. The interface we require is:
 \begin{enumerate}
@@ -845,6 +845,7 @@ We now need to consider which data structure we will use to store our polylines.
 \item Shift the polyline right by some value.
 \item Increase the value of $W(P)$ for some intervals of the polyline, induced by breakpoints of another polyline (this may require introducing new breakpoints). 
 \item Split the polyline at some value.
+\item Merge two polylines (s.t. the keys in one polyline are smaller than all keys in the other).
 \item "Mirror" a polyline, by negating all the keys ($d(h,v)$) and adding $\lambda$.
 \item Find the last breakpoint in some interval of the polyline.
 \end{enumerate}
