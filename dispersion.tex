@@ -809,7 +809,7 @@ We now construct the rest of the polyline. Notice that we need to maintain that 
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[scale=0.4]{new_polyline_second_half}
+\includegraphics[width=.7\textwidth, height=0.3\textheight]{new_polyline_second_half}
 \end{center}
 \caption{Constructing the second half of the polyline. The black polyline is $p_2$. The breakpoints inserted from $p_1$ are in red. In each interval we raise the polyline up by the value in $p_1$ (which is constant, as each interval is between breakpoints of $p_1$).
 \label{figure of constructing the second half of the polyline}}
@@ -840,19 +840,20 @@ We now need to build one polyline for the first half of the polyline, taking int
 
 We now need to consider which data structure we will use to store our polylines. The interface we require is:
 \begin{enumerate}
-\item Query the weight of $P$ for a certain value of $d(h,v)$.
-\item Iterate over the breakpoints of the polyline.
 \item Shift the polyline right by some value.
-\item Increase the value of $W(P)$ for some intervals of the polyline, induced by breakpoints of another polyline (this may require introducing new breakpoints). 
 \item Split the polyline at some value.
 \item Merge two polylines (s.t. the keys in one polyline are smaller than all keys in the other).
 \item "Mirror" a polyline, by negating all the keys ($d(h,v)$) and adding $\lambda$.
+\item Query the weight of $P$ for a certain value of $d(h,v)$.
+\item Increase the value of $W(P)$ for some intervals of the polyline, induced by breakpoints of another polyline (this may require introducing new breakpoints). 
 \item Find the last breakpoint in some interval of the polyline.
 \item Batched interval deletions - Given a list of disjoint intervals of the polyline, delete all the breakpoints inside the intervals.
 \item Batched interval insertions - Given a list of pairs of consecutive breakpoints in the polyline, insert between each pair a list of breakpoints.
 \end{enumerate}
 
-In order to implement these operations efficiently, we store the polylines in augmented balanced search trees, so we can answer queries in logarithmic time. Each node of the trees will store $d(h,v)$ as its key, and $W(P)$ for this key. The breakpoints will be represented at the leaves of the tree, and the key and value of each leaf will be the sum of all its ancestors. Querying the value at some point of the polyline can be done by a predecessor query. Shifting the polyline can be done by increasing the key at the root of the augmented tree. Increasing the value for some interval can be done by going up to the LCA of the endpoints of the interval, and adding to the value there. The negation needed for the "mirror" operation can be done by saving an extra bit in all nodes of the tree. Finding the last breakpoint in some interval of a polyline can also be done by a predecessor query.
+In order to implement these operations efficiently, we store the polylines in augmented balanced search trees. Each node of the trees will store $d(h,v)$ as its key, and $W(P)$ for this key. The breakpoints will be represented at the leaves of the tree, and the key and value of each leaf will be the sum of all its ancestors.
+
+Operations 1-4 will be done only a constant number of times per step. The number of times operations 5-9 will be performed is linear in the number of breakpoints of $p_1$ (in each step), and they will be performed on $p_2$. The augmented balanced search trees we use here can answer such queries in logarithmic time. Querying the value at some point of the polyline can be done by a predecessor query. Shifting the polyline can be done by increasing the key at the root of the augmented tree. Increasing the value for some interval can be done by adding to the value in roots of subtrees hanging off of the paths from the endpoints of the interval to their LCA. The negation needed for the "mirror" operation can be done by saving an extra bit in all nodes of the tree. Finding the last breakpoint in some interval of a polyline can also be done by a predecessor query.
 Batched interval deletions will be done by going up to the LCA of the endpoints of each interval, and deleting its entire subtree.
 Batched interval insertions will be done just as a single insertion.
 
