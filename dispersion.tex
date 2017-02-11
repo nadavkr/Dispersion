@@ -802,12 +802,12 @@ Assume w.l.o.g. that the number of breakpoints in $p_1$, is smaller or equal to 
 \label{figure of a single step of the weighted feasibility test}}
 \end{figure}
 
-Let us consider the case where $v$ is in the solution. In this case we simply query $p_1$ and $p_2$ for their values with distances of the closest node being $\lambda - d(v,u_1)$ and $\lambda - d(v,u_2)$ (if one of these values is negative, we take zero instead), add them together with the weight of $v$, and get the weight of the solution for $v$'s subtree in case $v$ is in the solution. This will be the value of the new polyline for $d(h,v)$ between zero and the first breakpoint.
+Let us consider the case where $v$ is in the solution. In this case we simply query $p_1$ and $p_2$ for their values with distances of the closest node being $\lambda - d(v,u_1)$ and $\lambda - d(v,u_2)$ (if one of these is negative, we take zero instead), add them together with the weight of $v$, and get the weight of the solution for $v$'s subtree in case $v$ is in the solution. This will be the value of the new polyline for $d(h,v)$ between zero and the first breakpoint.
 
 We now construct the rest of the polyline. Notice that we need to maintain that $d(h_1,h_2) \geq \lambda$. First, we need to shift $p_1$ and $p_2$ right by $d(v,u_1)$ and $d(v,u_2)$ respectively. We then proceed in two steps:
 
 \begin{enumerate}
-\item We start by constructing the second part of the polyline, where $d(h,v) \geq \frac{\lambda}{2}$. In this case we query both polylines ($p_1$ and $p_2$) with the same value, since $d(h_1,v) \geq \frac{\lambda}{2}$ and $d(h_2,v) \geq \frac{\lambda}{2}$ implies that $d(h_1,h_2) \geq \lambda$. So, we go over all the breakpoints of $p_1$ (the smaller of the polylines) for values of $d(h_1,v)$ that are greater or equal to $\frac{\lambda}{2}$. These breakpoints induce intervals of $p_2$. For each of these intervals we increase the value of $W(P)$ by the value in theses intervals in $p_1$. For this we might need to insert some of the breakpoints from $p_1$ (where there is no breakpoint already in $p_2$). Now the new polyline stores the weight of the solution for the entire subtree of $v$, as we summed up the weight gained in the subtrees rooted at $u_1$ and $u_2$ (for $d(h,v) \geq \frac{\lambda}{2}$). 
+\item We start by constructing the second part of the polyline, where $d(h,v) \geq \frac{\lambda}{2}$. In this case we query both polylines ($p_1$ and $p_2$) with the same key, since $d(h_1,v) \geq \frac{\lambda}{2}$ and $d(h_2,v) \geq \frac{\lambda}{2}$ implies that $d(h_1,h_2) \geq \lambda$. So, we go over all the breakpoints of $p_1$ (the smaller of the polylines) where $d(h_1,v)\geq \frac{\lambda}{2}$. These breakpoints induce intervals of $p_2$. For each of these intervals we increase the value of $W(P)$ by the value in theses intervals in $p_1$. For this we might need to insert some of the breakpoints from $p_1$ (where there is no breakpoint already in $p_2$). Now the new polyline stores the weight of the solution for the entire subtree of $v$, as we summed up the weight gained in the subtrees rooted at $u_1$ and $u_2$ (for $d(h,v) \geq \frac{\lambda}{2}$). 
 
 \begin{figure}[h]
 \begin{center}
@@ -817,7 +817,7 @@ We now construct the rest of the polyline. Notice that we need to maintain that 
 \label{figure of constructing the second half of the polyline}}
 \end{figure}
 
-\item We now need to handle values of $d(h,v)$ which are smaller than $\frac{\lambda}{2}$. For this, we consider two cases: first, the case where $d(h_1,v) < d(h_2,v)$ (i.e. the closest chosen node in $v$'s subtree is inside $u_1$'s subtree), and second, the case where $d(h_1,v) > d(h_2,v)$. For each of the two cases we will construct the first half of the polyline (where $0 \leq d(h,v) \leq \frac{\lambda}{2}$), and then we take the maximum of the two polylines at every point.
+\item We now need to handle the case where $d(h,v) < \frac{\lambda}{2}$. For this, we consider two cases: first, the case where $d(h_1,v) < d(h_2,v)$ (i.e. the closest chosen node in $v$'s subtree is inside $u_1$'s subtree), and second, the case where $d(h_1,v) > d(h_2,v)$. For each of the two cases we will construct the first half of the polyline (where $0 \leq d(h,v) \leq \frac{\lambda}{2}$), and then we take the maximum of the two polylines at every point.
 
 Let us start with the first case. We need to consider possibilities where $d(h_1,v) < \frac{\lambda}{2}$, which implies that $d(h_1,v) > \frac{\lambda}{2}$, and furthermore $d(h_2,v) \geq \lambda - d(h_1,v)$. For this we must iterate over $p_1$ from zero to $\frac{\lambda}{2}$ while iterating over $p_2$ from $\lambda$ to $\frac{\lambda}{2}$ (i.e. from right to left), and sum the values of the two polylines. We start by splitting $p_1$ at $\frac{\lambda}{2}$ and taking the first half (denote it by $p_1'$), then we split $p_2$ (also at $\frac{\lambda}{2}$), take the second half, and "mirror" it (so that we can iterate over the resulting polyline, $p_2'$, from left to right as usual). We now iterate over the two resulting polylines and sum their values for each point. This is done similarly to before, the breakpoints of $p_2'$ induce intervals of $p_1'$, and we lift up each such interval. Notice that since $p_1'$ is a monotone decreasing polyine, and $p_2'$ is a monotone increasing polyline, the resulting polyline may not be monotone. This can be solved by first observing that we could look at only the last breakpoint of $p_2'$ in each interval induced by the breakpoints of $p_1'$ (since the previous breakpoints can surely be ignored, as they represent lighter solutions, where $h$ is at the same distance from the root). In order to do this, we must find the predecessor breakpoint in $p_2'$ for each breakpoint of $p_1'$, and lift the appropriate interval of $p_1'$. We then need to make sure the resulting polyline is monotone, by iterating it from $\frac{\lambda}{2}$ to zero, and deleting unnecessary breakpoints. The number of breakpoints in the resulting polyline will be at most twice the number of breakpoints in $p_1$ (since for every interval between breakpoints of $p_1'$ we add at most one new breakpoint from $p_2'$).
 
@@ -842,12 +842,12 @@ We now need to build one polyline for the first half of the polyline, taking int
 
 We now need to consider which data structure we will use to store our polylines. The interface we require is:
 \begin{enumerate}
-\item Shift the polyline right by some value.
-\item Split the polyline at some value.
+\item Shift the polyline right by some distance.
+\item Split the polyline at some key.
 \item Merge two polylines (s.t. the keys in one polyline are smaller than all keys in the other).
 \item "Mirror" a polyline, by negating all the keys ($d(h,v)$) and adding $\lambda$.
-\item Query the weight of $P$ for a certain value of $d(h,v)$.
-\item Increase the value of $W(P)$ for some intervals of the polyline, induced by breakpoints of another polyline (this may require introducing new breakpoints). 
+\item Query the weight of $P$ for a certain key $d(h,v)$.
+\item Batched interval increase - Given a list of disjoint intervals of the polyline, and a number for each interval, increase the value of the polyline in each interval by the appropriate number.
 \item Find the last breakpoint in some interval of the polyline.
 \item Batched interval deletions - Given a list of disjoint intervals of the polyline, delete all the breakpoints inside the intervals.
 \item Batched interval insertions - Given a list of pairs of consecutive breakpoints in the polyline, insert between each pair a list of breakpoints.
@@ -860,6 +860,26 @@ Batched interval deletions will be done by going up to the LCA of the endpoints 
 Batched interval insertions will be done just as a single insertion.
 
 Each such step, where we merge two polyline will cost $x \log y$, where $x$ is the number of breakpoints in $p_1$ and $y$ is the number of breakpoints in $p_2$ (so $x \leq y$). This sums up to $O(n \log^2 n)$ overall in the worst case.
+
+
+\subsection{An \boldmath$O(n \log n)$ Algorithm for the weighted feasibility test}
+We now present an optimal $O(n \log n)$ time algorithm for the weighted feasibility test. We do this by building upon the previous algorithm, and reducing the running time of the heavier operations we run on the polylines. Previously, we had a running time of $O(x \log y)$ for these operations, and we will now show how we can reduce this to $O(x \log (\frac{y}{x}))$ time per operation, which will induce a running time of $O(n \log n)$ for the entire algorithm. We achieve this running time by using a result by Huddelston and Melhorn. In %TODO cite
+the writers prove some properties of Finger Search Trees which we use. The main idea here is to analyse the complexity of operations more carefully, by looking at the performance of the basic operations we do on our balanced trees (i.e. search, insert and delete) in the context of the interface we defined, and what we do in each step of the algorithm. We will show that since these basic operations are not random, the amortized cost of each operation is less than logarithmic.
+
+
+\begin{lemma}
+For any B tree with $n$ nodes, and a subset of the nodes of the tree of size $m$, s.t. no node in the subset is an ancestor of another node in the subset, the sum of the heights of the subset nodes is $m \log (\frac{n}{m})$.
+\end{lemma}
+\begin{proof}
+
+\end{proof}
+
+\begin{lemma}
+Operation 5 - Batched interval increase, is performed in $O(x \log (\frac{y}{x}))$ time in each step.
+\end{lemma}
+\begin{proof}
+It is easy to see that the cost of each single interval increase is linear in the height of the LCA of the endpoints of the interval. Thus, we need to prove that the sum of the heights of these LCA nodes, is at most $x \log (\frac{y}{x})$. Since the intervals are disjoint, we know that it is not possible for one of these nodes to be an ancestor of another of these nodes.
+\end{proof}
 
 \bibliographystyle{abbrv}
 \bibliography{dispersion}
