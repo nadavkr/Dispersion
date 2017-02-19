@@ -894,23 +894,23 @@ We conclude that the total complexity of our weighted feasibility test is $O(n \
 
 
 \subsection{An \boldmath$O(n \log n)$ Algorithm for the weighted feasibility test}
-We now present an optimal $O(n \log n)$ time algorithm for the weighted feasibility test. We do this by building upon the previous algorithm, and reducing the running time of the heavier operations we run on the polylines. Previously, we had a running time of $O(x \log y)$ for these operations, and we will now show how we can reduce this to $O(x \log (\frac{y}{x}))$ time per operation, which will induce a running time of $O(n \log n)$ for the entire algorithm. We achieve this running time by using a result by Huddelston and Melhorn. In %TODO cite
-the writers prove some properties of Finger Search Trees which we use. The main idea here is to analyse the complexity of operations more carefully, by looking at the performance of the basic operations we do on our balanced trees (i.e. search, insert and delete) in the context of the interface we defined, and what we do in each step of the algorithm. We will show that since these basic operations are not random, the amortized cost of each operation is less than logarithmic.
+We now present an optimal $O(n \log n)$ time algorithm for the weighted feasibility test. We use the same algorithm described in the previous section, and reduce its running by implementing the heavier operations we run on the polylines more efficiently. Previously, we had a running time of $O(x \log y)$ for these operations, and we will now show how we can reduce this to $O(x \log (\frac{y}{x}))$ time per operation, which will induce a running time of $O(n \log n)$ for the entire algorithm. We achieve this running time by using properties of Finger Search Trees proven by Huddelston and Melhorn In. %TODO cite. 
+In this section we use $(2,5)$ Trees to store our polylines.
+The main idea we use is analysing the complexity of operations more carefully, by looking at the performance of the basic operations we do on our balanced trees (i.e. search, insert and delete) in the context of the interface we defined, and what we do in each step of the algorithm (i.e. the batched operations). We will show that since these basic operations are not performed in random, the amortized cost of each operation is less than logarithmic.
 
-
-\begin{lemma}
-For any B tree with $n$ nodes, and a subset of the nodes of the tree of size $m$, s.t. no node in the subset is an ancestor of another node in the subset, the sum of the heights of the subset nodes is $m \log (\frac{n}{m})$.
+Our four batched operations traverse the search tree in the same way. Given a list of $x$ leaves we, denoted by $p_1,p_2,...,p_x$, define an \emph{interval traversal} on these leaves as a traversal on the path $r \rightarrow p_1 \rightarrow p_2 \rightarrow ... \rightarrow p_x$ (where $r$ is the root of the tree). 
+%For $1 \leq i \leq x$, and to get from one leaf to the next, we go up to their LCA, and then go down. %TODO add figure
+\begin{lemma} \label{interval traversal lemma}
+The number of nodes in an interval traversal over $O(x)$ leaves in a tree with $O(y)$ leaves is $O(x \log (\frac{y}{x}))$,
 \end{lemma}
 \begin{proof}
-Since the tree is balanced, the height of each of the nodes in the subset, is at most $\log n - d_i$ (where $d_i$ is the depth of the node). So, we need to show that $\Sigma{i=1}{m} d_i \geq m \log m$. Consider the tree that is obtained by removing the subtree of each node in the subset. This tree has $m$ leaves (the nodes of the subset), and since every non-leaf node has a degree of at least two, the number of inner nodes is at most $m/2$.
+Theorem 4 in %TODO cite.
+shows that the number of different ancestors of $x$ leaves in a $(a, \infty)$ with $y$ leaves, is at most $3x + 2( \log _{a}{y} + \sum_{i=2}^{x} \log (d_i))$, where $d_i$ is the number of leaves in the tree that are between $p_{i-1}$ and $p_i$. The lemma is implied directly from this, due to convexity of the logarithm function.
 \end{proof}
 
-\begin{lemma}
-Operation 5 - Batched interval increase, is performed in $O(x \log (\frac{y}{x}))$ time in each step.
-\end{lemma}
-\begin{proof}
-It is easy to see that the cost of each single interval increase is linear in the height of the LCA of the endpoints of the interval. Thus, we need to prove that the sum of the heights of these LCA nodes, is at most $x \log (\frac{y}{x})$. Since the intervals are disjoint, we know that it is not possible for one of these nodes to be an ancestor of another of these nodes.
-\end{proof}
+By Lemma \ref{interval traversal lemma}, the running time of operations 6 and 7 is $O(x \log (\frac{y}{x})$, since their running time is linear in the number of nodes traversed by them.
+
+
 
 \bibliographystyle{abbrv}
 \bibliography{dispersion}
