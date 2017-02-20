@@ -850,8 +850,8 @@ We now need to consider which data structure we will use to store our polylines.
 \item Shift the polyline right by some distance.
 \item Split the polyline at some key.
 \item Merge two polylines (s.t. the keys in one polyline are smaller than all keys in the other).
-\item "Mirror" a polyline, by negating all the keys ($d(h,v)$) and adding $\lambda$.
 \item Query the value of the polyline for a certain key $d(h,v)$.
+\item Return a sorted list of the breakpoints of the polyline
 \item Batched interval increase - Given a list of disjoint intervals of the polyline, and a number for each interval, increase the value of the polyline in each interval by the appropriate number. Each interval is given by the keys of its endpoints.
 \item Batched value predecessor - Given a list of key-value pairs, $\{(k_i,v_i)\}$, find for each $k_i$, the maximal key $k_{i}'$, s.t. $k_{i}' \leq k_i$ and the value of the polyline at $k_{i}'$ is larger or equal to $v_i$.
 \item Batched interval insertions - Given a list of pairs of consecutive breakpoints in the polyline, insert between each pair a list of breakpoints.
@@ -862,9 +862,9 @@ We now show how to use some standard techniques to implement the required operat
 
 We represent the polylines by storing their breakpoints in augmented B Trees, where the data is stored in the leaves. Each node of the trees will store a key-value pair. The breakpoints of the polyline will be stored at the leaves of the tree, and we will maintain the following property: the key of each leaf will be the sum of the keys of all its ancestors, and its value will be the sum of the values of all its ancestors.
 
-Let us describe the implementation of each operation. We denote the number of breakpoints in $p_1$ (the smaller polyline) by $x$, and the number of breakpoint of $p_2$ by $y$ (i.e. $x \leq y$). Operation 1 can simply be implemented by adding the required distance to the key at the root of the tree. This will take constant time. Operations 2 and 3 can use standard split and merge procedures for balanced search trees. This will take logarithmic time. Operation 4 requires saving an extra bit in the root of the tree, thus allowing to negate all the keys in the tree by switching it (all the procedures will switch right and left when the negation flag is on). After the negation, the mirroring operation will add $\lambda$ to all the keys in the tree (by adding to the root). This is done in constant time. Operation 5 can be done by a predecessor query, and returning the value at the previous breakpoint.
+Let us describe the implementation of each operation. We denote the number of breakpoints in $p_1$ (the smaller polyline) by $x$, and the number of breakpoint of $p_2$ by $y$ (i.e. $x \leq y$). Operation 1 can simply be implemented by adding the required distance to the key at the root of the tree. This will take constant time. Operations 2 and 3 can use standard split and merge procedures for balanced search trees. This will take logarithmic time. Operation 4 can be done by a predecessor query, and returning the value at the previous breakpoint. Operation 5 will return the list of leaves of the tree.
 
-Operations 1-5 are performed only a constant number of times per step, and so their total cost is logarithmic. The next four operations are the more costly, since each of the them is comprised of a batch of $O(x)$ operations on a tree of size $O(y)$.
+Operations 1-4 are performed only a constant number of times per step, and so their total cost is logarithmic. Operation 5 will also be performed a constant number of times, and will be used in order to iterate over the breakpoints of the smaller polyline (which takes $O(x)$ time). The next four operations are the more costly, since each of the them is comprised of a batch of $O(x)$ operations on a tree of size $O(y)$.
 
 Operation 6 - batched interval increase: we iterate over the intervals and for each interval, we traverse the tree from the starting point of the interval, through the LCA, and to the ending point of the interval. We store in each node of the tree the maximum of its subree, so we know when we reach the LCA. On the way up to the LCA we increase the key of every right child which is not on the path, and on the way down from the LCA we increase the key of every left child that is not in the path. This operation take time which is linear in the number of nodes reached by the described traversal. Since we use a balanced tree, the distance between interval endpoints and their LCA is at $O(\log y)$, and so the operation takes $O(x \log y)$ in the worst case.
 
@@ -911,6 +911,8 @@ The number of nodes in an interval traversal over $O(x)$ leaves in a tree with $
 Theorem 4 in %TODO cite.
 shows that the number of different ancestors of $x$ leaves in a $(a, \infty)$ with $y$ leaves, is at most $3x + 2( \log _{a}{y} + \sum_{i=2}^{x} \log (d_i))$, where $d_i$ is the number of leaves in the tree that are between $p_{i-1}$ and $p_i$. The lemma is implied directly from this, due to convexity of the logarithm function.
 \end{proof}
+
+%TODO prove that batched value predecessor is xlog(y\x) by proving that paths don't cross.
 
 By Lemma \ref{interval traversal lemma}, the running time of operations 6 and 7 is $O(x \log (\frac{y}{x})$, since their running time is linear in the number of nodes traversed by them.
 
