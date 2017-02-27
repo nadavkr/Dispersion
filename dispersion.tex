@@ -901,25 +901,52 @@ We conclude that the total complexity of our weighted feasibility test is $O(n \
 
 
 \subsection{An \boldmath$O(n \log n)$ Algorithm for the weighted feasibility test}
-We now present an optimal $O(n \log n)$ time algorithm for the weighted feasibility test. We use the same algorithm described in the previous section, and reduce its running by implementing the heavier operations we run on the polylines more efficiently. Previously, we had a running time of $O(x \log y)$ for these operations, and we will now show how we can reduce this to $O(x \log (\frac{y}{x}))$ time per operation, which will induce a running time of $O(n \log n)$ for the entire algorithm. We achieve this running time by using properties of Finger Search Trees proven by Huddelston and Melhorn In. %TODO cite. 
-In this section we use $(2,5)$ Trees to store our polylines.
-The main idea we use is analysing the complexity of operations more carefully, by looking at the performance of the basic operations we do on our balanced trees (i.e. search, insert and delete) in the context of the interface we defined, and what we do in each step of the algorithm (i.e. the batched operations). We will show that since these basic operations are not performed in random, the amortized cost of each operation is less than logarithmic.
+In this section, we present a more careful analysis of our weighted feasibility test, and show that its running time is in fact $O(n \log n)$ in the worst case, thus proving that it is optimal. We do this by showing that the time complexity of the heavier operations we run on the polylines (i.e. the batched operations) is actually $O(x \log (\frac{y}{x}))$ in the worst case, which will induce a running time of $O(n \log n)$ for the entire algorithm. For this we use some results on the running time of sequences of operations on 2-3 trees, presented by Tarjan and Brown in. %TODO cite
 
-Our four batched operations traverse the search tree in the same way. Given a list of $x$ leaves we, denoted by $p_1,p_2,...,p_x$, define an \emph{interval traversal} on these leaves as a traversal on the path $r \rightarrow p_1 \rightarrow p_2 \rightarrow ... \rightarrow p_x$ (where $r$ is the root of the tree). 
+%The main idea for this analysis, is looking at the performance of the basic operations we do on our balanced trees (i.e. search, insert and delete) in the context of the interface we defined, and what we do in each step of the algorithm (i.e. the batched operations). We will show that since these basic operations are not performed in random, the amortized cost of each operation is less than logarithmic.
+
+%Our four batched operations traverse the search tree in the same way. Given a list of $k$ leaves, denoted by $p_1,p_2,...,p_k$, we define an \emph{interval traversal} on these leaves as a traversal on the path $r \rightarrow p_1 \rightarrow p_2 \rightarrow ... \rightarrow p_x$ (where $r$ is the root of the tree). 
 %For $1 \leq i \leq x$, and to get from one leaf to the next, we go up to their LCA, and then go down. %TODO add figure
-\begin{lemma} \label{interval traversal lemma}
-The number of nodes in an interval traversal over $O(x)$ leaves in a tree with $O(y)$ leaves is $O(x \log (\frac{y}{x}))$,
+
+We now present a lemma which will help us improve the time bound of our four batched operations.
+
+\begin{lemma} \label{number of ancestors lemma}
+The number of different ancestors of $O(x)$ leaves in a tree with $O(y)$ leaves is $O(x \log (\frac{y}{x}))$.
 \end{lemma}
 \begin{proof}
-Theorem 4 in %TODO cite.
-shows that the number of different ancestors of $x$ leaves in a $(a, \infty)$ with $y$ leaves, is at most $3x + 2( \log _{a}{y} + \sum_{i=2}^{x} \log (d_i))$, where $d_i$ is the number of leaves in the tree that are between $p_{i-1}$ and $p_i$. The lemma is implied directly from this, due to convexity of the logarithm function.
+Lemma 7 in %TODO cite.
+shows that the number of nodes which lie on the paths from $k$ leaves (denoted by $p_1<p_2<...<p_k$) to the root, in a 2-3 tree with $n$ leaves, is at most $2( \log n + \sum_{i=2}^{k} \log (d_i))$, where $d_i$ is the number of leaves in the tree that are between $p_{i-1}$ and $p_i$. Our lemma is implied directly from this, due to convexity of the logarithm function.
+\end{proof}
+
+
+\begin{lemma}
+The running time of operation 5 - batched interval increase, is $O(x \log (\frac{y}{x}))$ in the worst case.
+\end{lemma}
+\begin{proof}
+Notice that we can traverse from interval to interval in the same manner we traverse between the endpoints of a single interval, i.e. go from the end of an interval to the starting point of the next one by going through their LCA, as opposed to searching for the staring point of each interval from the root. 
+
+Given a list of $k$ leaves, denoted by $p_1,p_2,...,p_k$, we define an \emph{interval traversal} on these leaves as a traversal on the path $r \rightarrow p_1 \rightarrow p_2 \rightarrow ... \rightarrow p_k$ (where $r$ is the root of the tree).
+
+Operation 5 can be performed by doing an interval traversal on the leaves which are the endpoints of the given intervals. In addition to this, we also need to update the nodes which are on the paths from any LCA of a starting and ending point of an interval, to the root. It is easy to see that the number of all the nodes reached by the operation is bounded by the number of ancestors of the leaves which are endpoints of the given interval, and so Lemma \ref{number of ancestors lemma} implies the correctness of this lemma.
 \end{proof}
 
 %TODO prove that batched value predecessor is xlog(y\x) by proving that paths don't cross.
 
-By Lemma \ref{interval traversal lemma}, the running time of operations 6 and 7 is $O(x \log (\frac{y}{x})$, since their running time is linear in the number of nodes traversed by them.
+\begin{lemma}
+The running time of operation 6 - batched value predecessor, is $O(x \log (\frac{y}{x}))$ in the worst case.
+\end{lemma}
+\begin{proof}
+Immediate from the fact that the running time of the operation is linear in the number of nodes in the interval traversal of the tree.
+\end{proof}
 
 
+\begin{lemma}
+The running time of operation 7 - batched interval insertions, is $O(x \log (\frac{y}{x}))$ in the worst case.
+\end{lemma}
+\begin{proof}
+Immediate from Theorem 1 in %TODO cite
+and the convexity of the logarithm function.
+\end{proof}
 
 \bibliographystyle{abbrv}
 \bibliography{dispersion}
