@@ -869,6 +869,13 @@ Operations 1-3 are performed only a constant number of times per step, and so th
 
 Operation 5 - batched interval increase: We iterate over the intervals, and for each interval, we find its starting point, and traverse the path from the starting point, through the LCA, to the ending point of the interval. We know when we reach the LCA, since we store the maximal key in each subtree. For each node on the path from the starting point to the LCA, we increase the value of every child of the node which is to the right of the child that is on the path. Similarly, on the path from the LCA to the end of the interval, we increase the value of every child that is to the left of the child that is on the path. During this traversal, we update the maximal value field in each node we reach, and then update the nodes on the path from the LCA to the root. Notice that if one of the endpoints of the interval is not in the structure, we need to insert it. We might also need to delete a breakpoint which is a starting point of some interval, in case the interval is increased  s.t. the value of this breakpoint is now equal to the value of its predecessor. The batched interval increase operation takes time which is linear in the number of nodes reached by the described traversal, plus the cost of insertions and deletions, the number of which is linear in the number of intervals. We have $O(x)$ intervals to increase, in a tree of size $O(y)$, and we use a balanced tree, so the distance between interval endpoints and their LCA and the distance between the LCA and the root are both bounded by $O(\log y)$. Thus, the operation takes $O(x \log y)$ time in the worst case.
 
+\begin{figure}[h]
+\begin{center}
+\includegraphics{interval_increase}
+\end{center}
+\caption{A single interval increase. In order to increase the values of all the breakpoints in the blue interval, we increase the values of the red nodes. We then traverse the path from the LCA of the endpoints of the interval to the root, and update the maximum value field.}
+\end{figure}
+
 Operation 6 - batched value predecessor: Each value predecessor query will be answered by first finding $k_i$ (or it's predecessor, if there is no breakpoint at $k_i$). Then, we go up the tree until the maximum value in at least one of the subtrees rooted at children of the current node which are to the left of the child from which we came, is larger or equal to $v_i$.\footnote{We can compute the maximal value in a subtree by adding the value in the maximal value field with the value of the node itself. When we reach the breakpoint from which we start the search ($k_i$ or its predecessor), we have its value, and so we can compute the value of each node we reach by subtracting the values of nodes while going up the tree, and adding when going down.} We then go down while searching for the right-most leaf which is a descendant of the current node, and has value at least $v_i$. This search is done by always going down to the right-most child that has at least $v_i$ as the maximum in its subtree. Each value predecessor query takes $O(\log y)$ and so the operation takes $O(x \log y)$ in total.
 
 Operation 7 - Batched interval insertions: Here we use a regular insert for a 2-3 tree, and update the subtree maximum fields where it is necessary. Since we insert at most $O(x)$ new breakpoints, this operation takes $O(x \log y)$ in the worst case.
@@ -931,7 +938,13 @@ Given a list of $k$ intervals, with endpoints $p_1,p_2,...,p_{2k}$, we define an
 Operation 5 can be performed by doing an interval traversal on the given intervals, and increasing the values of the intervals during the traversal of the path between the starting and ending point of each interval, as described in the previous section. In addition to this, we also need to update the nodes which are on the paths from any LCA of a starting and ending point of an interval, to the root. If we make sure to only update each node once, by doing this in parallel, the time for this step is also bounded by the number of ancestors of the endpoints. Thus, the total time for the operation is linear in the number of ancestors of the leaves which are endpoints of the given intervals, and so Lemma \ref{number of ancestors lemma} implies the correctness of this lemma.
 \end{proof}
 
-%TODO prove that batched value predecessor is xlog(y\x) by proving that paths don't cross.
+\begin{figure}[h]
+\begin{center}
+\includegraphics{interval_traversal}
+\end{center}
+\caption{Example of an interval traversal. The breakpoints in the intervals are in blue, and their endpoints are $p_1,p_2,...,p_{12}$. The operations require that we traverse the path between the starting point and the ending point of each interval. The traversal goes from each endpoint to the next through their LCA.}
+\end{figure}
+
 
 \begin{lemma}
 The running time of operation 6 - batched value predecessor, is $O(x \log (\frac{y}{x}))$ in the worst case.
