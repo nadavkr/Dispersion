@@ -877,7 +877,7 @@ Operation 8 - Batched interval deletions: For each interval deletion we can simp
 
 %, we do the same traversal as we did for interval increase, and instead of increasing the keys of the roots of subtrees as we did there, we delete these subtrees. We delete a subtree by disconnecting its root, and do the required balancing operations at the end of the operation, after deleting all the subtrees. Recall that when we delete a node from a 2-3 tree, we rebalance the tree by simply making sure we are not left with a "1-node" (i.e. a node with only one child), while maintaining the invariant that all the leaves have the same depth. For a regular deletion, we achieve this by either doing some local rearrangement that solves the problem, or by fusing the 1-node with its brother, and moving the problem up the tree. In our case, we start the rebalancing at each of the endpoints of the interval, and move up to the LCA In our case. During this process , we might encounter a situation that cannot occur for a regular 2-3 tree, where we have a 1-node that is the child of another 1-node.
 
-\begin{lemma}
+\begin{lemma} \label{nlog^2n running time for weighted f.t. lemma}
 The above implementation induces $O(n \log ^2 n)$ complexity for our weighted feasibility test.
 \end{lemma}
 
@@ -901,7 +901,7 @@ We conclude that the total complexity of our weighted feasibility test is $O(n \
 
 
 \subsection{An \boldmath$O(n \log n)$ Algorithm for the weighted feasibility test}
-In this section, we present a more careful analysis of our weighted feasibility test, and show that its running time is in fact $O(n \log n)$ in the worst case, thus proving that it is optimal. We do this by showing that the time complexity of the heavier operations we run on the polylines (i.e. the batched operations) is actually $O(x \log (\frac{y}{x}))$ in the worst case, which will induce a running time of $O(n \log n)$ for the entire algorithm. For this we use some results on the running time of sequences of operations on 2-3 trees, presented by Tarjan and Brown in. %TODO cite
+In this section, we improve by the complexity of our weighted feasibility test by implementing the interface we use for operations on polylines more efficiently. We achieve a $O(x \log (\frac{y}{x}))$ time bound for the batched operations and show that the overall running time induced by this implementation is $O(n \log n)$ in the worst case, which matches the lower bound. For this we use the same structure as in the previous section, and apply some results on the running time of sequences of operations on 2-3 trees, presented by Tarjan and Brown in. %TODO cite
 
 %The main idea for this analysis, is looking at the performance of the basic operations we do on our balanced trees (i.e. search, insert and delete) in the context of the interface we defined, and what we do in each step of the algorithm (i.e. the batched operations). We will show that since these basic operations are not performed in random, the amortized cost of each operation is less than logarithmic.
 
@@ -911,23 +911,24 @@ In this section, we present a more careful analysis of our weighted feasibility 
 We now present a lemma which will help us improve the time bound of our four batched operations.
 
 \begin{lemma} \label{number of ancestors lemma}
-The number of different ancestors of $O(x)$ leaves in a tree with $O(y)$ leaves is $O(x \log (\frac{y}{x}))$.
+The number of different ancestors of $x$ leaves in a tree with $y$ leaves is $O(x \log (\frac{y}{x}))$.
 \end{lemma}
 \begin{proof}
 Lemma 7 in %TODO cite.
 shows that the number of nodes which lie on the paths from $k$ leaves (denoted by $p_1<p_2<...<p_k$) to the root, in a 2-3 tree with $n$ leaves, is at most $2( \log n + \sum_{i=2}^{k} \log (d_i))$, where $d_i$ is the number of leaves in the tree that are between $p_{i-1}$ and $p_i$. Our lemma is implied directly from this, due to convexity of the logarithm function.
 \end{proof}
 
+In the following lemmas, we prove that the each of the four required batched operations runs in $O(x \log(\frac{y}{x}))$ time in the worst case.
 
 \begin{lemma}
 The running time of operation 5 - batched interval increase, is $O(x \log (\frac{y}{x}))$ in the worst case.
 \end{lemma}
 \begin{proof}
-Notice that we can traverse from interval to interval in the same manner we traverse between the endpoints of a single interval, i.e. go from the end of an interval to the starting point of the next one by going through their LCA, as opposed to searching for the staring point of each interval from the root. 
+In this implementation, we increase the value of each interval in the same way as before, but reduce the running time by not starting each interval increase from the root. Notice that we can traverse from interval to interval in the same manner we traverse between the endpoints of a single interval, i.e. go from the last breakpoint of an interval to the first breakpoint of the next one by going through their LCA, as opposed to searching for the staring point of each interval from the root. 
 
-Given a list of $k$ leaves, denoted by $p_1,p_2,...,p_k$, we define an \emph{interval traversal} on these leaves as a traversal on the path $r \rightarrow p_1 \rightarrow p_2 \rightarrow ... \rightarrow p_k$ (where $r$ is the root of the tree).
+Given a list of $k$ intervals, with endpoints $p_1,p_2,...,p_{2k}$, we define an \emph{interval traversal} as a traversal on the path $r \rightarrow p_1 \rightarrow p_2 \rightarrow ... \rightarrow p_{2k}$ (where $r$ is the root of the tree). Notice that each node that is reached by the interval traversal, is visited at most twice, since we don't search for a leaf which has already been visited, and the number of these nodes is at most the number of ancestors of the endpoints of the given intervals. 
 
-Operation 5 can be performed by doing an interval traversal on the leaves which are the endpoints of the given intervals. In addition to this, we also need to update the nodes which are on the paths from any LCA of a starting and ending point of an interval, to the root. It is easy to see that the number of all the nodes reached by the operation is bounded by the number of ancestors of the leaves which are endpoints of the given interval, and so Lemma \ref{number of ancestors lemma} implies the correctness of this lemma.
+Operation 5 can be performed by doing an interval traversal on the given intervals, and increasing the values of the intervals during the traversal of the path between the starting and ending point of each interval, as described in the previous section. In addition to this, we also need to update the nodes which are on the paths from any LCA of a starting and ending point of an interval, to the root. If we make sure to only update each node once, by doing this in parallel, the time for this step is also bounded by the number of ancestors of the endpoints. Thus, the total time for the operation is linear in the number of ancestors of the leaves which are endpoints of the given intervals, and so Lemma \ref{number of ancestors lemma} implies the correctness of this lemma.
 \end{proof}
 
 %TODO prove that batched value predecessor is xlog(y\x) by proving that paths don't cross.
@@ -936,7 +937,7 @@ Operation 5 can be performed by doing an interval traversal on the leaves which 
 The running time of operation 6 - batched value predecessor, is $O(x \log (\frac{y}{x}))$ in the worst case.
 \end{lemma}
 \begin{proof}
-Immediate from the fact that the running time of the operation is linear in the number of nodes in the interval traversal of the tree.
+Similarly to operation 5, we start each value predecessor search from the leaf where we finished the previous one, and so the running time of the operation is linear in the number of nodes in the interval traversal of the tree, which is at most $O(x \log (\frac{y}{x}))$.
 \end{proof}
 
 
@@ -946,6 +947,33 @@ The running time of operation 7 - batched interval insertions, is $O(x \log (\fr
 \begin{proof}
 Immediate from Theorem 1 in %TODO cite
 and the convexity of the logarithm function.
+\end{proof}
+
+\begin{lemma}
+The running time of operation 8 - batched interval deletions, is $O(x \log (\frac{y}{x}))$ in the worst case.
+\end{lemma}
+\begin{proof}
+Here we need look at things a bit more closely. While Theorem 2 in %TODO cite
+does deal with a batch of deletions, this is not good enough for us, as we might be deleting much more than $O(x)$ elements in each such operation. 
+
+In the previous section we simply used split and join operations on the entire tree, but these are to expensive, so we avoid them by doing the following. We start by splitting the tree into $O(x)$ smaller trees, each of which has $O(\frac{y}{x})$ leaves. We do this by recursively splitting the tree, first into two trees with $O(\frac{y}{2})$ leaves, then we split each of these trees into trees with $O(\frac{y}{4})$ leaves, and so on, until we have trees of size $O(\frac{y}{x})$. We then delete the relevant intervals from each of the small trees. Each interval is either contained in a single tree, and will be deleted by performing a split operation and a join operation, or it spans over several trees, in which case it is deleted by two split operations (on the trees where the endpoints of the interval lie), and maybe deleting some trees entirely. Thus, each interval is deleted by performing at most two split or join operations, each of which costs $O(\log (\frac{y}{x}))$ time, as this is the height of our small trees. Since we have at most $x$ intervals to delete, this takes $O(x \log(\frac{x}{y}))$ time overall. We then join the resulting trees symmetrically to how we produced them, by first joining pairs of trees, then pairs of the resulting trees, and so on. The tree we obtain has exactly the leaves of the original tree, without the deleted intervals.
+
+Let us consider the time it takes to obtain the small trees with $O(\frac{y}{x})$ leaves. We start with a tree that has $y$ leaves, split it at the middle element in $O(\log y)$ time, and obtain two trees with $\ceil{\frac{y}{2}}$ leaves. We then split these two trees, which takes $2 \cdot O(\frac{y}{2})$ time, and so on. The cost of this process sums up to:
+\begin{align*}
+& \sum_{i=0}^{\log (\frac{x}{2})} 2^i \cdot \log (\frac{y}{2^i}) = \sum_{i=0}^{\log (\frac{x}{2})} 2^i \cdot \log y - \sum_{i=0}^{\log (\frac{x}{2})} 2^i \cdot \log (2^i) \leq \\
+& \leq x \log y - 2 \cdot (2^{ \log ( \frac{x}{2})} \cdot \log ( \frac{x}{2}) - 2^{ \log ( \frac{x}{2})}+1) = \\
+& = x \log y  -  x \log (\frac{x}{2}) - x - 2 = x \log (\frac{2y}{x}) - x -2 = O(x \log (\frac{y}{x}) 
+\end{align*}
+Clearly, the cost of the joins we make in order to obtain the large tree in the end of the operation is no more then the cost of the splits, and so, the operation takes $O(x \log (\frac{y}{x}))$ time in total.
+\end{proof}
+
+\begin{theorem}
+The running time of the weighted feasibility test is $O(n \log n)$.
+\end{theorem}
+\begin{proof}
+As we have seen in the proof of Lemma \ref{nlog^2n running time for weighted f.t. lemma}, the time spent for nodes with degree one in the input tree is bounded by $O(n \log n)$, and we are left with the analysis for nodes of degree two.
+
+As we have shown, the time spent for each node of degree two is bounded by the running time of the batched operations, which by the previous lemmas is $O(x \log (\frac{y}{x}))$, and similarly to the proof of Lemma \ref{nlog^2n running time for weighted f.t. lemma}, we now prove that this sums up to $O(n \log n)$ by induction on the size of the input tree. It is easy to see that the base of the induction holds. Assume that for any tree of size $k$, where $k<n$, the time to construct polylines of subtrees rooted at nodes of degree two is $O(k \log k)$ overall. Consider some binary tree of size $n$. Denote the time spent for nodes of degree two while running the weighted feasibility test on the tree by $S$. If the root is of degree one, then by the induction hypothesis $S=O((n-1)\cdot \log(n-1))=O(n \log n)$. If the root is of degree two, denote the size of its smaller subtree by $x$, and the size of the larger by $y$ (so it holds that $n=x+y+1$, and $x \leq y$). Then, $S= O(x \log x + y \log y + x \log (\frac{y}{x})) = O((x+y) \cdot \log y) = O(n \log n)$. We conclude that the running time of our weighted feasibility test is bounded by $O(n \log n)$.
 \end{proof}
 
 \bibliographystyle{abbrv}
