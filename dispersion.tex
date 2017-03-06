@@ -979,18 +979,17 @@ The running time of the weighted feasibility test is $O(n \log n)$.
 \begin{proof}
 As we have seen in the proof of Lemma \ref{nlog^2n running time for weighted f.t. lemma}, the time spent for nodes with degree one in the input tree is bounded by $O(n \log n)$, and we are left with the analysis for nodes of degree two.
 
-As we have shown, the time spent for each node of degree two is bounded by the running time of the batched operations, which by the previous lemmas is $c\cdot x \log (\frac{2y}{x})$, and similarly to the proof of Lemma \ref{nlog^2n running time for weighted f.t. lemma}, we now prove that this sums up to $O(n \log n)$ by induction on the size of the input tree. It is easy to see that the base of the induction holds. Assume that for any tree of size $k$, where $k<n$, the time to construct polylines of subtrees rooted at nodes of degree two is $d\cdot k \log k$ overall. Consider some binary tree with $n$ nodes. Denote the time spent for nodes of degree two while running the weighted feasibility test on the tree by $S$. If the root is of degree one, then by the induction hypothesis $S=1+d\cdot (n-1)\log(n-1)\leq d\cdot n \log n$ for $d$ large enough. If the root is of degree two, denote the size of its smaller subtree by $x$, and the size of the larger by $y$ (so it holds that $n=x+y+1$, and $x \leq y$). Then, $S= d\cdot x \log x + d\cdot y \log y + c\cdot x \log (\frac{2y}{x})$ for some $c$. By choosing $d\geq 2c$ large enough, we can upper bound this as follows:
+As we have shown, the time spent for each node of degree two is bounded by the running time of the batched operations, which by the previous lemmas is $c\cdot x \log (\frac{2y}{x})$ for some constant $c$, and similarly to the proof of Lemma \ref{nlog^2n running time for weighted f.t. lemma}, we now prove that this sums up to $O(n \log n)$ by induction on the size of the input tree. It is easy to see that the base of the induction holds. Assume that for any tree of size $k$, where $k<n$, the time to construct polylines of subtrees rooted at nodes of degree two is at most $2c \cdot k \log k$ overall. Consider some binary tree with $n$ nodes. Denote the time spent for nodes of degree two while running the weighted feasibility test on the tree by $S$. If the root is of degree one, then by the induction hypothesis $S \leq 2c\cdot (n-1)\log(n-1)\leq 2c\cdot n \log n$. If the root is of degree two, denote the size of its smaller subtree by $x$, and the size of the larger by $y$ (so it holds that $n=x+y+1$, and $x \leq y$). Then, $S= 2c\cdot x \log x + 2c\cdot y \log y + c\cdot x \log (\frac{2y}{x})$. We can upper bound this as follows:
 \begin{align*}
-& x\log x+y\log y+x/2\log(\frac{2y}{x}) \\
-\leq & x\log x+y\log y+x/2+x/2\log y-x/2\log x \\
-\leq & x/2\log x+y\log y+x/2+x/2\log y \\
-\leq & x/2\log(2x)+(x/2+y)\log y \\
-\leq & x/2\log(x+y)+(x/2+y)\log y \\
-= & (x+y)\log(x+y)-x/2\log(x+y)-y\log(x+y)+(x/2+y)\log y \\
-= & (x+y)\log(x+y)-(x/2+y)\log(x+y)+(x/2+y)\log y \\
-= & (x+y)\log(x+y) - (x/2+y)\log(\frac{x+y}{y}).
+& x\log x+y\log y+\frac{x}{2}\log(\frac{2y}{x}) \\
+= & x\log x+y\log y+\frac{x}{2}+\frac{x}{2}\log y-\frac{x}{2}\log x \\
+= & \frac{x}{2}\log x+y\log y+\frac{x}{2}+\frac{x}{2}\log y \\
+= & \frac{x}{2}\log(2x)+(\frac{x}{2}+y)\log y \\
+\leq & \frac{x}{2}\log(x+y)+(\frac{x}{2}+y)\log (x+y) \\
+= & (x+y)\log(x+y) \\
+\leq & n \log n.
 \end{align*}
-This is always at most $(x+y)\log(x+y)$, so $S=d\cdot(x+y)\log(x+y)=d\cdot n\log n$.
+Thus, $S \leq 2c \cdot n\log n$.
 We conclude that the running time of our weighted feasibility test is bounded by $O(n \log n)$.
 \end{proof}
 
