@@ -72,7 +72,7 @@ the minimum distance between any two chosen nodes. This can be seen as a general
 of the independent set problem, where the goal is to select nodes so that the minimum distance
 is larger than 1.
 We design an optimal $\Oh(n)$ time algorithm for the dispersion problem on trees consisting
-of $n$ nodes, thus improving the previous $\Oh(n\log n)$ time solution. 
+of $n$ nodes, thus improving the previous  $\Oh(n\log n)$ time solution from 1997. 
 
 We also consider the weighted case, where the goal is to choose a set of nodes of total weight at least $k$. We present an $\Oh(n\log^2n)$ algorithm improving the previous $\Oh(n\log^4 n)$ solution. Our solution builds on the decision version (where we know the minimum distance $\lambda$ between the chosen nodes) for which we present tight $\Theta(n\log n)$ upper and lower bounds. 
 \end{abstract}
@@ -135,11 +135,16 @@ Every iteration uses an appropriately chosen parameter $b$ for the micro-macro d
 as to guarantee that the construction time is $O(n)$. The parameters grow exponentially,
 so after $O(\log^{*}n)$ iterations we obtain a feasibility test with sublinear query and $O(n\log^* n)$ preprocessing. 
 
-Finally, in Section~\ref{sectionLinear}, we improve the preprocessing from $O(n\log^* n)$ to $O(n)$. This means we cannot afford to construct each micro-macro decomposition separately. We overcome this by making each decomposition a refinement of the previous one. This requires relaxing the decomposition so that a fragment may contain more than $O(b)$ nodes. 
+In Section~\ref{sectionLinear} we improve the preprocessing from $O(n\log^* n)$ to $O(n)$. This means we cannot afford to construct each micro-macro decomposition separately. We overcome this by making each decomposition a refinement of the previous one. This requires relaxing the decomposition so that a fragment may contain more than $O(b)$ nodes. 
 We believe that this simple micro-macro variant is of independent interest. 
 %
 The main difficulty remaining is how to preprocess the fragments. We cannot afford to touch very node of every fragment at every decomposition level. Therefore, we take a closer look at how a (large) fragment decomposes into smaller fragments. 
 We show that a large fragment can be reduced to a concatenation of small caterpillars, each corresponding to a small fragment that we have already preprocessed. We then very carefully tailor these small fragments while reusing the results of their preprocessing. We show that this tailoring amortizes to $O(n)$ over all decompositions. This turns out to be quite technical. 
+
+Finally, in Section~\ref{section:weighted} we consider the weighted case. Our main result  is an  $O(n\log n)$ feasibility test (for which we also give a tight lower bound). In contrast to the unweighted case where each node had only one candidate, in the weighted case each  node can have a large number of candidates. To overcome this, we show that the candidates of every node can be captured by a monotone polyline. We then show that the polyline of a node can be computed from the polylines of its children. To this end, we develop a rather complicated data structure that can efficiently manipulate the polylines with various batch updates. We believe this data structure is of independent interest.  
+%TODO: Say that our data structure is a simplification/extention/etc. of Tarjan's.  
+
+
 
 
 \section{A Linear Feasibility Test}\label{linear F.T.}
@@ -247,7 +252,7 @@ Let p be nonnegative. The number of feasibility tests needed to discard all but 
 \end{theorem}
 In our case $m=b \log b \cdot \frac{n}{b} = n \log b$ (since for each of the $\frac{n}{b}$ fragments, we have $\log b$ levels of the centroid decomposition, and at each level we have the distance of every node to a centroid) and we set $p$ to be $n/b^2$. The theorem implies that we can use $O(\log b)$ feasibility tests and discard all but $n/b^2$ elements of the matrices. We also pay $O(n \log b)$ exclusive of the feasibility tests. This means that we have at most $n/b^2$ active fragments (out of all $n/b$ fragments). 
 
-For inactive fragment, it is clear that we can now answer queries checking whether some pairwise distance inside the fragment is at least $\lambda$, or if it is less than $\frac{\lambda}{2}$ \footnote{We can easily compute any pairwise distance in the tree in $O(1)$ time by precomputing all distances to the root of the tree, and using LCA queries \cite{Bender2000}, \cite{Djidjev1991}.}.
+For inactive fragment, it is clear that we can now answer queries checking whether some pairwise distance inside the fragment is at least $\lambda$, or if it is less than $\frac{\lambda}{2}$ \footnote{We can easily compute any pairwise distance in the tree in $O(1)$ time by precomputing all distances to the root of the tree, and using Lowest Common Ancestor queries \cite{Bender2000}, \cite{Djidjev1991}.}.
 
 Active fragments will be processed as in the linear algorithm described before, so we can ignore them for now. We refer to the certain node which is closest to the root simply as \textit{the certain node}. We now do the following preprocessing for each inactive fragment:
 \begin{enumerate}
@@ -279,7 +284,7 @@ remaining leaves from the root are non-decreasing.
 
 \begin{figure}
 \begin{center}
-\includegraphics[scale=0.5]{caterpillar}
+\includegraphics[scale=0.45]{caterpillar}
 \end{center}
 \caption{Pruning the caterpillar so that the distances of leaves from the root are non-decreasing: If $d(u_i,r)<d(u_{i-1},r)$ then  we can remove $u_{i}$ since (1) an optimal solution cannot contain both $u_{i}$ and $u_{i-1}$ (the distance between them is too small), and (2) if an optimal solution contains $u_{i}$ then it can be replaced with $u_{i-1}$ (every leaf $u_j$ is farther from $u_{i-1}$ than from $u_i$). \label{fig:pruning}}
 \end{figure}
@@ -737,7 +742,7 @@ cost $O(n)$ time altogether.
 % why do we stop at fragments of size polylog(n)? Can't we get one large fragment?
 
 
-\section{The Weighted Dispersion Problem}
+\section{The Weighted Dispersion Problem}\label{section:weighted}
 We now consider the weighted variant of the dispersion problem, in which not only the edges have weights, but also the nodes. Recall that $f(P)=\min_{u,v\in P} \{d(u,v)\}$. The weighted problems are defined as follows.
 \begin{itemize} 
 \item {\em The Weighted Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, non-negative node weights, and a number $W$, find a subset of nodes $P$ of weight at least $W$, such that  $f(P)$ is maximized. 
@@ -875,8 +880,8 @@ To conclude, the final polyline $p$ is obtained by concatenating the value we co
 \item Batched interval deletions - Given a list of disjoint intervals of the polyline, delete all the breakpoints inside the intervals.
 \end{enumerate}
 
-We now show how to use some standard techniques to implement the required operations, and achieve $O(n \log ^2 n)$ time for our weighted feasibility test. %In the next section we will use results by Tarjan, that will allow us to analyse the cost of these operations more precisely, and prove that the overall running time of our algorithm is $O(n \log n)$.
-We represent a polyline by storing its breakpoints in augmented 2-3 tree, where the data is stored in the leaves. Each node of the tree will store a key-value pair, and we will maintain the following property: the key of each breakpoint will be the sum of the key of the corresponding leaf, and of all its ancestors, and the same will hold for the values of breakpoints. In addition, we store in each node, the maximal key of a leaf in its subtree, and a maximal value field. The maximal value field holds in each node the largest value of any leaf in the node's subtree, minus the sum of the values of all the node's ancestors. In other words, it holds the sum of the values on the path between the node and the leaf with the maximal value in its subtree (including the value stored in the leaf itself).
+We now show how to use some standard techniques to implement the required operations, and achieve $O(n \log ^2 n)$ time for our weighted feasibility test. %In the next section we will use results by Tarjan, that will allow us to analyze the cost of these operations more precisely, and prove that the overall running time of our algorithm is $O(n \log n)$.
+We represent a polyline by storing its breakpoints in augmented 2-3 tree, where the data is stored in the leaves. Each node of the tree will store a key-value pair, and we will maintain the following property: the key of each breakpoint will be the sum of the key of the corresponding leaf, and of all its ancestors, and similarly for the values of breakpoints. In addition, we store in each node, the maximal key of a leaf in its subtree, and a maximal value field. The maximal value field holds in each node the largest value of any leaf in the node's subtree, minus the sum of the values of all the node's ancestors. In other words, it holds the sum of the values on the path between the node and the leaf with the maximal value in its subtree. % (including the value stored in the leaf itself).
 
 We now describe the implementation of each operation. We denote the number of breakpoints in $p_1$ (the smaller polyline) by $x$, and the number of breakpoints of $p_2$ (the larger polyline) by $y$ (i.e. $x \leq y$). 
 
@@ -885,43 +890,45 @@ We now describe the implementation of each operation. We denote the number of br
 {\bf Operation 4} is done by an inorder traversal of the tree. 
 Operations 1-3 are performed only a constant number of times per step, and so their total cost is logarithmic (i.e. $\log x + \log y$). Operation 4 will also be performed a constant number of times, and will be used in order to iterate over the breakpoints of the smaller polyline (which takes $O(x)$ time). The next four operations are the more costly, since each of the them is comprised of a batch of $O(x)$ operations on a tree of size $O(y)$.
 
-{\bf Operation 5} is done by iterating over the intervals, and for each interval, finding its starting point, and traversing the path from the starting point, through the LCA, to the ending point of the interval. We use the maximal key field to know when we reach the LCA. For each node on the path from the starting point to the LCA, we increase the value of every child of the node which is to the right of the child that is on the path. Similarly, on the path from the LCA to the end of the interval, we increase the value of every child that is to the left of the child that is on the path. During this traversal, we update the maximal value field in each node we reach, and then update the nodes on the path from the LCA to the root. Notice that if one of the endpoints of the interval is not in the structure, we need to insert it. We might also need to delete a breakpoint which is a starting point of some interval, in case the interval is increased  s.t. the value of this breakpoint is now equal to the value of its predecessor. The batched interval increase operation takes time which is linear in the number of nodes reached by the described traversal, plus the cost of insertions and deletions, the number of which is linear in the number of intervals. We have $O(x)$ intervals to increase, in a tree of size $O(y)$, and we use a balanced tree, so the distance between interval endpoints and their LCA, and the distance between the LCA and the root are both bounded by $O(\log y)$. Thus, the operation takes $O(x \log y)$ time in the worst case.
+{\bf Operation 5} is done by iterating over the intervals. For each interval, we find its starting point, and traverse the path from the starting point, through the lowest common ancestor (LCA), to the ending point.\footnote{We know when we have reached the LCA by using the maximal key field.} While traversing the path from the starting point to the LCA (from the LCA to the ending point), we increase the value of every node hanging to the right (left) of this path. We also update the maximal value field in each node we reach (including the nodes on the path from the LCA to the root). Notice that if one of the endpoints of the interval is not in the structure, we need to insert it. We might also need to delete a breakpoint if it is a starting point of some interval and its new value is now equal to the value of its predecessor. Overall, operation 5 takes time which is linear in the number of traversed nodes, plus the cost of insertions and deletions (whose number  is linear in the number of intervals). We have $O(x)$ intervals to increase, in a balanced tree of size $O(y)$, leading to a total of $O(x \log y)$ time.
 
-\begin{figure}[h]
-\begin{center}
-\includegraphics{interval_increase}
-\end{center}
-\caption{A single interval increase. The red path is the path between the endpoints of the blue interval. The red nodes are all the children of nodes on the red path that are ancestors of leaves in the blue interval. In order to increase the values of all the breakpoints in the blue interval, we increase the values of the red nodes. We then traverse the path from the LCA of the endpoints of the interval to the root, and update the maximum value field.}
-\end{figure}
+%\begin{figure}[h]
+%\begin{center}
+%\includegraphics{interval_increase}
+%\end{center}
+%\caption{A single interval increase. The red path is the path between the endpoints of the blue interval. The red nodes are all the children of nodes on the red path that are ancestors of leaves in the blue interval. In order to increase the values of all the breakpoints in the blue interval, we increase the values of the red nodes. We then traverse the path from the LCA of the endpoints of the interval to the root, and update the maximum value field.}
+%\end{figure}
 
-{\bf Operation 6} is done by first finding $k_i$ (or it's predecessor, if there is no breakpoint at $k_i$). Then, we go up the tree until the maximum value in at least one of the subtrees rooted at children of the current node which are to the left of the child from which we came, is larger or equal to $v_i$.\footnote{We can compute the maximal value in a subtree by adding the value in the maximal value field with the value of the node itself. When we reach the breakpoint from which we start the search ($k_i$ or its predecessor), we have its value, and so we can compute the value of each node we reach by subtracting the values of nodes while going up the tree, and adding when going down.} We then go down while searching for the right-most leaf which is a descendant of the current node, and has value at least $v_i$. This search is done by always going down to the right-most child that has at least $v_i$ as the maximum in its subtree. Each value predecessor query takes $O(\log y)$ and so the operation takes $O(x \log y)$ in total.
+{\bf Operation 6} is done by first finding $k_i$ (or it's predecessor, if there is no breakpoint at $k_i$). Then, we go up the path in the tree until the maximum value in a subtree hanging to the left of the path is at least $v_i$.\footnote{We can compute the maximal value in a subtree by adding the value in the maximal value field with the value of the node itself. When we reach the breakpoint from which we start the search ($k_i$ or its predecessor), we have its value, and so we can compute the value of each node we reach by subtracting the values of nodes while going up the tree, and adding while going down.} We then keep going down to the rightmost child that has at least $v_i$ as the maximum value in its subtree. The overall runtime is $O(x \log y)$ since each value predecessor query takes $O(\log y)$ time.
 
-{\bf Operation 7} is done with the standard insertion procedure for a 2-3 tree, and update the subtree maximum fields where it is necessary. Since we insert at most $O(x)$ new breakpoints, this operation takes $O(x \log y)$ in the worst case.
+{\bf Operation 7} is done with  standard insertion to 2-3 trees, while updating the subtree maximum fields. We insert at most $O(x)$ new breakpoints, so this operation takes $O(x \log y)$ time.
 
-{\bf Operation 8:} For each interval deletion we can simply do two split operation and a single join, to cut out the interval we wish to delete. This takes $O(\log y)$ for each interval, and $O(x \log y)$ overall.
+{\bf Operation 8} is done by performing, for each interval deletion, a standard split and join on 2-3 trees in $O(\log y)$ time (while updating the subtree maximum fields).  This takes  $O(x \log y)$ time overall.
 
 %, we do the same traversal as we did for interval increase, and instead of increasing the keys of the roots of subtrees as we did there, we delete these subtrees. We delete a subtree by disconnecting its root, and do the required balancing operations at the end of the operation, after deleting all the subtrees. Recall that when we delete a node from a 2-3 tree, we rebalance the tree by simply making sure we are not left with a "1-node" (i.e. a node with only one child), while maintaining the invariant that all the leaves have the same depth. For a regular deletion, we achieve this by either doing some local rearrangement that solves the problem, or by fusing the 1-node with its brother, and moving the problem up the tree. In our case, we start the rebalancing at each of the endpoints of the interval, and move up to the LCA In our case. During this process , we might encounter a situation that cannot occur for a regular 2-3 tree, where we have a 1-node that is the child of another 1-node.
 
 \begin{lemma} \label{nlog^2n running time for weighted f.t. lemma}
-The above implementation induces $O(n \log ^2 n)$ complexity for our weighted feasibility test.
+The above implementation induces an $O(n \log ^2 n)$ weighted feasibility test.
 \end{lemma}
 
 \begin{proof}
-Notice that the number of breakpoints in a polyline constructed for some subtree, is at most the number of nodes in the same subtree. This is because in each breakpoint we have a decrease in the weight of the solution, due to some node that could have been in the solution for smaller keys of the polyline, but is now too close to the root. This node will not be in the solution for any key after this breakpoint.
 
-The running time of the algorithm is the sum of running times required for constructing the polylines of the subtrees rooted at each node of the tree. We split the analysis into two parts: first we consider nodes of degree one, and then nodes of degree two.
-For any node with degree one, constructing the polyline for its subtree, given the polyline for the subtree rooted at its child is done with one query to the child's polyline, and an increase of the keys of all but the first breakpoint (which can be done by increasing the key stored at the root, and decreasing the key stored at the first leaf). This takes logarithmic time, i.e. no more than $O(\log n)$. Since we have at most $n$ nodes with degree one, the total processing time for these nodes is bounded by $O(n \log n)$.
+The running time of the algorithm is the sum of running times required for constructing the polylines of the subtrees rooted at each node of the tree.
+%
+Notice that the number of breakpoints in a polyline of a subtree is at most the number of nodes in this subtree. This is because every breakpoint happens when some node that was in the solution becomes too close to the root to be in the solution. 
+
+For any degree one node, constructing its polyline is done with one query to its single child's polyline, and an increase of the keys of all but the first breakpoint (which can be done by increasing the key stored at the root, and decreasing the key stored at the first leaf). This takes $O(\log n)$ time and so the total time over all degree one nodes is $O(n \log n)$.
  
-As we mentioned, operations 1-4 only take $O(x+ \log y)$ time per step, while operations 5-8 take $O(x \log y)$ time.  Thus, constructing the polyline for the subtree rooted at some node $v$, with degree two, takes $O(x \log y)$ time, where $x$ and $y$ are the sizes of the subtrees rooted at the children of $v$, and $x \leq y$. Clearly it holds that $x \log y \leq x \log n$, so the total running time for all nodes with degree two is bounded by $S \cdot \log n$, where $S$ is the sum of sizes of the smaller subtrees for all nodes of degree two.
-
-We prove by induction that for any binary tree with $n$ nodes, $S \leq n \log n$. It easy to see that the base of the induction holds. Assume that for any binary tree with $k$ nodes, where $k<n$, it holds that $S \leq k\log k$. Consider some binary tree with $n$ nodes. If the root of the tree has only one child, $S$ is the same for the subtree rooted at the child, and so $S \leq (n-1)\log (n-1) < n \log n$. If the root has two children, denote the size of its left subtree by $x$ and the size of its right subtree by $y$ so that $n=1+x+y$. Assume w.l.o.g. that $x \leq y$. From the induction hypothesis it follows that $S \leq x + x \log x + y \log y$. We would like to prove that $x + x \log x + y \log y \leq n \log n$. This holds because:
+For any degree two node $v$ with two children whose subtree sizes are $x$ and $y$ where $x \leq y$, constructing $v$'s polyline takes $O(x \log y)$ time. This is because operations 1-4 take $O(x+ \log y)$ time and operations 5-8 take $O(x \log y)$ time.  The total running time over all degree two nodes is therefore bounded by $S \cdot \log n$, where $S$ is the sum of sizes of the smaller subtrees over all nodes of degree two. 
+%
+We prove by induction that $S \leq n \log n$. Consider some binary tree with $n$ nodes. If the root of the tree has only one child, $S$ is the same for the subtree rooted at the child, and so $S \leq (n-1)\log (n-1) < n \log n$. If the root has two children with subtree sizes $x$ and $y$ so that $x\le y$ and $n=1+x+y$. From the induction hypothesis it follows that $S \leq x + x \log x + y \log y$. This is bounded by:
 \begin{align*}
 x + x\log x + y\log y &= x \log (2x) + y\log y \\
 & \leq x \log (x+y) + y\log y \\
 & \leq x \log (x+y) + y \log (x+y) \\
 & = (x+y)\log(x+y) < n \log n.
 \end{align*}
-We conclude that the total complexity of our weighted feasibility test is $O(n \log n \cdot \log n) = O(n \log ^2 n)$.
+We conclude that the overall complexity is $O(S \log n) = O(n \log ^2 n)$.
 \end{proof}
 
 
@@ -958,7 +965,7 @@ We are left with at most $\frac{y+x}{\frac{y}{x}} \leq \frac{2y}{\frac{y}{x}} = 
 \paragraph{Operation 8 - batched interval deletions:}
 Once again we split our tree to small trees. We then delete the relevant intervals from each of the small trees. Each interval is either contained in a single tree, and will be deleted by performing one or two split operations and at most one join operation, or it spans over several trees, in which case it is deleted by two split operations (on the trees where the endpoints of the interval lie), and maybe deleting some trees entirely. Similarly to the batched interval increase operation, this costs $O(x \log(\frac{y}{x}) +x) = O(x \log(\frac{2y}{x}))$ in total.
 \begin{theorem}
-The running time of the weighted feasibility test is $O(n \log n)$.
+The above implementation induces an $O(n \log n)$ weighted feasibility test.
 \end{theorem}
 \begin{proof}
 As we have seen in the proof of Lemma \ref{nlog^2n running time for weighted f.t. lemma}, the time spent for nodes with degree one in the input tree is bounded by $O(n \log n)$, and we are left with the analysis for nodes of degree two.
