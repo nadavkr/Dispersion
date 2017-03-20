@@ -791,7 +791,7 @@ The values $W(P)$ can be viewed as a monotone polyline, since the weight of $P$ 
 \includegraphics[scale=0.4]{polyline}
 \end{center}
 \caption{The polyline represents the weight of the optimal solution $P$ as a function of the distance of the closest chosen node in the subtree. %$v$ is the root of the subtree, and $h$ is the chosen node closest to $v$ in its subtree. 
-The weight of $P$ only decreases at certain points called breakpoints. Each breakpoint holds the value of the interval between itself and the next breakpoint.
+The weight of $P$ only decreases at certain points called breakpoints (in bold). Each breakpoint holds the value of the interval between itself and the next breakpoint.
 \label{figure of a polyline}}
 \end{figure}
 
@@ -854,7 +854,7 @@ See  Figure~\ref{figure of the second case in the construction of the first half
 \begin{center}
 \includegraphics[scale=0.6]{polyline_first_half_construction_case2}
 \end{center}
-\caption{Case II of constructing the first half of the polyline. The first half of $p_2$ is in blue. The vertical black dashed lines are the breakpoints of $p_1$. We lift the intervals of $p_2$ and get the red polyline, which is not monotone. To make it monotone, we delete all the breakpoints below the green intervals and get a monotone decreasing polyline.\label{figure of the second case in the construction of the first half of the polyline}
+\caption{Case II of constructing the first half of the polyline. The first half of $p_2$ is in blue. The vertical black dashed lines are the breakpoints of $p_1$. We lift the intervals of $p_2$ and get the red polyline, which is not monotone. To make it monotone, we delete all the breakpoints below the green intervals, which are found by running value predecessor queries (the results of these queries are the bold points).\label{figure of the second case in the construction of the first half of the polyline}
 }
 \end{figure}
 %TODO: Why is the left endpoint of every green interval in the figure always a corner? In general can't it be any point in the middle of a horizontal red line.
