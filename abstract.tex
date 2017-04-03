@@ -1,0 +1,80 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage[dvipsnames,usenames]{color}
+\usepackage[colorlinks=true,urlcolor=Blue,citecolor=Green,linkcolor=BrickRed]{hyperref}
+\usepackage[usenames,dvipsnames]{xcolor}
+\urlstyle{same}
+
+\usepackage{amsthm,amsmath,amssymb,breqn}
+\usepackage{fullpage}
+\usepackage[ruled,noend,linesnumbered]{algorithm2e}     
+\usepackage{enumerate,comment}
+\usepackage{url}
+\usepackage[capitalise]{cleveref}
+\usepackage{todonotes}
+\usepackage{tikz}
+\usepackage[noadjust]{cite}
+\usepackage{xspace}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amsfonts}
+\usepackage{color}
+\usepackage{array}
+
+%\pagestyle{plain}
+
+\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\poly}{\text{poly}}
+\newcommand{\jump}{\text{jump}}
+
+\newcommand{\Oh}{{O}}
+
+% For cleverref compatibility
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{algo}{Algorithm}[section]
+\newtheorem{corollary}{Corollary}
+\newtheorem{lemma}{Lemma}
+\newtheorem{observation}{Observation}
+\newtheorem{fact}[theorem]{Fact}
+\theoremstyle{definition}   
+\newtheorem{definition}{Definition}
+\usepackage{authblk}
+\theoremstyle{remark}
+\newtheorem{example}[theorem]{Example}
+\newtheorem*{claim}{Claim}
+\newtheorem{case}{Case}
+\newtheorem{invariant}{Invariant}
+\newtheorem{step}{Step}[section]
+
+\newtheorem{property}[theorem]{Property}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+\begin{document}
+
+\title{Dispersion on Trees\thanks{The research was supported in part by Israel Science Foundation grant 794/13.}}
+\author[1]{Pawe\l{} Gawrychowski}
+\author[1]{Nadav Krasnopolsky}
+\author[2]{Shay Mozes}
+\author[1]{Oren Weimann}
+\affil[1]{University of Haifa, Israel}
+\affil[2]{IDC Herzliya, Israel}
+
+
+\date{}
+\maketitle
+
+\begin{abstract}
+In the $k$-dispersion problem, we need to select $k$ nodes of a given graph so as to maximize
+the minimum distance between any two chosen nodes. This can be seen as a generalization
+of the independent set problem, where the goal is to select nodes so that the minimum distance
+is larger than 1.
+We design an optimal $\Oh(n)$ time algorithm for the dispersion problem on trees consisting
+of $n$ nodes, thus improving the previous $\Oh(n\log n)$ time solution. 
+
+We also consider the weighted case, where the goal is to choose a set of nodes of total weight at least $k$. We present an $\Oh(n\log^2n)$ algorithm improving the previous $\Oh(n\log^4 n)$ solution. Our solution builds on the decision version (where we know the minimum distance $\lambda$ between the chosen nodes) for which we present tight $\Theta(n\log n)$ upper and lower bounds. 
+\end{abstract}
+
+\end{document}
