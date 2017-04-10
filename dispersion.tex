@@ -320,6 +320,7 @@ The general idea of the algorithm is to use the heavy path decomposition. We are
 \end{definition}
 We go through the heavy path tree bottom-up, and process all heavy paths at a specific depth in parallel, until we are left with a certain and candidate node for each of them. We maintain an interval $[\lambda_1,\lambda_2)$ as previously. The interval will get smaller and smaller throughout the run.
 
+We now describe the processing of a heavy path, which is very similar to the preprocessing of inactive fragments presented in Subsection \ref{Pre-Processing Fragments}. Notice that the traversal is bottom-up, so we have already processed all of the path's children in the heavy path tree. Because we have determined $\lambda^*$ with sufficient accuracy (i.e. reduced the size of the maintained interval), each subtree hanging off a heavy path can be replaced by its candidate and certain node attached by single edges to the heavy path\footnote{The heavy paths in these hanging subtrees are all descendants of the current heavy path in the heavy path tree, and so they have already been processed.}. Hence, each such heavy path is a caterpillar, with at most two leaves attached to each spine node. We would like to reduce the current heavy path to at most two nodes (a certain node and a candidate node).
 Assume that the caterpillar has $k$ nodes. As we have defined before, let the $i$-th leaf be connected by an edge of length $y_i$ to a spine node at distance $x_i$ from the root of the caterpillar. Notice that $x_1 < x_2 < \ldots < x_k$.
 \begin{enumerate}
 \item\textbf{Find the candidate nodes that will certainly not be taken:}
@@ -358,21 +359,18 @@ iteration, the total preprocessing is in $O(n \log ^*n)$ time.
 
 We now describe one iteration of this process. Assuming we have obtained an $O(\frac{n}{b^3} \cdot \log b)$ time 
 test from the previous step, we now find a good partition of the tree with $n/B^{3}$ fragments of size $O(B^3)$, 
-where $B=2^b$. We perform a heavy path decomposition on each fragment, and process all the heavy
-path decompositions bottom up and in parallel. The paths at lower levels have been processed so that each of them is
-reduced to a candidate and a certain node, and so each current path is a caterpillar, that we will now reduce to
-two nodes using Frederickson's method. As we have seen in Section \ref{sublinear f.t.}, we can create a matrix 
-with linear number of rows and columns, that contains all pairwise distances of a path at the current level. We 
-construct each matrix by pruning the caterpillars so that the distances of leaves from the root and the hole are monotone, thus achieving a matrix that is row and column sorted. For each level of the heavy path decomposition
-we have $O(n/B^3)$ matrices, each of size at most $B^{3}$ and of total size at most $n$.
-We use Frederickson's search (Theorem~\ref{Frederickson's theorem}) with $m=n$ and the parameter $p$ set to $\frac{n}{B^7}$. We thus need to use the
-test $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (B^{3}), \log(\frac{n}{n/B^{7}} \rbrace) = O(\log B)$ times, and spend extra linear processing time exclusive of the feasibility tests. We compute the candidate and certain node of each path as we did before, and continue with the next level
+where $B=2^b$. We perform a heavy path decomposition on each fragment, and process the heavy
+path trees of all fragments bottom up and in parallel. The paths at lower levels have been processed so that each of them is
+reduced to a candidate and a certain node, and so each current path is a caterpillar, that we will now reduce to at most two nodes using Frederickson's method. As we have seen in Section \ref{sublinear f.t.}, after some processing, we can create a matrix 
+with linear number of rows and columns that contains all pairwise distances in such a caterpillar. As before, this is done by pruning the caterpillars so that the distances of leaves from the root and the hole are monotone, thus achieving a matrix that is row and column sorted. For any level of the heavy path decomposition the maximum side length of a matrix is $B^{3}$ (i.e. the parameter $n_j$ in Theorem \ref{Frederickson's theorem} is equal to $B^3$) and of total size of all matrices in the level is at most $n$ ($m=n$).
+We use Frederickson's search (Theorem~\ref{Frederickson's theorem}) with the parameter $p$ set to $\frac{n}{B^7}$. We thus need to use the
+test $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (B^{3}), \log(\frac{n}{n/B^{7}} \rbrace) = O(\log B)$ times, and additionally spend linear time exclusive of the feasibility tests. This allows us to eliminate all pairwise distances in the caterpillars of the heavy paths at the current level for most of the fragments. We proceed to compute the candidate and certain node of each path as we did before, and continue with the next level
 of the heavy path decompositions, until we are left with only the top heavy path of each fragment.
 Since $p>0$, during this preprocessing some fragments become active. Once a fragment becomes active we stop
 its preprocessing. Accounting for all the levels, we use $O(\log^{2}B)$ calls to the previous tests,
 which costs $(\log ^2B \cdot \frac{n}{b^3} \cdot \log b)=O(\frac{n}{b} \cdot \log b)$. This sums to $O(n)$
 over all iterations.
-Additionally, in every iteration we spend extra linear time to construct a good partition, then find all heavy
+Additionally, in every iteration we spend linear time to construct a good partition, then find all heavy
 path decompositions, and finally for the Frederickson's search, so in total $O(n \log ^*n)$. 
 
 After the preprocessing is done, we have at most $\log B \cdot \frac{n}{B^7}\leq \frac{n}{B^{6}}$ active fragments (because we have not eliminated at most $p$ pairwise distances for each level), which we will process in $O(B^{3})$
@@ -380,7 +378,7 @@ time each in the new test. For all other fragments we have obtained a pruned cat
 
 We do this iteratively until we have an $O(\frac{n}{\log ^3n} \cdot \log \log n)$ time test, and then use it to
 solve the dispersion optimization problem in linear time (in the same manner as in each of the previous
-$\log ^*n$ iterations, this time with only one fragment of size $n$).
+$\log ^*n$ iterations, this time with only one fragment of size $n$, and setting $p$ to zero).
 
 
 \section{A Sublinear Feasibility Test with \boldmath
