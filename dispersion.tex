@@ -3,9 +3,7 @@
 \usepackage[T1]{fontenc}
 
 \usepackage[dvipsnames,usenames]{color}
-\usepackage[colorlinks=true,urlcolor=Blue,citecolor=Green,linkcolor=BrickRed]{hyperref}
 \usepackage[usenames,dvipsnames]{xcolor}
-\urlstyle{same}
 
 \usepackage{amsthm,amsmath,amssymb,breqn}
 \usepackage{fullpage}
@@ -22,6 +20,8 @@
 \usepackage{amsfonts}
 \usepackage{color}
 \usepackage{array}
+\usepackage[colorlinks=true,urlcolor=Blue,citecolor=Green,linkcolor=BrickRed]{hyperref}
+\urlstyle{same}
 
 %\pagestyle{plain}
 
@@ -82,12 +82,17 @@ We also consider the weighted case, where the goal is to choose a set of nodes o
 \emph{Facility location} is a family of problems dealing with the placement of facilities on a network in order to optimize certain distances between the facilities, or between facilities and other nodes of the network. Facility location problems are usually if not always NP-hard on general graphs. There is a rich literature on approximation algorithms for general graphs (see e.g.~\cite{DavidB.Shmoys1997,Vazirani2003} and references therein) as well as exact algorithms for restricted graph families. In particular, many linear and near-linear time algorithms were developed for facility location problems on edge-weighted trees.   
 
 
-In the most basic problem, called \emph{$k$-center}, we are given an edge-weighted tree with $n$ nodes and wish to designate up to $k$ nodes to be facilities, so as to minimize the maximum distance of a node to its closest facility. This problem was studied in the early 80's by Megiddo et al.~\cite{Megiddo1981} who gave an $\Oh(n\log^2n)$ time algorithm that was subsequently improved to $\Oh(n\log n)$ by Frederickson and Johnson \cite{Frederickson1983}. In the early 90's, an optimal $\Oh(n)$ time solution (also for more general variants such as placing facilities on any point along an edge) was given by Frederickson \cite{Frederickson1991a} %TODO the other varaints are not in 1991a, try Optimal algorithms for partitioning trees and locating p-centers in trees (technical report)
-using a seminal approach based on parametric search. 
+In the most basic problem, called \emph{$k$-center}, we are given an edge-weighted tree with $n$ nodes and wish to designate up to $k$ nodes to be facilities, so as to minimize the maximum distance of a node to its closest facility. This problem was studied in the early 80's by Megiddo et al.~\cite{Megiddo1981} who gave an $\Oh(n\log^2n)$ time algorithm that was subsequently improved to $\Oh(n\log n)$ by Frederickson and Johnson \cite{Frederickson1983}.
+In the early 90's, an optimal $\Oh(n)$ time solution was given by Frederickson~\cite{Frederickson1991a,Frederickson1990} using a seminal approach based on
+parametric search, also for two other versions where points on edges can be designated as facilities or where we minimize over points on edges.
+In yet another variant, called $k$-center with weighted demands, every node has a positive weight and we wish to minimize the maximum weight of a node multiplied
+by the distance to its closest facility. Megiddo et al.~\cite{Megiddo1981} solved this in $\Oh(n\log^{2}n)$ time, and
+Megiddo and Tamir~\cite{Megiddo1983} designed an $\Oh(n\log^{2}n\log\log n)$ time algorithm when allowing points on edges can be
+designated as facilities. The latter complexity can be further improved to $\Oh(n\log^{2}n)$ using a technique of Cole~\cite{Cole87}. 
 %
-A related problem, also suggested in the early 80's  \cite{Becker1982,Perl1981}, is \emph{$k$-partitioning}. In this problem the nodes have weight and we wish to delete $k$ edges in the tree so as to maximize the weight of the lightest resulting subtree. This problem was also solved by Fredrickson in $\Oh(n)$ time \cite{Frederickson1991} and also uses his parametric search framework. 
+A related problem, also suggested in the early 80's  \cite{Becker1982,Perl1981}, is \emph{$k$-partitioning}. In this problem the nodes have weight and we wish to delete $k$ edges in the tree so as to maximize the weight of the lightest resulting subtree. This problem was also solved by Fredrickson in $\Oh(n)$ time \cite{Frederickson1991} using his parametric search framework. 
 %
-Finally, and the focus of this paper, is the  {\em $k$-dispersion} problem. In this problem we wish to designate $k$ nodes as facilities so as to maximize the distances among the facilities.  In other words, we wish to select $k$ nodes that are as spread-apart as possible. This can be seen as a generalization of the classical maximum independent set problem (that can be solved by binary searching for the largest value of $k$ for which the minimum distance is at least 2).  
+Finally, and the focus of this paper, is the  {\em $k$-dispersion} problem, where we wish to designate $k$ nodes as facilities so as to maximize the distances among the facilities.  In other words, we wish to select $k$ nodes that are as spread-apart as possible. This can be seen as a generalization of the classical maximum independent set problem (that can be solved by binary searching for the largest value of $k$ for which the minimum distance is at least 2).  
 %
 It turns out that the $k$-dispersion and the $k$-partitioning problems are actually equivalent in the one-dimensional case (i.e. when the tree is a path).\footnote{The reduction simply creates a new path, whose edges correspond to nodes in the original path and vice versa. The original edge weights are now assigned to the nodes so we can run the $k$-partitioning solution.} However, such equivalence does not apply to general trees, on which $k$-dispersion seems more difficult than $k$-partitioning. In particular, until the present work, no linear time solution for $k$-dispersion was known. The fastest solution was the $O(n \log n)$ solution given in the late 90's by Bhattacharya and Houle \cite{Bhattacharya1991}. Bhattacharya and Houle also considered the case where nodes have weights and the goal is to select nodes with total weight at least $k$, for which they gave an $\Oh(n\log^4 n)$ time solution \cite{Bhattacharya1999}.
 
@@ -109,11 +114,19 @@ For completeness, we present a simplified version of the linear time feasibility
 %Using this feasibility test, the optimization problem can then be solved by parametric search: Since the answer is always
 %a distance between two nodes, we can construct an implicit representation of all possible $O(n^{2})$ distances and binary search over this representation. More precisely, the representation consists of $O(n)$ matrices that are each monotone in both row and columns. The total side length
 %of all the matrices is $O(n\log n)$, and we can provide constant-time access to any entry after $O(n\log n)$ preprocessing. Using $O(\log n)$ calls to such feasibility test we can solve the optimization problem in $O(n\log n)$ time. 
-In order to achieve linear time for the dispersion optimization problem in the unweighted case, we cannot afford to binary search over all the pairwise distances in the tree. Instead, we construct an implicit representation of all possible $O(n^{2})$ distances and use Frederickson's parametric search method to search over this representation. More precisely, the representation consists of matrices which are monotone in both rows and columns. The search is done by running feasibility tests on specific values from the matrices, and eliminating many entries of the matrices each time. Throughout the search we maintain an interval $[\lambda_1,\lambda_2)$, s.t. $\lambda_1$ is the largest value we have tested and is feasible, and $\lambda_2$ is the smallest value we have tested and found not feasible (which implies that the optimal value, denoted by $\lambda^*$, lies within the interval). Using this search method allows us to construct an algorithm that avoids the extra logarithmic factor for the optimization problem in the unweighted case.
-
-In this paper, we achieve $O(n)$ time for the unweighted dispersion problem by developing a feasibility test that requires {\em linear} preprocessing and can then be queried in \emph{sublinear} time. This was the approach of Fredrickson for $k$-partitioning and $k$-center. However, we use a somewhat different terminology, and present new ideas and techniques (briefly described next), that allow us to present a simpler algorithm. Finally, for the weighted case, we present tight $\Theta(n\log n)$ upper and lower bounds for the decision problem, which induce an $\Oh(n\log^2n)$ time solution for the optimization problem. 
-
- 
+We are able to decrease the total time to $O(n)$ by
+developing a feasibility test that requires {\em linear} preprocessing and can then be queried in \emph{sublinear} time. This was the approach of Fredrickson for $k$-partitioning and $k$-center and it is plausible that his framework can be adapted to solve also our problem.
+However, we believe that our (slightly different) take on this allows for a simpler and more structured algorithm, and hence might be of
+independent interest.
+Note that even a sublinear feasibility test is not enough to solve the whole problem in $O(n)$ time, as we cannot afford to represent all the pairwise
+distances between the nodes in such complexity. Therefore, the whole algorithm maintains the current interval
+interval $[\lambda_1,\lambda_2)$, s.t. $\lambda_1$ is the largest value we have tested and is feasible, and $\lambda_2$ is the smallest value we have tested and found not feasible (which implies that the optimal value, denoted by $\lambda^*$, lies within the interval) and generates,
+in every step, an implicit representation of only some of these distances.
+The representation consists of matrices which are monotone in both rows and columns. Then, we run feasibility tests with a few values from
+the matrices that allow us to eliminate many entries of the matrices each time. Then, we are able to prune the tree and repeat.
+Again, this is the same as in the Frederickson's approach, but our algorithm differs in which distances are represented in every step and how the
+tree is pruned.
+Finally, for the weighted case, we present tight $\Theta(n\log n)$ upper and lower bounds for the decision problem, which implies an $\Oh(n\log^2n)$ time solution for the optimization problem. 
 
 %ideas, at least at a high level. However, many details and tricks are actually different, and we believe
 %that some of our techniques might be somehow simpler than his. 
@@ -125,11 +138,11 @@ In this paper, we achieve $O(n)$ time for the unweighted dispersion problem by d
 \paragraph{Our techniques.}
 We first define a variant of the well known micro-macro decomposition that partitions the input tree $T$ into $O(n/b)$ {\em fragments}, each containing $O(b)$ nodes and at most two {\em boundary nodes} incident to nodes in other fragments. Our variant is unique in the sense that it guarantees that one boundary node is always the root of the fragment (the other boundary node is called the {\em hole}). We use this to
  simulate a bottom-up feasibility test by jumping over entire 
-fragments. I.e., knowing $\lambda$, we extend in $O(\log b)$ time a solution for a subtree of $T$ rooted at the framgment's hole to a subtree of $T$ rooted at the fragment's root. This is achieved by a rather complicated preprocessing which we next highlight.
+fragments, i.e., knowing $\lambda$, we extend in $O(\log b)$ time a solution for a subtree of $T$ rooted at the fragment's hole to a subtree of $T$ rooted at the fragment's root. This is achieved by a rather complicated preprocessing which we next highlight.
 
 The first step of the preprocessing computes values $\lambda_1$ and  $\lambda_2$ such that (1) there is no solution to the decision problem on $T$ for any $\lambda > \lambda_2$, (2) there is a solution to the decision problem on $T$ for any $\lambda \le \lambda_1$, and (3) for {\em most} of the fragments, the distance between any two nodes is either smaller than $\lambda_1$ or larger or equal to $\lambda_2$. This is achieved with a recursive procedure that uses centroid decomposition in order to obtain the implicit monotone matrices required for Frederickson's parametric search. The (few) fragments that do not satisfy property (3) are handled naively in linear $O(b)$ time during query time. 
 
-The fragments that do satisfy property (3) are handled in the second step of the preprocessing: The goal here is to eliminate from such fragments nodes that are guaranteed to be included or excluded from an optimal solution for any $\lambda \in [\lambda_1,\lambda_2)$. This is done by looking at the path from the hole to the root of the fragment and running the linear-time feasibility test for all subtrees hanging off from it (all contained in the fragment). It turns out that we can run this feasibility test without knowing $\lambda$ as long as we can determine for any two nodes if their distance is smaller than $\lambda_1$ or larger or equal to $\lambda_2$ (which we can, in constant time). This allows us to conceptually trim the fragment and think of it as a caterpillar. The spine of the caterpillar is the hole-to-root path and each spine node has two leaf children - a \emph{certain} node (that is guaranteed to be included in an optimal solution for any $\lambda$, and a \emph{candidate} node (whose inclusion in an optimal solution depends on $\lambda$). Finally, we perform additional pruning of some caterpillar leaves that results in a highly structured caterpillar where the leaves are in monotonically increasing distance from both the hole and the root. This structure enables us to precompute for each candidate node, assuming this node is the bottom-most node in the solution, what are all the other nodes in the solution. Upon query, we can then jump over the entire fragment  in $O(\log b)$ time by binary searching for this bottom-most node. 
+The fragments that do satisfy property (3) are handled in the second step of the preprocessing: The goal here is to eliminate from such fragments nodes that are guaranteed to be included or excluded from an optimal solution for any $\lambda \in [\lambda_1,\lambda_2)$. This is done by looking at the path from the hole to the root of the fragment and running the linear-time feasibility test for all subtrees hanging off from it (all contained in the fragment). It turns out that we can run this feasibility test without knowing $\lambda$ as long as we can determine for any two nodes if their distance is smaller than $\lambda_1$ or larger or equal to $\lambda_2$ (which we can, in constant time). This allows us to conceptually trim the fragment and think of it as a caterpillar. The spine of the caterpillar is the hole-to-root path and each spine node has two leaf children: a \emph{certain} node (that is guaranteed to be included in an optimal solution for any $\lambda$, and a \emph{candidate} node (whose inclusion in an optimal solution depends on $\lambda$). Finally, we perform additional pruning of some caterpillar leaves that results in a highly structured caterpillar where the leaves are in monotonically increasing distance from both the hole and the root. This structure enables us to precompute for each candidate node, assuming this node is the bottom-most node in the solution, what are all the other nodes in the solution. Upon query, we can then jump over the entire fragment  in $O(\log b)$ time by binary searching for this bottom-most node. 
 
 The above feasibility test is presented in Section~\ref{sublinear f.t.}. By appropriately setting up $b$ to balance the preprocessing and the query time, the overall preprocessing time is $O(n\log\log n)$. The bottleneck of this preprocessing are its calls to the vanilla linear-time feasibility test.  
 In Section~\ref{sectionlog*} we improve this gradually to $O(n\log^* n)$ by constructing a sequence of faster and faster feasibility tests. 
@@ -144,9 +157,22 @@ We believe that this simple micro-macro variant is of independent interest.
 The main difficulty remaining is how to preprocess the fragments. We cannot afford to touch every node of every fragment at every decomposition level. Therefore, we take a closer look at how a (large) fragment decomposes into smaller fragments. 
 We show that a large fragment can be reduced to a concatenation of small caterpillars, each corresponding to a small fragment that we have already preprocessed. We then very carefully tailor these small fragments while reusing the results of their preprocessing. We show that this tailoring amortizes to $O(n)$ over all decompositions. This turns out to be quite technical. 
 
-Finally, in Section~\ref{section:weighted} we consider the weighted case. Our main result  is an  $O(n\log n)$ feasibility test (for which we also give a tight lower bound). In contrast to the unweighted case where each subtree had only one candidate, in the weighted case each subtree can have a large number of candidates. To overcome this, we describe the candidates of every subtree with a monotonically decreasing polyline. The polylines are represented by their breakpoints, which we store in sorted order. We then show that the polyline of a node can be efficiently computed from the polylines of its children. To this end, we develop a rather intricate data structure (see Section~\ref{section:data structure}) that can efficiently manipulate polylines with various batch updates. We believe this data structure is of independent interest, as it both simplifies and generalizes a data structure presented by Brown and Tarjan \cite{Brown1980a}. Our data structure not only allows for efficient deletions and insertions of batches of elements to a sorted sequence (as with Brown and Tarjan's structure), but also enables efficient implementation of operations on batches of \emph{intervals} of elements (which might large).
-
-
+Finally, in Section~\ref{section:weighted} we consider the weighted case. Our main result is an $O(n\log n)$ feasibility test (for which we also give
+a simple tight lower bound). In contrast to the unweighted case, where each subtree had only one candidate, in the weighted case each subtree can
+have a large number of candidates. To overcome this, we describe the candidates of a subtree with a monotonically decreasing polyline:
+for every possible distance $d$, we store the maximum $f(P)$ such that the distance of every node of $P$ to the root of the subtree is at least $d$.
+This can be conveniently represented by a sorted list of breakpoints, and the number of breakpoints is at most
+the size of the subtree. We then show that the polyline of a node can be efficiently computed from the polylines of its children. If the polylines
+are stored in augmented balanced search trees, then two polylines of size $x$ and $y$ can be merged in time $\Oh(\min(x,y)\log\max(x,y))$,
+and by standard calculation we obtain an $\Oh(n\log^{2}n)$ time feasibility test. To improve on that and obtain an optimal algorithm,
+we need to merge in $\Oh(\min(x,y)\log\frac{\max(x,y)}{\min(x,y)})$ time. 
+An old result of Brown and Tarjan is that, given AVL trees representing two sorted lists of length $x$ and $y$, an AVL tree representing
+their merge can be produced in $\Oh(\min(x,y)\log\frac{\max(x,y)}{\min(x,y)})$ time. This was later generalized by Huddleston and
+Mehlhorn~\cite{huddlestonM82} to any sequence of operations that exhibits a certain locality of reference. However, in our specific
+application we need multiple non-standard operations on the lists, and hence applying these results would requires some extra work.
+Instead, we present a different (and simpler) approach in Section~\ref{section:data structure} that works with essentially any balanced search
+tree with split and join operations. We believe that this might of independent interest due to its simplicity. With this structure in hand,
+another standard calculation implies that the total time becomes $O(n\log n)$.
 
 \section{A Linear Feasibility Test}\label{linear F.T.}
 We show a recursive linear algorithm. At each step of the recursion, we would like to provide a valid solution with maximal cardinality for the current subtree, given some $\lambda$, i.e. the algorithm will maintain the following invariant:
@@ -182,8 +208,7 @@ Thus we have proven that $P$ is of maximal cardinality. Now, assume for contradi
 
 This linear time feasibility test can be used to achieve $O(n \log n)$ time for the dispersion optimization problem, by binary searching over all possible values of $\lambda$, using Frederickson's algorithm \cite{Frederickson1983}, which returns the $k$-th longest path in a tree in linear time (as was done in \cite{Bhattacharya1991}).
 
-\section{A Sublinear Feasibility Test with \boldmath
-$O(n\log\log n)$ Preprocessing}\label{sublinear f.t.}
+\section{A Sublinear Feasibility Test with \texorpdfstring{\boldmath$O(n\log\log n)$}{O(nloglogn)} Preprocessing}\label{sublinear f.t.}
 The main idea here is partitioning the input tree into fragments and preprocessing them, so that in query time we can process fragments in sub-linear time. For this, we need to use a partitioning with some specific attributes, which we now present. We assume the tree is binary, and justify this assumption later.
 \subsection{Tree partitioning}\label{tree partitioning}
 We would like to partition the tree into fragments s.t. each fragment will be connected to the rest of the tree by at most two vertices. Each fragment will have at most $b$ vertices, and there will be $O(n/b)$ fragments. Each fragment is defined by its border vertices $u$ and $v$, s.t. $v$ is a descendant of $u$. The fragment will consist of $u$'s subtree without $v$'s subtree ($v$ itself is not part of the fragment). We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. In the case where the fragment has only one border vertex, i.e. the fragment is a subtree of the input tree, we say the fragment has no hole. We call such a partition of the tree a \emph{good partition}.
@@ -314,7 +339,7 @@ We now consider the second case, where the hole does have a candidate node. Deno
 Each feasibility test costs us $O(\log b)$ for each inactive fragment, and $O(b)$ for each active one. In total $O(\frac{n}{b} \cdot \log b) + O(\frac{n}{b^2} \cdot b) = O(\frac{n \log \log n}{\log ^2n})$.
 
 
-\subsection{\boldmath$O(n\log\log n)$ Preprocessing} 
+\subsection{\texorpdfstring{\boldmath$O(n\log\log n)$}{O(nloglogn)} Preprocessing} 
 The general idea of the algorithm is to use the heavy path decomposition. We are searching for $\lambda^*$, which is the distance between some two nodes in the tree, and the largest number for which a feasibility test would return true.
 \begin{definition}[Heavy Path Decomposition] \cite{Sleator1983} Given a rooted tree, define the \emph{heavy edge} of each non-leaf node of the tree as the edge to the child that has the greatest number of descendants. These heavy edges form a decomposition of the tree into heavy paths. The heavy path decomposition induces a \emph{heavy path tree}, where each node corresponds to a path of the heavy path decomposition. For a path $p$ of the heavy path decomposition, $p$'s parent in the heavy path tree is the path that contains the parent of $p$'s topmost node. The heavy path tree has depth of at most $\log n$. 
 \end{definition}
@@ -346,8 +371,7 @@ degree $d\geq 3$ node with a binary tree on $d$ leaves. The edges of the binary 
 its artificial inner nodes cannot be taken (notice that our algorithm easily generalises so that for each node
 we can specify if it can be included in a solution).
 
-\section{A Sublinear Feasibility Test with \boldmath
-$O(n\log^{*}n)$ Preprocessing} \label{sectionlog*}
+\section{A Sublinear Feasibility Test with \texorpdfstring{\boldmath$O(n\log^{*}n)$}{O(nlog^*n)} Preprocessing} \label{sectionlog*}
 The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test (or test for short) to get a sublinear one. In order to get the complexity down to $O(n \log ^*n)$ we will use a similar process, iteratively, with growing fragments size, improving in each iteration the performance of our test.
 We start with $O(n/c^{3})$ fragments of size at most $c^3$ for some constant $c$.
 We pay $O(n)$ time for preprocessing and get an $O(\frac{n}{c^3} \cdot \log c)$ time test.
@@ -381,8 +405,7 @@ solve the dispersion optimization problem in linear time (in the same manner as 
 $\log ^*n$ iterations, this time with only one fragment of size $n$, and setting $p$ to zero).
 
 
-\section{A Sublinear Feasibility Test with \boldmath
-\boldmath$O(n)$ Preprocessing}\label{sectionLinear}
+\section{A Sublinear Feasibility Test with \texorpdfstring{\boldmath$O(n)$}{O(n)} Preprocessing}\label{sectionLinear}
 
 
 In this section, given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with $O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
@@ -620,7 +643,7 @@ less than $\frac{\lambda^{*}}{2}$. Hence, $u_{i}$ belongs to the unstable suffix
 \end{proof}
 
 We maintain the unstable prefix and the unstable suffix  in balanced search
-trees (sorted by the distance to the root or the hole) that allow split and merge in logarithmic time.
+trees (sorted by the distance to the root or the hole) that allow split and join in logarithmic time.
 The stable infix is maintained in a separate structure that allows us to efficiently simulate traversing jump pointers inside the stable infix. 
 %
 In query time, we first use the balanced search tree storing the unstable suffix to locate the bottom-most node
@@ -751,7 +774,7 @@ With the $O(n\log n)$ feasibility test in hand, we can apply the Frederickson's 
 matrices obtained from the centroid decomposition in $O(n\log n)$ time to solve the weighted optimization
 problem with $O(\log n)$ calls to the feasibility tests, so in $O(n\log^{2}n)$ total time.
 
-\subsection{An \boldmath$ \Omega (n\log n)$ lower bound for the weighted feasibility test}
+\subsection{An \texorpdfstring{\boldmath$ \Omega (n\log n)$}{Omega(nlogn)} lower bound for the weighted feasibility test}
 
 In the {\em Set Disjointness} problem, we are given two sets of real numbers $X=\lbrace x_1,x_2,\ldots,x_n \rbrace$ and $Y=\lbrace y_1,y_2,\ldots,y_n \rbrace$ and we need to return true iff $X \cap Y = \emptyset$. 
 It is known that solving the set disjointness problem requires $\Omega(n \log n)$ operations in the algebraic
@@ -779,7 +802,7 @@ Observe that it is also not possible for $P$ to contain only one node, since the
 If $P= \{ x_i,y_j \}$ is a feasible solution then on the one hand $d(x_i,y_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} + y_j +1 = K - x_i + y_j \geq K$, implying that $y_j \geq x_i$. On the other hand, $W(P) = x_i + 1 + K - y_j -1 = K + x_i - y_j \geq K$, implying that $x_i \geq y_j$. We conclude that $x_i = y_j$.
 \end{proof}
 
-\subsection{An \boldmath$O(n \log ^2 n)$ algorithm for the weighted feasibility test}
+\subsection{An \texorpdfstring{\boldmath$O(n \log ^2 n)$}{O(nlog^2n)} algorithm for the weighted feasibility test}
 Similarly to the unweighted case, we would like to compute for each node of the tree, the subset of nodes $P$ in its subtree  s.t. $f(P) \geq \lambda$ and $W(P)$ is maximized. We compute this by going over the nodes of the tree bottom-up. Previously, the situation was simpler, as for any subtree we had just one candidate node (i.e., a node that may or may not be in the optimal solution for the entire input tree). This was true because nodes had uniform weights. This meant that amongst all nodes at distance at most $\lambda$ from the root we could keep as candidate only the farthest one. Now however, when nodes have non-uniform weights, it is not clear which nodes should be kept.
 
 Out of all the already chosen nodes in the subtree rooted at $v$, let $h$ be the node for which $d(h,v)$ is minimized. We call $h$ the {\em closest chosen node} in $v$'s subtree. In our weighted feasibility test, $v$ will store an optimal solution $P$ for any possible value of $d(h,v)$ (up to $\lambda$, since if the closest node is farther, it does not affect nodes outside the subtree). That is, a subset of nodes $P$ in $v$'s subtree of maximum weight $W(P)$ s.t. the closest chosen node is at distance {\em greater or equal} to $d(h,v)$ from $v$, and $d(x_1,x_2) \geq \lambda$ for every  $x_1,x_2\in P$. 
@@ -886,7 +909,7 @@ We represent a polyline by storing its breakpoints in an augmented 2-3 tree, whe
 
 We now describe the implementation of each operation. We denote the number of breakpoints of $p_1$ (the smaller polyline) by $x$, and the number of breakpoints of $p_2$ (the larger polyline) by $y$ (i.e. $x \leq y$). 
 
- Operations~\ref{op1} and~\ref{op2} can use standard split and merge procedures for 2-3 trees in logarithmic time. 
+ Operations~\ref{op1} and~\ref{op2} can use standard split and join procedures for 2-3 trees in logarithmic time. 
  Operation~\ref{op3} can be done by running a predecessor query and returning the value at the returned breakpoint in logarithmic time.
  Operation~\ref{op4} is done by an inorder traversal of the tree. 
 Operations~\ref{op1}-\ref{op3} are performed only a constant number of times per step, and so their total cost is logarithmic (i.e. $O(\log x + \log y)$). Operation~\ref{op4} is also performed a constant number of times to iterate over the breakpoints of $p_{1}$ (in $O(x)$ time). The next four operations are more costly, since each of them is comprised of a batch of $O(x)$ operations on a tree of size $O(y)$.
@@ -935,7 +958,7 @@ We conclude that the overall complexity is $O(n \log ^2 n)$.
 \end{proof}
 
 
-\subsection{An \boldmath$O(n \log n)$ algorithm for the weighted feasibility test}\label{section:data structure}
+\subsection{An \texorpdfstring{\boldmath$O(n \log n)$}{O(nlogn)} algorithm for the weighted feasibility test}\label{section:data structure}
 In this section, we improve the complexity of our weighted feasibility test by implementing the interface we use for operations on polylines more efficiently. Namely, we next show how to speed up the batched operations (operations \ref{op5}-\ref{op8}) from $O(x \log y)$ to $O(x \log (\frac{2y}{x}))$ and then show that this implies an  $O(n \log n)$ feasibility test. 
 
 \paragraph{Operation~\ref{op5} -- batched interval increase.}
