@@ -884,7 +884,7 @@ To conclude, the final polyline $p$ is obtained by concatenating the value compu
 We now show how to use some standard techniques to implement the required operations, and achieve $O(n \log ^2 n)$ time for our weighted feasibility test.
 We represent a polyline by storing its breakpoints in an augmented 2-3 tree, where the data is stored in the leaves. Each node of the tree stores a key-value pair, and we maintain the following property: the key of each breakpoint is the sum of the keys of the corresponding leaf and of all its ancestors, and similarly for the values. In addition, we store in each node the maximal key and the maximal value of a leaf in its subtree. More precisely, the maximal key is the largest sum of keys on a path from the node to a leaf in its subtree, and similarly for the maximal value. We also store in each node the number of leaves in its subtree.
 
-We now describe the implementation of each operation. We denote the number of breakpoints of $p_1$ (the smaller polyline) by $x$, and the number of breakpoints of $p_2$ (the larger polyline) by $y$ (i.e. $x \leq y$). 
+We now describe the implementation of each operation. We denote the number of breakpoints of $p_1$ (the smaller polyline) by $x$, and the number of breakpoints of $p_2$ (the larger polyline) by $y$ (i.e. $x \leq y$). Note that the input for all four batched operations is given in sorted order (by keys).
 
  Operations~\ref{op1} and~\ref{op2} can use standard split and merge procedures for 2-3 trees in logarithmic time. 
  Operation~\ref{op3} can be done by running a predecessor query and returning the value at the returned breakpoint in logarithmic time.
