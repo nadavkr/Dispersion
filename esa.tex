@@ -1,0 +1,58 @@
+\documentclass[a4paper,UKenglish]{lipics-v2016}
+
+\usepackage{microtype}%if unwanted, comment out or use option "draft"
+
+\usepackage[utf8]{inputenc}
+\usepackage[noadjust]{cite}
+
+\newcommand{\jump}{\text{jump}}
+\newcommand{\Oh}{{O}}
+\newtheorem{invariant}{Invariant}
+
+\bibliographystyle{plainurl}% the recommended bibstyle
+
+\title{Dispersion on Trees\protect \thanks{The research was supported in part by Israel Science Foundation grant 794/13.}}
+\titlerunning{Dispersion on Trees}
+\author[1]{Pawe\l{} Gawrychowski}
+\author[1]{Nadav Krasnopolsky}
+\author[2]{Shay Mozes}
+\author[1]{Oren Weimann}
+\affil[1]{University of Haifa, Israel}
+\affil[2]{IDC Herzliya, Israel}
+
+\authorrunning{P. Gawrychowski, N. Krasnopolsky, S. Mozes, and O. Weimann}
+
+\Copyright{Pawe\l{} Gawrychowski, Nadav Krasnopolsky, Shay Mozes, and Oren Weimann}%mandatory, please use full first names. LIPIcs license is "CC-BY";  http://creativecommons.org/licenses/by/3.0/
+
+\subjclass{F.2.2 Nonnumerical Algorithms and Problems} 
+\keywords{parametric search, dispersion, $k$-center, dynamic programming}% mandatory: Please provide 1-5 keywords
+
+%Editor-only macros:: begin (do not touch as author)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\EventEditors{John Q. Open and Joan R. Acces}
+\EventNoEds{2}
+\EventLongTitle{42nd Conference on Very Important Topics (CVIT 2016)}
+\EventShortTitle{CVIT 2016}
+\EventAcronym{CVIT}
+\EventYear{2016}
+\EventDate{December 24--27, 2016}
+\EventLocation{Little Whinging, United Kingdom}
+\EventLogo{}
+\SeriesVolume{42}
+\ArticleNo{23}
+% Editor-only macros::end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% lipics aligns to the left, I don't like this.
+\usepackage{etoolbox}
+\makeatletter
+\setbool{@fleqn}{false}
+\makeatother
+\renewcommand{\paragraph}{\subparagraph}
+
+\begin{document}
+
+\maketitle
+
+\bibliography{dispersion}
+
+\end{document}
+
