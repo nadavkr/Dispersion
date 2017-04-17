@@ -778,21 +778,12 @@ we can simply find the minimum element, and subtract the minimum from all the el
 Given the two sets $X$ and $Y$, we construct a tree $T$ as follows. We first compute and set
 $K := 2 \cdot \max (X\cup Y) +3$.
 The tree $T$ contains two vertices of weight zero, $u$ and $v$, that are connected by an edge of length $\frac{K}{2}$. In addition, for each element $x_i \in X$, we have a node of weight $x_i+1$, that is connected to $u$ by an edge of length $\frac{K}{2} - x_i -1$. For each element $y_i \in Y$, we have a node of weight $K - y_i -1$, that is connected to $v$ by an edge of length $y_i+1$.
-\begin{lemma}
+\begin{lemma}\label{lemma of the reduction to set disjointness}
 $X \cap Y = \emptyset$ iff the weighted feasibility test returns false for $T$ with  parameters $W=K$ and $\lambda =K$.
 \end{lemma}
 
-\begin{proof}
-We start by proving that if $X \cap Y \neq \emptyset$ then there is a subset of the vertices of the tree, $P \subseteq T$, s.t. $W(P) \geq K$ and $f(P) \geq K$ (where $W(P)$ is the sum of the weights of all the vertices in $P$). Suppose that  $x_i=y_j$. Then, $d(x_i,y_j) = d(x_i,u) + d(u,v) + d(v,y_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} + y_j +1 = K \geq K$. Furthermore, $W(x_i) + W(y_j) = x_i + 1 + K- y_j -1 = K \geq K$, and so the feasibility test should return true due to $P = \lbrace x_i, y_j \rbrace$.
+The proof of the lemma can be found in Appendix~\ref{appendix proof of reduction lemma}.
 
-Now we need to prove that if the feasibility test returns true, the sets are not disjoint.
-We start by proving that any feasible subset $P$ cannot have more than one vertex from each of the sets.
-Assume for contradiction that $P'$ is a feasible subset that contains at least two vertices that correspond to elements of $X$. Denote these two vertices by $x_i$ and $x_j$. We assume that $P'$ is a feasible solution, and so $d(x_i,x_j) \geq K$. But, $d(x_i,x_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} - x_j -1 = K - x_i - x_j -2 < K$ (since $x_i$ and $x_j$ are non-negative) and we have a contradiction.
-If $P'$ contains two elements of $Y$, denoted $y_{i}$ and $y_{j}$, we also obtain a contradiction because
-$d(y_{i},y_{j})=y_{i}+1+y_{j}+1<K$.
-Observe that it is also not possible for $P$ to contain only one node, since the weight of any node is strictly less than $K$. So, we now only need to prove that if $P= \{ x_i,y_j \}$ is a feasible solution, then $x_i = y_j$.
-If $P= \{ x_i,y_j \}$ is a feasible solution then on the one hand $d(x_i,y_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} + y_j +1 = K - x_i + y_j \geq K$, implying that $y_j \geq x_i$. On the other hand, $W(P) = x_i + 1 + K - y_j -1 = K + x_i - y_j \geq K$, implying that $x_i \geq y_j$. We conclude that $x_i = y_j$.
-\end{proof}
 
 \subsection{An \texorpdfstring{\boldmath$O(n \log ^2 n)$}{O(nlog^2n)} algorithm for the weighted feasibility test}
 We now present an $O(n \log ^2 n)$ time algorithm for the weighted feasibility test, upon which we will base our optimal $O(n \log n)$ time weighted feasibility test.
@@ -929,25 +920,7 @@ Operation~\ref{op8} is done by performing, for each interval deletion, a standar
 The above implementation implies an $O(n \log ^2 n)$ weighted feasibility test.
 \end{lemma}
 
-\begin{proof}
-
-The running time of the algorithm is the sum of running times required for constructing the polylines of the subtrees rooted at each node of the tree.
-%
-Notice that the number of breakpoints in the polyline of a subtree is at most the number of nodes in this subtree. This is because every breakpoint corresponds to some node that was in the solution becoming too close to the root to be still included.
-
-For any degree one node, constructing its polyline is done with one query to the polyline of its child, and an increase of the keys of all but the first breakpoint (which can be done by increasing the key stored at the root, and decreasing the key stored at the first leaf). This takes $O(\log n)$ time and so the total time over all degree one nodes is $O(n \log n)$.
- 
-For any degree two node $v$ with two children whose subtree sizes are $x$ and $y$ where $x \leq y$, constructing $v$'s polyline takes $O(x \log y)$ time. This is because operations~\ref{op1}-\ref{op4} take $O(x+ \log y)$ time and operations ~\ref{op5}-\ref{op8} take $O(x \log y)$ time.  The total running time over all degree two nodes is therefore bounded by $O(S \cdot \log n)$, where $S$ is the sum of sizes of the smaller subtrees over all nodes of degree two. 
-%
-We prove by induction that $S \leq n \log n$. Consider some binary tree with $n$ nodes. If the root of the tree has only one child, $S$ is the same for the subtree rooted at the child, and so $S \leq (n-1)\log (n-1) < n \log n$. If the root has two children with subtree sizes $x$ and $y$, let $x\le y$ and $n=1+x+y$. From the induction hypothesis it follows that $S \leq x + x \log x + y \log y$. This is bounded by:
-\begin{align*}
-x + x\log x + y\log y &= x \log (2x) + y\log y \\
-& \leq x \log (x+y) + y\log y \\
-& \leq x \log (x+y) + y \log (x+y) \\
-& = (x+y)\log(x+y) < n \log n.
-\end{align*}
-We conclude that the overall complexity is $O(n \log ^2 n)$.
-\end{proof}
+The proof of the lemma can be found in Appendix~\ref{appendix proof of nlog^2n lemma}.
 
 
 \subsection{An \texorpdfstring{\boldmath$O(n \log n)$}{O(nlogn)} algorithm for the weighted feasibility test}\label{section:data structure}
@@ -1000,9 +973,63 @@ up to a constant factor, by essentially the same calculation, thus we obtain $O(
 \paragraph{Operation~\ref{op8} -- batched interval deletions.}
 Once again we split our tree into small trees. We then delete the relevant intervals from each of the small trees. Each interval is either contained in a single small tree (and is then deleted by performing one or two split operations and at most one join operation) or it spans several small trees (in which case it is deleted by performing two split operations on the trees containing the interval's endpoints, and maybe deleting some trees entirely). Similarly to Operation~\ref{op5}, this costs $O(x \log(\frac{y}{x}) +x) = O(x \log(\frac{2y}{x}))$ in total.
 
+\begin{theorem}\label{nlogn weighted f.t. theorem}
+The above implementation implies an $O(n \log n)$ weighted feasibility test.
+\end{theorem}
+The proof of the theorem can be found in Appendix \ref{appendix proof of nlogn theorem}.
+
+\bibliography{dispersion}
+
+\newpage
+\appendix
+
+\section{Proof of Lemma~\ref{lemma of the reduction to set disjointness}}\label{appendix proof of reduction lemma}
+\begin{lemma} %TODO change the lemma number
+$X \cap Y = \emptyset$ iff the weighted feasibility test returns false for $T$ with  parameters $W=K$ and $\lambda =K$.
+\end{lemma}
+
+\begin{proof}
+We start by proving that if $X \cap Y \neq \emptyset$ then there is a subset of the vertices of the tree, $P \subseteq T$, s.t. $W(P) \geq K$ and $f(P) \geq K$ (where $W(P)$ is the sum of the weights of all the vertices in $P$). Suppose that  $x_i=y_j$. Then, $d(x_i,y_j) = d(x_i,u) + d(u,v) + d(v,y_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} + y_j +1 = K \geq K$. Furthermore, $W(x_i) + W(y_j) = x_i + 1 + K- y_j -1 = K \geq K$, and so the feasibility test should return true due to $P = \lbrace x_i, y_j \rbrace$.
+
+Now we need to prove that if the feasibility test returns true, the sets are not disjoint.
+We start by proving that any feasible subset $P$ cannot have more than one vertex from each of the sets.
+Assume for contradiction that $P'$ is a feasible subset that contains at least two vertices that correspond to elements of $X$. Denote these two vertices by $x_i$ and $x_j$. We assume that $P'$ is a feasible solution, and so $d(x_i,x_j) \geq K$. But, $d(x_i,x_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} - x_j -1 = K - x_i - x_j -2 < K$ (since $x_i$ and $x_j$ are non-negative) and we have a contradiction.
+If $P'$ contains two elements of $Y$, denoted $y_{i}$ and $y_{j}$, we also obtain a contradiction because
+$d(y_{i},y_{j})=y_{i}+1+y_{j}+1<K$.
+Observe that it is also not possible for $P$ to contain only one node, since the weight of any node is strictly less than $K$. So, we now only need to prove that if $P= \{ x_i,y_j \}$ is a feasible solution, then $x_i = y_j$.
+If $P= \{ x_i,y_j \}$ is a feasible solution then on the one hand $d(x_i,y_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} + y_j +1 = K - x_i + y_j \geq K$, implying that $y_j \geq x_i$. On the other hand, $W(P) = x_i + 1 + K - y_j -1 = K + x_i - y_j \geq K$, implying that $x_i \geq y_j$. We conclude that $x_i = y_j$.
+\end{proof}
+
+\section{Proof of Lemma~\ref{nlog^2n running time for weighted f.t. lemma}}\label{appendix proof of nlog^2n lemma}
+\begin{lemma} 
+The above implementation implies an $O(n \log ^2 n)$ weighted feasibility test.
+\end{lemma}
+
+\begin{proof}
+
+The running time of the algorithm is the sum of running times required for constructing the polylines of the subtrees rooted at each node of the tree.
+%
+Notice that the number of breakpoints in the polyline of a subtree is at most the number of nodes in this subtree. This is because every breakpoint corresponds to some node that was in the solution becoming too close to the root to be still included.
+
+For any degree one node, constructing its polyline is done with one query to the polyline of its child, and an increase of the keys of all but the first breakpoint (which can be done by increasing the key stored at the root, and decreasing the key stored at the first leaf). This takes $O(\log n)$ time and so the total time over all degree one nodes is $O(n \log n)$.
+ 
+For any degree two node $v$ with two children whose subtree sizes are $x$ and $y$ where $x \leq y$, constructing $v$'s polyline takes $O(x \log y)$ time. This is because operations~\ref{op1}-\ref{op4} take $O(x+ \log y)$ time and operations ~\ref{op5}-\ref{op8} take $O(x \log y)$ time.  The total running time over all degree two nodes is therefore bounded by $O(S \cdot \log n)$, where $S$ is the sum of sizes of the smaller subtrees over all nodes of degree two. 
+%
+We prove by induction that $S \leq n \log n$. Consider some binary tree with $n$ nodes. If the root of the tree has only one child, $S$ is the same for the subtree rooted at the child, and so $S \leq (n-1)\log (n-1) < n \log n$. If the root has two children with subtree sizes $x$ and $y$, let $x\le y$ and $n=1+x+y$. From the induction hypothesis it follows that $S \leq x + x \log x + y \log y$. This is bounded by:
+\begin{align*}
+x + x\log x + y\log y &= x \log (2x) + y\log y \\
+& \leq x \log (x+y) + y\log y \\
+& \leq x \log (x+y) + y \log (x+y) \\
+& = (x+y)\log(x+y) < n \log n.
+\end{align*}
+We conclude that the overall complexity is $O(n \log ^2 n)$.
+\end{proof}
+
+\section{Proof of Theorem~\ref{nlogn weighted f.t. theorem}}\label{appendix proof of nlogn theorem}
 \begin{theorem}
 The above implementation implies an $O(n \log n)$ weighted feasibility test.
 \end{theorem}
+The proof of the theorem can be found in Appendix 
 \begin{proof}
 As we have seen in the proof of Lemma \ref{nlog^2n running time for weighted f.t. lemma}, the time spent for all nodes of degree one in the input tree is bounded by $O(n \log n)$, so we only need to analyze the time for degree two nodes.
 %
@@ -1018,13 +1045,6 @@ S = & \ 2c\cdot x \log x + 2c\cdot y \log y + c\cdot x \log (\frac{2y}{x})\\
 \end{align*}
 This concludes the induction and yields our $O(n \log n)$ weighted feasibility test.
 \end{proof}
-
-\bibliography{dispersion}
-
-\newpage
-\appendix
-
-Put the appendix here.
 
 \end{document}
 
