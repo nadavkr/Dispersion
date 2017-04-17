@@ -330,28 +330,11 @@ We now consider the weighted variant of the dispersion problem, in which the edg
 \end{itemize}
 
 
-In this section we present an $O(n\log n)$ time algorithm (feasibility test) for the weighted decision problem, and prove that it is optimal, by giving an $\Omega(n\log n)$ lower bound in the algebraic computation tree model.
+In this section we present an $O(n\log n)$ time algorithm (feasibility test) for the weighted decision problem. A matching lower bound follows by a reduction from the set disjointness problem (see Appendix \ref{appendix weighted f.t. lower bound}).
 With the $O(n\log n)$ feasibility test in hand, we can apply the Frederickson's search technique on a set of
 matrices obtained from the centroid decomposition in $O(n\log n)$ time to solve the weighted optimization
 problem with $O(\log n)$ calls to the feasibility tests, so in $O(n\log^{2}n)$ total time.
 
-\subsection{An \texorpdfstring{\boldmath$ \Omega (n\log n)$}{Omega(nlogn)} lower bound for the weighted feasibility test}
-
-In the {\em Set Disjointness} problem, we are given two sets of real numbers $X=\lbrace x_1,x_2,\ldots,x_n \rbrace$ and $Y=\lbrace y_1,y_2,\ldots,y_n \rbrace$ and we need to return true iff $X \cap Y = \emptyset$. 
-It is known that solving the set disjointness problem requires $\Omega(n \log n)$ operations in the algebraic
-computation tree model~\cite{BenOr}.
-We present a reduction from the set disjointness problem to the weighted feasibility test problem. We assume without loss of generality that the elements of $X$ and $Y$ are non-negative~\footnote{Otherwise
-we can simply find the minimum element, and subtract the minimum from all the elements.}.
-
-
-Given the two sets $X$ and $Y$, we construct a tree $T$ as follows. We first compute and set
-$K := 2 \cdot \max (X\cup Y) +3$.
-The tree $T$ contains two vertices of weight zero, $u$ and $v$, that are connected by an edge of length $\frac{K}{2}$. In addition, for each element $x_i \in X$, we have a node of weight $x_i+1$, that is connected to $u$ by an edge of length $\frac{K}{2} - x_i -1$. For each element $y_i \in Y$, we have a node of weight $K - y_i -1$, that is connected to $v$ by an edge of length $y_i+1$.
-\begin{lemma}\label{lemma of the reduction to set disjointness}
-$X \cap Y = \emptyset$ iff the weighted feasibility test returns false for $T$ with  parameters $W=K$ and $\lambda =K$.
-\end{lemma}
-
-The proof of the lemma can be found in Appendix~\ref{appendix proof of reduction lemma}.
 
 
 \subsection{An \texorpdfstring{\boldmath$O(n \log n)$}{O(nlogn)} algorithm for the weighted feasibility test}\label{O(nlogn) weighted f.t.}
@@ -565,24 +548,6 @@ Denoting the size of the $i$-th chain by $b_{i}$, and the number of chains by $k
 bounded by $$\sum_{i=1}^{k} \left\lceil \frac{b_i}{b} \right\rceil \leq n/b+k=O(n/b).$$
 In total we have created $O(n/b)$ fragments, and each of them is of size at most $b$.
 %By adjusting $b$ we can obtain up to $n/b$ fragments, each of size $O(n)$.
-\end{proof}
-
-
-\subsection{Proof of Lemma~\ref{lemma of the reduction to set disjointness}}\label{appendix proof of reduction lemma}
-\begin{lemma} %TODO change the lemma number
-$X \cap Y = \emptyset$ iff the weighted feasibility test returns false for $T$ with  parameters $W=K$ and $\lambda =K$.
-\end{lemma}
-
-\begin{proof}
-We start by proving that if $X \cap Y \neq \emptyset$ then there is a subset of the vertices of the tree, $P \subseteq T$, s.t. $W(P) \geq K$ and $f(P) \geq K$ (where $W(P)$ is the sum of the weights of all the vertices in $P$). Suppose that  $x_i=y_j$. Then, $d(x_i,y_j) = d(x_i,u) + d(u,v) + d(v,y_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} + y_j +1 = K \geq K$. Furthermore, $W(x_i) + W(y_j) = x_i + 1 + K- y_j -1 = K \geq K$, and so the feasibility test should return true due to $P = \lbrace x_i, y_j \rbrace$.
-
-Now we need to prove that if the feasibility test returns true, the sets are not disjoint.
-We start by proving that any feasible subset $P$ cannot have more than one vertex from each of the sets.
-Assume for contradiction that $P'$ is a feasible subset that contains at least two vertices that correspond to elements of $X$. Denote these two vertices by $x_i$ and $x_j$. We assume that $P'$ is a feasible solution, and so $d(x_i,x_j) \geq K$. But, $d(x_i,x_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} - x_j -1 = K - x_i - x_j -2 < K$ (since $x_i$ and $x_j$ are non-negative) and we have a contradiction.
-If $P'$ contains two elements of $Y$, denoted $y_{i}$ and $y_{j}$, we also obtain a contradiction because
-$d(y_{i},y_{j})=y_{i}+1+y_{j}+1<K$.
-Observe that it is also not possible for $P$ to contain only one node, since the weight of any node is strictly less than $K$. So, we now only need to prove that if $P= \{ x_i,y_j \}$ is a feasible solution, then $x_i = y_j$.
-If $P= \{ x_i,y_j \}$ is a feasible solution then on the one hand $d(x_i,y_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} + y_j +1 = K - x_i + y_j \geq K$, implying that $y_j \geq x_i$. On the other hand, $W(P) = x_i + 1 + K - y_j -1 = K + x_i - y_j \geq K$, implying that $x_i \geq y_j$. We conclude that $x_i = y_j$.
 \end{proof}
 
 
@@ -993,6 +958,34 @@ node. After $\log ^*n$ iterations, we have a $O(\frac{n}{\log ^4n} \cdot \log \l
 which we use to solve the dispersion optimization problem in linear time. All iterations of the preprocessing
 cost $O(n)$ time altogether.
 % why do we stop at fragments of size polylog(n)? Can't we get one large fragment?
+
+\section{An \texorpdfstring{\boldmath$ \Omega (n\log n)$}{Omega(nlogn)} lower bound for the weighted feasibility test}\label{appendix weighted f.t. lower bound}
+
+In the {\em Set Disjointness} problem, we are given two sets of real numbers $X=\lbrace x_1,x_2,\ldots,x_n \rbrace$ and $Y=\lbrace y_1,y_2,\ldots,y_n \rbrace$ and we need to return true iff $X \cap Y = \emptyset$. 
+It is known that solving the set disjointness problem requires $\Omega(n \log n)$ operations in the algebraic
+computation tree model~\cite{BenOr}.
+We present a reduction from the set disjointness problem to the weighted feasibility test problem. We assume without loss of generality that the elements of $X$ and $Y$ are non-negative~\footnote{Otherwise
+we can simply find the minimum element, and subtract the minimum from all the elements.}.
+
+
+Given the two sets $X$ and $Y$, we construct a tree $T$ as follows. We first compute and set
+$K := 2 \cdot \max (X\cup Y) +3$.
+The tree $T$ contains two vertices of weight zero, $u$ and $v$, that are connected by an edge of length $\frac{K}{2}$. In addition, for each element $x_i \in X$, we have a node of weight $x_i+1$, that is connected to $u$ by an edge of length $\frac{K}{2} - x_i -1$. For each element $y_i \in Y$, we have a node of weight $K - y_i -1$, that is connected to $v$ by an edge of length $y_i+1$.
+\begin{lemma}\label{lemma of the reduction to set disjointness}
+$X \cap Y = \emptyset$ iff the weighted feasibility test returns false for $T$ with  parameters $W=K$ and $\lambda =K$.
+\end{lemma}
+
+\begin{proof}
+We start by proving that if $X \cap Y \neq \emptyset$ then there is a subset of the vertices of the tree, $P \subseteq T$, s.t. $W(P) \geq K$ and $f(P) \geq K$ (where $W(P)$ is the sum of the weights of all the vertices in $P$). Suppose that  $x_i=y_j$. Then, $d(x_i,y_j) = d(x_i,u) + d(u,v) + d(v,y_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} + y_j +1 = K \geq K$. Furthermore, $W(x_i) + W(y_j) = x_i + 1 + K- y_j -1 = K \geq K$, and so the feasibility test should return true due to $P = \lbrace x_i, y_j \rbrace$.
+
+Now we need to prove that if the feasibility test returns true, the sets are not disjoint.
+We start by proving that any feasible subset $P$ cannot have more than one vertex from each of the sets.
+Assume for contradiction that $P'$ is a feasible subset that contains at least two vertices that correspond to elements of $X$. Denote these two vertices by $x_i$ and $x_j$. We assume that $P'$ is a feasible solution, and so $d(x_i,x_j) \geq K$. But, $d(x_i,x_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} - x_j -1 = K - x_i - x_j -2 < K$ (since $x_i$ and $x_j$ are non-negative) and we have a contradiction.
+If $P'$ contains two elements of $Y$, denoted $y_{i}$ and $y_{j}$, we also obtain a contradiction because
+$d(y_{i},y_{j})=y_{i}+1+y_{j}+1<K$.
+Observe that it is also not possible for $P$ to contain only one node, since the weight of any node is strictly less than $K$. So, we now only need to prove that if $P= \{ x_i,y_j \}$ is a feasible solution, then $x_i = y_j$.
+If $P= \{ x_i,y_j \}$ is a feasible solution then on the one hand $d(x_i,y_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} + y_j +1 = K - x_i + y_j \geq K$, implying that $y_j \geq x_i$. On the other hand, $W(P) = x_i + 1 + K - y_j -1 = K + x_i - y_j \geq K$, implying that $x_i \geq y_j$. We conclude that $x_i = y_j$.
+\end{proof}
 
 
 \end{document}
