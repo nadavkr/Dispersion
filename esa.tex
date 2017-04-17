@@ -88,9 +88,9 @@ Consider the unweighted $k$-dispersion problem. This optimization problem can be
 
 
 \begin{itemize} 
-\item {\em The Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, and a  number $k$, find a subset of nodes $P$ of size $k$  such that  $f(P)$ is maximized. 
+\item {\em The Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, and a  number $k$, find a subset of nodes $P$ of size $k$ such that $f(P)$ is maximized. 
 
-\item  {\em The Dispersion Decision Problem (feasibility test).}  Given a tree with non-negative edge lengths, a number $k$, and a number $\lambda$, find a subset of nodes  $P$ of size $k$ such that  $f(P)\geq\lambda$. 
+\item  {\em The Dispersion Decision Problem (feasibility test).}  Given a tree with non-negative edge lengths, a number $k$, and a number $\lambda$, find a subset of nodes $P$ of size $k$ such that  $f(P)\geq\lambda$. 
 \end{itemize}
 
 Both \cite{Bhattacharya1991} and \cite{Bhattacharya1999} present efficient feasibility tests, and use a result by Fredrickson \cite{Frederickson1983} that allows them to binary search over the possible values of $\lambda$ (which are all pairwise distances in the tree). This implies $O(n \log n + \tau \cdot \log n)$ time algorithms for the dispersion optimization problems (in both the weighted and unweighted cases), where $\tau$ is the running time of the feasibility test.
@@ -130,20 +130,27 @@ Our data structure both simplifies and extends an old data structure of Brown an
 %decompositions used by Frederickson.%TODO explain more?
 
 \paragraph{Our techniques.}
-We first define a variant of the well known micro-macro decomposition that partitions the input tree $T$ into $O(n/b)$ {\em fragments}, each containing $O(b)$ nodes and at most two {\em boundary nodes} incident to nodes in other fragments. Our variant is unique in the sense that it guarantees that one boundary node is always the root of the fragment (the other boundary node is called the {\em hole}). We use this to
- simulate a bottom-up feasibility test by jumping over entire 
-fragments, i.e., knowing $\lambda$, we extend in $O(\log b)$ time a solution for a subtree of $T$ rooted at the fragment's hole to a subtree of $T$ rooted at the fragment's root. This is achieved by a rather complicated preprocessing which we next highlight.
+We first define a variant of the well known micro-macro decomposition that partitions the input tree $T$ into $O(n/b)$ {\em fragments}, each containing $O(b)$ nodes and at most two {\em boundary nodes} incident to nodes in other fragments: the root of the fragment and, possible, another boundary
+node called the {\em hole}.
+We use this to simulate a bottom-up feasibility test by jumping over entire 
+fragments, i.e., knowing $\lambda$, we extend in $O(\log b)$ time a solution for a subtree of $T$ rooted at the fragment's hole to a subtree of $T$ rooted at the fragment's root. This is achieved by a preprocessing highlighted below.
 
-The first step of the preprocessing computes values $\lambda_1$ and  $\lambda_2$ such that (1) there is no solution to the decision problem on $T$ for any $\lambda > \lambda_2$, (2) there is a solution to the decision problem on $T$ for any $\lambda \le \lambda_1$, and (3) for {\em most} of the fragments, the distance between any two nodes is either smaller than $\lambda_1$ or larger or equal to $\lambda_2$. This is achieved with a recursive procedure that uses centroid decomposition in order to obtain the implicit monotone matrices required for Frederickson's parametric search. The (few) fragments that do not satisfy property (3) are handled naively in linear $O(b)$ time during query time. 
+The first step of the preprocessing computes values $\lambda_1$ and  $\lambda_2$ such that (1) there is no solution to the decision problem on $T$ for any $\lambda > \lambda_2$, (2) there is a solution to the decision problem on $T$ for any $\lambda \le \lambda_1$, and (3) for {\em most} of the fragments, the distance between any two nodes is either smaller than $\lambda_1$ or larger or equal to $\lambda_2$. This is achieved by
+generating an implicit representation of the monotone matrices capturing the pairwise distance between the nodes in the same fragment
+and then applying Frederickson's parametric search. The (few) fragments that do not satisfy property (3) are handled naively in $O(b)$ time during query time. 
+The fragments that do satisfy property (3) are further preprocessed. We look at the path from the hole to the root of the
+fragment and run the linear-time feasibility test for all subtrees hanging off from it. This can be done without knowing the exact value of $\lambda$,
+as for any two nodes of the fragment we know if their distance is smaller than $\lambda_{1}$ or larger than $\lambda_{2}$. Then, we can conceptually
+prune the fragment and think of it as a caterpillar. The spine of the caterpillar is the hole-to-root path and each spine node has two leaf children: a \emph{certain} node (that is guaranteed to be included in an optimal solution for any $\lambda$, and a \emph{candidate} node (whose inclusion in an optimal solution depends on $\lambda$). Finally, we perform additional pruning on the leaves so that their distances from both the hole and
+the root are monotonically increasing. This structure enables us to precompute for each candidate node, assuming this node is the bottom-most node
+of the fragment included in the solution, what are all the other nodes in the solution. Upon query, we can then jump over the entire fragment  in $O(\log b)$ time by binary searching for this bottom-most node.
 
-The fragments that do satisfy property (3) are handled in the second step of the preprocessing: The goal here is to eliminate from such fragments nodes that are guaranteed to be included or excluded from an optimal solution for any $\lambda \in [\lambda_1,\lambda_2)$. This is done by looking at the path from the hole to the root of the fragment and running the linear-time feasibility test for all subtrees hanging off from it (all contained in the fragment). It turns out that we can run this feasibility test without knowing $\lambda$ as long as we can determine for any two nodes if their distance is smaller than $\lambda_1$ or larger or equal to $\lambda_2$ (which we can, in constant time). This allows us to conceptually prune the fragment and think of it as a caterpillar. The spine of the caterpillar is the hole-to-root path and each spine node has two leaf children: a \emph{certain} node (that is guaranteed to be included in an optimal solution for any $\lambda$, and a \emph{candidate} node (whose inclusion in an optimal solution depends on $\lambda$). Finally, we perform additional pruning of some caterpillar leaves that results in a highly structured caterpillar where the leaves are in monotonically increasing distance from both the hole and the root. This structure enables us to precompute for each candidate node, assuming this node is the bottom-most node in the solution, what are all the other nodes in the solution. Upon query, we can then jump over the entire fragment  in $O(\log b)$ time by binary searching for this bottom-most node. 
-
-The above feasibility test is presented in Section~\ref{sublinear f.t.}, with an overall preprocessing time of $O(n\log\log n)$. %The bottleneck of this preprocessing are its calls to the vanilla linear-time feasibility test. 
-In Section~\ref{sectionLinear} we give the high-level ideas of our optimal $O(n)$ time feasibility test (the full description of the algorithm is in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}).
-%We iteratively use the current feasibility test to construct the next (faster) feasibility test.
-%Every iteration uses an appropriately chosen parameter $b$ for the micro-macro decomposition
-%as to guarantee that the construction time is $O(n)$. The parameters grow exponentially,
-%so after $O(\log^{*}n)$ iterations we obtain a sufficiently efficient feasibility test which can be used to solve the dispersion optimization problem in linear time. 
+The above feasibility test is presented in~Section~\ref{sublinear f.t.}, with an overall preprocessing time of $O(n\log\log n)$.
+The test is then translated into a solution for the optimization problem. This is done by, again, maintaining an interval
+$[\lambda_{1},\lambda_{2})$ and applying Frederickson's parametric search, but now we apply the heavy path decomposition to construct
+the monotone matrices, so that the feasibility test needs to be applied only $O(\log^{2}n)$ times in total.
+Finally, in Section~\ref{sectionLinear} we highlight the high-level ideas used to decrease the preprocessing time of the sublinear feasibility
+test to optimal $O(n)$.
 
 In Section~\ref{section:weighted} we consider the weighted version. 
 Our main result is an $O(n\log n)$ feasibility test (for which we also give
@@ -159,7 +166,7 @@ An old result of Brown and Tarjan~\cite{Brown1980} is that, in exactly such time
 Mehlhorn~\cite{huddlestonM82} to any sequence of operations that exhibits a certain locality of reference. However, in our specific
 application we need various non-standard batch operations on the lists, and hence applying these results would require effort.
 Instead, we present a simpler approach for merging polylines in Section~\ref{O(nlogn) weighted f.t.} that efficiently supports the required batch operations and works with essentially any balanced search
-tree with split and join capabilities. We believe that this is of independent interest due to its simplicity. %With this structure in hand, another standard calculation implies that the total time becomes $O(n\log n)$.
+tree with split and join capabilities. We believe that this is of independent interest due to its simplicity.
 
 \section{A Linear Feasibility Test}\label{linear F.T.}
 
@@ -184,9 +191,16 @@ A proof of correctness of this algorithm can be found in Appendix~\ref{appendix 
 %This linear time feasibility test can be used to achieve $O(n \log n)$ time for the dispersion optimization problem, by binary searching over all possible values of $\lambda$, using Frederickson's algorithm \cite{Frederickson1983}, which returns the $k$-th longest path in a tree in linear time (as was done in \cite{Bhattacharya1991}).
 
 \section{A Sublinear Feasibility Test with \texorpdfstring{\boldmath$O(n\log\log n)$}{O(nloglogn)} Preprocessing}\label{sublinear f.t.}
-The main idea here is partitioning the input tree into fragments and preprocessing them, so that in query time we can process fragments in sub-linear time. For this, we need to use a partitioning with some specific attributes, which we now present. We assume the tree is binary, and justify this assumption later.
+
+To accelerate the linear-time feasibility test described in Section~\ref{linear F.T.}, we want to partition the tree into fragments.
+Then, the fragments are preprocessed so that in query time we can process them in sublinear time.
+To this end, we need a specific way of partitioning the tree
+described below. We assume that the tree is binary: given a non-binary tree, we can replace every degree $d\geq 3$ node with a binary tree on
+$d$ leaves. The edges of the binary tree are all of length zero and its artificial inner nodes cannot be taken.
+
 \subsection{Tree partitioning}\label{tree partitioning}
-We would like to partition the tree into fragments s.t. each fragment will be connected to the rest of the tree by at most two vertices. Each fragment will have at most $b$ vertices, and there will be $O(n/b)$ fragments. Each fragment is defined by its border vertices $u$ and $v$, s.t. $v$ is a descendant of $u$. The fragment will consist of $u$'s subtree without $v$'s subtree ($v$ itself is not part of the fragment). We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. In the case where the fragment has only one border vertex, i.e. the fragment is a subtree of the input tree, we say the fragment has no hole. We call such a partition of the tree a \emph{good partition}.
+We would like to partition the tree into fragments s.t. each fragment is connected to the rest of the tree by at most two vertices, each fragment
+consists of at most $b$ vertices, and there are $O(n/b)$ fragments. Each fragment is defined by its border vertices $u$ and $v$, s.t. $v$ is a descendant of $u$, and consists of $u$'s subtree without $v$'s subtree ($v$ itself is not part of the fragment). We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. In the case where the fragment has only one border vertex, i.e. the fragment is a subtree of the input tree, we say the fragment has no hole. We call such a partition of the tree a \emph{good partition}.
 The proof of the following lemma can be found in Appendix \ref{appendix proof of basic partitioning lemma}.
 
 \begin{figure}
@@ -201,7 +215,10 @@ For any binary tree on $n$ nodes and a parameter $b$, a good partition of the tr
 \end{lemma}
 
 \subsection{Preprocessing fragments} \label{Pre-Processing Fragments}
-We now would like to preprocess the fragments s.t. we can later check in constant time for any two nodes in a fragment, $u_1$ and $u_2$, if $d(u_1,u_2)\geq\lambda$, and if $d(u_1,u_2) \geq \frac{\lambda}{2}$, for any possible $\lambda$. The possible values of $\lambda$ in the beginning are of course all the pairwise distances in the input tree. We achieve the ability to perform such queries for most of the fragments, by using a parametric search method by Frederickson that allows us to eliminate some of the possible values of $\lambda$, using our existing feasibility test. By the end of this elimination process, most of the fragments will have the property that any pairwise distance inside them is either smaller then the smallest possible value of $\lambda$ or
+We now would like to preprocess the fragments s.t. we can later check in constant time for any two nodes in a fragment, $u_1$ and $u_2$, if $d(u_1,u_2)\geq\lambda$ or $d(u_1,u_2) \geq \frac{\lambda}{2}$, for any possible $\lambda$ specified in query time.
+
+
+. The possible values of $\lambda$ in the beginning are of course all the pairwise distances in the input tree. We achieve the ability to perform such queries for most of the fragments, by using a parametric search method by Frederickson that allows us to eliminate some of the possible values of $\lambda$, using our existing feasibility test. By the end of this elimination process, most of the fragments will have the property that any pairwise distance inside them is either smaller then the smallest possible value of $\lambda$ or
  greater than the largest possible value of $\lambda$. The same will hold for $\frac{\lambda}{2}$.
 For each fragment, we will implicitly construct matrices of total side length (number of rows and columns) $O(b \log b)$, that are row and column sorted, and contain all pairwise distances in the fragment. This is done using the standard centroid decomposition. A full description of this procedure is in Appendix \ref{appendix constructing sorted matrices using centroid decomp.}.
 
@@ -300,11 +317,6 @@ Since the number of vertices in the heavy paths of the current level is at most 
 After processing all heavy paths we finally have a maximal valid solution for the whole tree.
 Notice that throughout our algorithm we process caterpillars, and do not consider taking spine nodes to our solution. 
 This is fine, since we can attach to every such spine node an artificial leaf connected with an edge of length zero.
-The same trick allows us to handle non-binary trees: given a non-binary tree, we can replace every 
-degree $d\geq 3$ node with a binary tree on $d$ leaves. The edges of the binary tree are all of length zero and
-its artificial inner nodes cannot be taken (notice that our algorithm easily generalises so that for each node
-we can specify if it can be included in a solution).
-
 
 \section{A Sublinear Feasibility Test with \texorpdfstring{\boldmath$O(n)$}{O(n)} Preprocessing}\label{sectionLinear}
 The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test to get a sublinear one. We will now use a similar process, iteratively, with growing fragments size (starting from constant size and growing exponentially), improving in each iteration the performance of our feasibility test. Given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with $O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
@@ -548,7 +560,7 @@ We scan each of these chains bottom-up and greedily cut them into fragments of s
 Denoting the size of the $i$-th chain by $b_{i}$, and the number of chains by $k$, the number of fragments created in this phase is
 bounded by $$\sum_{i=1}^{k} \left\lceil \frac{b_i}{b} \right\rceil \leq n/b+k=O(n/b).$$
 In total we have created $O(n/b)$ fragments, and each of them is of size at most $b$.
-%By adjusting $b$ we can obtain up to $n/b$ fragments, each of size $O(n)$.
+The whole process can be implemented by scanning the tree twice bottom-up in $O(n)$ time.
 \end{proof}
 
 
