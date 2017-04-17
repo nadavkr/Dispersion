@@ -173,7 +173,7 @@ the size of the subtree. We then show that the polyline of a node can be efficie
 are stored in augmented balanced search trees, then two polylines of size $x$ and $y$ can be merged in time $\Oh(\min(x,y)\log\max(x,y))$,
 and by standard calculation we obtain an $\Oh(n\log^{2}n)$ time feasibility test. To improve on that and obtain an optimal feasibility test,
 we need to merge in $\Oh(\min(x,y)\log\frac{\max(x,y)}{\min(x,y)})$ time. 
-An old result of Brown and Tarjan~\cite{Brown1980} is that, in exactly such time we can merge two {\em AVL trees} representing two sorted lists of length $x$ and $y$. This was later generalized by Huddleston and
+An old result of Brown and Tarjan~\cite{Brown1980} is that, in exactly such time we can merge two {\em 2-3 trees} representing two sorted lists of length $x$ and $y$ (and also delete $x$ nodes in a tree of size $y$). This was later generalized by Huddleston and
 Mehlhorn~\cite{huddlestonM82} to any sequence of operations that exhibits a certain locality of reference. However, in our specific
 application we need various non-standard batch operations on the lists, and hence applying these results would require effort.
 Instead, we present a simpler approach for merging polylines in Section~\ref{section:data structure} that efficiently supports the required batch operations and works with essentially any balanced search
