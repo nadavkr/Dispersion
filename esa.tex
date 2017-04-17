@@ -172,7 +172,8 @@ tree with split and join capabilities. We believe that this is of independent in
 
 The feasibility test processes the tree bottom-up and computes, for every subtree $T_{r}$ rooted at a node $r$, a valid solution with maximal cardinality.
 If $P$ is a valid solution for the subtree $T_{r}$ (i.e., $f(P)\geq\lambda$), we call a node $u\in P$, s.t. $d(r,u)<\frac{\lambda}{2}$, the \emph{candidate} node of the subtree (or a candidate with respect to $r$). There is at most one such candidate node.
-The remaining nodes in $P$ are called \emph{certain} (w.r.t. $r$). When clear from the context, we will not explicitly say which subtree we are referring to.
+The remaining nodes in $P$ are called \emph{certain} (w.r.t. $r$) and the one that is nearest to the root is called the certain node.
+When clear from the context, we will not explicitly say which subtree we are referring to.
 
 In each step we are given a node $r$, its children nodes $r_{1},r_{2},\ldots,r_{k}$, and for each child $r_{i}$ we are given a maximal valid
 solution $P_{i}$ for the feasibility test on $T_{r_{i}}$. We would like to produce a maximal valid solution for the feasibility test on $r$'s subtree.
@@ -194,59 +195,75 @@ A proof of correctness of this algorithm can be found in Appendix~\ref{appendix 
 
 To accelerate the linear-time feasibility test described in Section~\ref{linear F.T.}, we want to partition the tree into fragments.
 Then, the fragments are preprocessed so that in query time we can process them in sublinear time.
-To this end, we need a specific way of partitioning the tree
-described below. We assume that the tree is binary: given a non-binary tree, we can replace every degree $d\geq 3$ node with a binary tree on
-$d$ leaves. The edges of the binary tree are all of length zero and its artificial inner nodes cannot be taken.
-
-\subsection{Tree partitioning}\label{tree partitioning}
-We would like to partition the tree into fragments s.t. each fragment is connected to the rest of the tree by at most two vertices, each fragment
-consists of at most $b$ vertices, and there are $O(n/b)$ fragments. Each fragment is defined by its border vertices $u$ and $v$, s.t. $v$ is a descendant of $u$, and consists of $u$'s subtree without $v$'s subtree ($v$ itself is not part of the fragment). We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. In the case where the fragment has only one border vertex, i.e. the fragment is a subtree of the input tree, we say the fragment has no hole. We call such a partition of the tree a \emph{good partition}.
+To this end, we need a specific way of partitioning the tree into fragments, where
+each fragment is connected to the rest of the tree by at most two vertices and consists of at most $b$ nodes,
+and there are only $O(n/b)$ fragments. Each fragment is defined by its border vertices $u$ and $v$, s.t. $v$ is a descendant of $u$, and consists of $u$'s subtree without $v$'s subtree ($v$ itself is not part of the fragment). We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. In the case where the fragment has only one border vertex, i.e. the fragment is a subtree of the input tree, we say the fragment has no hole. We call such a partition of the tree a \emph{good partition}.
 The proof of the following lemma can be found in Appendix \ref{appendix proof of basic partitioning lemma}.
-
-\begin{figure}
-\begin{center}
-\includegraphics[scale=0.7]{fragment}
-\end{center}
-\caption{Example of a fragment in a good partition. The fragment consists of the subtree of $u$ without the subtree of $v$. We call $u$ the \emph{root} of the fragment and $v$ the \emph{hole} of the fragment. The path from $u$ to $v$ is called the \emph{spine} of the fragment.}
-\end{figure}
+Note that we can assume that the input tree is binary: given a non-binary tree, we can replace every degree $d\geq 3$ node with a binary tree on
+$d$ leaves. The edges of the binary tree are all of length zero and its artificial inner nodes cannot be taken.
 
 \begin{lemma}\label{basic partitioning lemma}
 For any binary tree on $n$ nodes and a parameter $b$, a good partition of the tree can be found in $O(n)$ time.
 \end{lemma}
 
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[scale=0.7]{fragment}
+\end{center}
+\caption{A fragment in a good partition consists of the subtree of $u$ without the subtree of $v$.
+$u$ is the root, $v$ is the hole, and the path from $u$ to $v$ is the spine of the fragment.}
+\end{figure}
+
 \subsection{Preprocessing fragments} \label{Pre-Processing Fragments}
-We now would like to preprocess the fragments s.t. we can later check in constant time for any two nodes in a fragment, $u_1$ and $u_2$, if $d(u_1,u_2)\geq\lambda$ or $d(u_1,u_2) \geq \frac{\lambda}{2}$, for any possible $\lambda$ specified in query time.
+We now would like to preprocess the fragments, so that for any two nodes $u_{1}$ and $u_{2}$ in the same fragment we know
+if $d(u_1,u_2)\geq\lambda$ or $d(u_1,u_2) \geq \frac{\lambda}{2}$, for any possible $\lambda$ specified in query time. 
+This is done with the parametric search method by Frederickson as follows. We maintain an interval $[\lambda_1,\lambda_2)$ and
+$\lambda^{*}$ that we are searching for in the optimization problem is surely inside the interval, that is, $\lambda_{1}$ is feasibly
+while $\lambda_{2}$ is not. In the beginning, the interval is simply $[0,\infty)$. Then, we use $O(\log\log n)$ calls to the
+linear-time feasibility test to decrease the interval, so that most of the fragments have the property that any pairwise distance
+(and also any pairwise distance multiplied by 2) inside is either smaller than $\lambda_{1}$ or larger than $\lambda_{2}$.
+A method of choosing which tests to perform to achieve this is the gist of Frederickson's method.
 
+For each fragment, we construct an implicit representation of $O(b)$ matrices of total side length $O(b\log b)$, that are row- and column-sorted,
+and any pairwise distance inside is an entry is some matrix. This is done using the standard centroid decomposition as described
+in Appendix \ref{appendix constructing sorted matrices using centroid decomp.}. Intuitively, by carefully choosing an entry in one of
+these matrices and using the linear-time feasibility test, we can actually eliminate a large piece of the matrix, because the
+matrices are row- and column-sorted. We use the following theorem:
 
-. The possible values of $\lambda$ in the beginning are of course all the pairwise distances in the input tree. We achieve the ability to perform such queries for most of the fragments, by using a parametric search method by Frederickson that allows us to eliminate some of the possible values of $\lambda$, using our existing feasibility test. By the end of this elimination process, most of the fragments will have the property that any pairwise distance inside them is either smaller then the smallest possible value of $\lambda$ or
- greater than the largest possible value of $\lambda$. The same will hold for $\frac{\lambda}{2}$.
-For each fragment, we will implicitly construct matrices of total side length (number of rows and columns) $O(b \log b)$, that are row and column sorted, and contain all pairwise distances in the fragment. This is done using the standard centroid decomposition. A full description of this procedure is in Appendix \ref{appendix constructing sorted matrices using centroid decomp.}.
-
-Now, we can use a parametric search algorithm by Frederickson to eliminate entries of the matrices. The idea of this method is looking at specific locations in the matrices, running feasibility tests on their values, and eliminating large pieces of the matrices. This is possible because these matrices are both row and column sorted, and because if some number $x$ is not a feasible solution for the dispersion problem, then any number $y>x$ is also not feasible, and also, if $x$ is feasible, then any number $z<x$ is also feasible. Using this searching method, we find the interval of possible solutions to the dispersion optimization problem\footnote{The possible solutions to the dispersion optimization problem are all the pairwise distances in the input tree. All of these distances are represented in entries of the matrices we have implicitly constructed.}, $[\lambda_1,\lambda_2)$, s.t. the $\lambda^*$ we are searching for is in this interval, $\lambda_1$ is the largest number we know is feasible, and $\lambda_2$ is the smallest number we know is not feasible. We call fragments that do not contain a pairwise distance that is in the interval \textit{inactive}, and all other fragments \textit{active}. Since we would like to also answer queries for $\frac{\lambda}{2}$, we do the same process for matrices that contain twice the distance in every entry of the original matrices.
-For this search, we use the following theorem of \cite{Frederickson1991}:
 \begin{theorem}[\cite{Frederickson1991}]\label{Frederickson's theorem}
 Let  ${M_1, M_2, . . . , M_N}$ be a collection of sorted matrices in which matrix $M_j$ is of dimension $m_j \times n_j$, $m_j \leq n_j$, and $\sum_{j=1}^{N} m_j = m$.
-Let p be nonnegative. The number of feasibility tests needed to discard all but at most p of the elements is $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace)$, and the total running time exclusive of feasibility tests is $O(\sum_{j=1}^{N} m_j \cdot \log (2n_j/m_j))$.
+Let p be nonnegative. The number of feasibility tests needed to discard all but at most $p$ of the elements is $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace)$, and the total running time exclusive of feasibility tests is $O(\sum_{j=1}^{N} m_j \cdot \log (2n_j/m_j))$.
 \end{theorem}
-In our case $m=b \log b \cdot \frac{n}{b} = n \log b$ (since for each of the $\frac{n}{b}$ fragments, we have $\log b$ levels of the centroid decomposition, and at each level we have the distance of every node to a centroid) and we set $p$ to be $n/b^2$. The theorem implies that we can use $O(\log b)$ feasibility tests and discard all but $n/b^2$ elements of the matrices. This means that we have at most $n/b^2$ active fragments (out of all $n/b$ fragments). We also pay $O(n \log b)$ exclusive of the feasibility tests.
+In our case, $m=b \log b \cdot \frac{n}{b} = n \log b$ and we set $p$ to be $n/b^2$. The theorem implies that we can use $O(\log b)$ feasibility tests and discard all but $n/b^2$ elements of the matrices.
+We call fragments with the property that any pairwise distance (and any pairwise distance multiplied by 2) inside is either smaller than
+$\lambda_{1}$ or larger than $\lambda_{2}$ \text{inactive}, and all other fragments \textit{active}.
+By the choice of parameters, we have at most $n/b^{2}$ active fragments (out of all $n/b$) and we also pay $O(n \log b)$ exclusive of the feasibility tests.
+For an inactive fragment, we can now check if the distance between two nodes inside is at least $\lambda$ or $\lambda/2$ by first calculating
+the distance in $O(1)$ time (using lowest common ancestor queries~\cite{Bender2000}) and comparing it to $\lambda_{1}$.
+This allows us to preprocess each inactive fragment in $O(b)$ time as follows:
 
-For inactive fragment, it is clear that we can now answer queries checking whether some pairwise distance inside the fragment is at least $\lambda$, or if it is less than $\frac{\lambda}{2}$ \footnote{We can easily compute any pairwise distance in the tree in $O(1)$ time by precomputing all distances to the root of the tree, and using Lowest Common Ancestor queries \cite{Bender2000}, \cite{Djidjev1991}.}.
-
-Active fragments will be processed as in the linear algorithm described before, so we can ignore them for now. We refer to the certain node which is closest to the root simply as \textit{the certain node}. We now do the following preprocessing for each inactive fragment:
 \begin{enumerate}
 \item\textbf{Reduce the fragment to a caterpillar:}\\
-Observe that each fragment is comprised of its spine, and the subtrees hanging off of it. Using queries on pairwise distances as described above, we can use our linear feasibility test on the subtrees hanging off the spine, and get a candidate and a certain node for each of them. This is done in linear time.
-Our fragment is now reduced to a caterpillar with at most two leaves attached to each spine node: a candidate
-node and a certain node.
+A fragment consists of the spine and the subtrees hanging off the spine. Because for any two nodes inside the fragment we can compare
+their distance to $\lambda$ and $\lambda/2$, we can run our linear-time feasibility test on the subtrees hanging off the spine to obtain
+the candidate and the certain node for each of them. The fragment is now reduced to a caterpillar with at most two leaves attached to each
+spine node: a candidate node and a certain node.
 \item\label{removing certain nodes}
-\textbf{Find the candidate nodes that will certainly not be taken:}\\ %TODO add drawing
-Let the $i$-th leaf of the caterpillar be connected by an edge of length $y_i$ to a spine node at distance $x_i$ from the root of the caterpillar. Order the leaves so that $x_1 < x_2 < \ldots < x_k$.
-Some of the candidate nodes can be ignored as they "collide" with certain nodes. We start by finding the closest certain node to each candidate node. We can do this in linear time by scanning the caterpillar bottom-up, while saving for each candidate node, the closest certain node below it and the distance to it. We then do the same scan from top to bottom, and from both scans combined, we get for each candidate node the closest certain node and the distance to it. Now we want to find the candidate nodes that are too close to a certain node. We can do this since we are looking at an inactive fragment, and so a pairwise distance in it must be either smaller than $\lambda_1$ or greater or equal to $\lambda_2$. Delete all candidate nodes for which the distance to the closest certain node is smaller than $\lambda_1$. 
-Now we are only left with some of the candidate nodes to consider, and for all of them it hold that $y_i < \frac{\lambda_1}{2}$ (otherwise they would be certain). From now on we ignore the certain nodes, and only deal with leaves which are candidate nodes.
+\textbf{Find candidate nodes that cannot be taken:}\\
+For every candidate node we want to find the nearest certain node. Then, we can compare their distance to $\lambda$ and remove the
+candidate node if it cannot be taken. To find the nearest certain node, we first scan all nodes bottom-up (according to the natural order
+on the spine nodes they are attached to) and compute for each of them the nearest certain node below it. Then, we repeat the scan
+in the other direction to compute the nearest certain node above. This gives us, for every candidate node, the nearest certain node above
+and below. We delete all candidate nodes for which one of these distances is smaller than $\lambda_{1}$.
+From now on we ignore the certain nodes, and only deal with the remaining candidate nodes.
 \item\label{making distances from the root monotone}
-\textbf{Prune the caterpillar so that the leaves' distances to the root are non-decreasing:}\\
-Consider the $i$-th leaf, $u_i$, and the adjacent leaf above it, $u_{i-1}$. See Figure~\ref{fig:pruning}. Suppose that $u_{i-1}$ is farther from the root than $u_i$ (i.e. $x_{i-1}+y_{i-1} > x_i+y_i$), then:
-$$ d(u_{i},u_{i-1}) = x_i-x_{i-1}+y_i+y_{i-1} = x_{i} + y_{i} - x_{i-1} + y_{i-1} < 2y_{i-1} < \lambda_1.$$
+\textbf{Prune leaves to make their distances to the root non-decreasing:}\\
+Let the $i$-th leaf, $u_{i}$, be connected with an edge of length $y_{i}$ to a spine node at distance $x_{i}$ from the root,
+and order the leaves so that $x_{1}<x_{2}<\ldots$. See Figure~\ref{fig:pruning} in the appendix.
+Note that $y_{i}<\frac{\lambda_{1}}{2}$, as otherwise $u_{i}$ would be a certain node.
+Suppose that $u_{i-1}$ is farther from the root than $u_i$ (i.e.,
+$x_{i-1}+y_{i-1} > x_i+y_i$), then:
+$$d(u_{i},u_{i-1}) = x_i-x_{i-1}+y_i+y_{i-1} = x_{i} + y_{i} - x_{i-1} + y_{i-1} < 2y_{i-1} < \lambda_1.$$
 Therefore an optimal solution cannot contain both $u_{i}$ and $u_{i-1}$. We claim that if the solution contains
 $u_{i}$ then it can be replaced with $u_{i-1}$. To prove this, it is enough to argue that
 $u_{i-1}$ is farther away from any node above it than $u_i$, and $u_i$ is closer to any node below it than $u_{i-1}$.
@@ -254,23 +271,15 @@ Consider a node $u_{j}$ that is above $u_{i-1}$ (so $j<i-1$), then:
 $$d(u_j,u_{i-1}) - d(u_j,u_{i}) = y_{i-1}-(x_i-x_{i-1})-y_i = x_{i-1}+y_{i-1}-(x_i+y_i) > 0.$$
 Now consider a node $u_{j}$ that is below $u_{i}$ (so $j>i$), then:
 $$d(u_j,u_{i-1}) - d(u_j,u_{i}) = y_{i-1}+(x_i-x_{i-1})-y_i > 2(x_i-x_{i-1}) > 0.$$
-So in fact, we can remove the $i$-th leaf from the caterpillar if $x_{i-1}+y_{i-1} > x_i+y_i$. 
-We traverse the caterpillar from top to bottom and remove such leaves.
-To this end, it is enough to compare the distance of the current leaf to the root with the most recently processed non-removed leaf,
-so the whole scan takes linear time in the number of candidate nodes. In the end, the distances of the
+So in fact, we can remove the $i$-th leaf from the caterpillar if $x_{i-1}+y_{i-1} > x_i+y_i$.
+To check this condition efficiently, we scan the caterpillar from top to bottom while maintaining the most recently processed non-removed leaf.
+The whole scan takes linear time in the number of candidate nodes and ensures that the distances of the
 remaining leaves from the root are non-decreasing.
 
-\begin{figure}
-\begin{center}
-\includegraphics[scale=0.45]{caterpillar}
-\end{center}
-\caption{Pruning the caterpillar so that the distances of leaves from the root are non-decreasing: If $d(u_i,r)<d(u_{i-1},r)$ then  we can remove $u_{i}$ since (1) an optimal solution cannot contain both $u_{i}$ and $u_{i-1}$ (the distance between them is too small), and (2) if an optimal solution contains $u_{i}$ then it can be replaced with $u_{i-1}$ (every leaf $u_j$ is farther from $u_{i-1}$ than from $u_i$). \label{fig:pruning}}
-\end{figure}
-
 \item \label{making distances from the hole monotone}
-\textbf{Prune the caterpillar so that the leaves' distances to the hole are non-decreasing:}\\
+\textbf{Prune leaves to make their distances to the hole non-decreasing:}\\
 This is done as in the previous step.
-\item\textbf{Compute the solution for any possible distance of the hole's candidate node:}\\
+\item\textbf{Precompute for any candidate node with respect to the hole:}\\
 In query time we want to process each fragment after its hole has already been processed.
 We call a set of consecutive leaves of the caterpillar, that contains the closest leaf to the hole, a \emph{suffix} of the caterpillar. Similarly we can define the caterpillar's \emph{prefix}.
 Assuming we know what is the closest chosen node in the fragment's hole, we can eliminate an entire suffix of the caterpillar (because of the monotonicity of the distances of candidate nodes from the hole). We can compute in preprocessing, for any possible eliminated suffix, which nodes in the fragment should be chosen, and also which nodes are the candidate node and certain node we need to pass to the next fragment.
@@ -999,6 +1008,14 @@ Observe that it is also not possible for $P$ to contain only one node, since the
 If $P= \{ x_i,y_j \}$ is a feasible solution then on the one hand $d(x_i,y_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} + y_j +1 = K - x_i + y_j \geq K$, implying that $y_j \geq x_i$. On the other hand, $W(P) = x_i + 1 + K - y_j -1 = K + x_i - y_j \geq K$, implying that $x_i \geq y_j$. We conclude that $x_i = y_j$.
 \end{proof}
 
+\section{Additional figures}
+
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[scale=0.45]{caterpillar}
+\end{center}
+\caption{If $d(u_i,r)<d(u_{i-1},r)$ then  we can remove $u_{i}$ since (1) an optimal solution cannot contain both $u_{i}$ and $u_{i-1}$ (the distance between them is too small), and (2) if an optimal solution contains $u_{i}$ then it can be replaced with $u_{i-1}$ (every leaf $u_j$ is farther from $u_{i-1}$ than from $u_i$). \label{fig:pruning}}
+\end{figure}
 
 \end{document}
 
