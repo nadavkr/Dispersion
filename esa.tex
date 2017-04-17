@@ -139,16 +139,11 @@ The first step of the preprocessing computes values $\lambda_1$ and  $\lambda_2$
 The fragments that do satisfy property (3) are handled in the second step of the preprocessing: The goal here is to eliminate from such fragments nodes that are guaranteed to be included or excluded from an optimal solution for any $\lambda \in [\lambda_1,\lambda_2)$. This is done by looking at the path from the hole to the root of the fragment and running the linear-time feasibility test for all subtrees hanging off from it (all contained in the fragment). It turns out that we can run this feasibility test without knowing $\lambda$ as long as we can determine for any two nodes if their distance is smaller than $\lambda_1$ or larger or equal to $\lambda_2$ (which we can, in constant time). This allows us to conceptually prune the fragment and think of it as a caterpillar. The spine of the caterpillar is the hole-to-root path and each spine node has two leaf children: a \emph{certain} node (that is guaranteed to be included in an optimal solution for any $\lambda$, and a \emph{candidate} node (whose inclusion in an optimal solution depends on $\lambda$). Finally, we perform additional pruning of some caterpillar leaves that results in a highly structured caterpillar where the leaves are in monotonically increasing distance from both the hole and the root. This structure enables us to precompute for each candidate node, assuming this node is the bottom-most node in the solution, what are all the other nodes in the solution. Upon query, we can then jump over the entire fragment  in $O(\log b)$ time by binary searching for this bottom-most node. 
 
 The above feasibility test is presented in Section~\ref{sublinear f.t.}, with an overall preprocessing time of $O(n\log\log n)$. %The bottleneck of this preprocessing are its calls to the vanilla linear-time feasibility test. 
-In Section~\ref{sectionlog*} we show how this can be gradually improved to $O(n\log^* n)$ by constructing a sequence of faster and faster feasibility tests, each building upon the previous one. Finally, in Section~\ref{sectionLinear} we address the more challenging step of bringing the preprocessing down from $O(n\log^* n)$ to $O(n)$.
+In Section~\ref{sectionLinear} we give the high-level ideas of our optimal $O(n)$ time feasibility test (the full description of the algorithm is in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}).
 %We iteratively use the current feasibility test to construct the next (faster) feasibility test.
 %Every iteration uses an appropriately chosen parameter $b$ for the micro-macro decomposition
 %as to guarantee that the construction time is $O(n)$. The parameters grow exponentially,
 %so after $O(\log^{*}n)$ iterations we obtain a sufficiently efficient feasibility test which can be used to solve the dispersion optimization problem in linear time. 
-This means we cannot afford to construct each micro-macro decomposition separately. We overcome this by making each decomposition a refinement of the previous one. This requires relaxing the decomposition so that a fragment may contain more than $O(b)$ nodes. 
-We believe that this simple micro-macro variant is of independent interest. 
-%
-The main difficulty remaining is how to preprocess the fragments. We cannot afford to touch every node of every fragment at every decomposition level. Therefore, we take a closer look at how a (large) fragment decomposes into smaller fragments. 
-We show that a large fragment can be reduced to a concatenation of small caterpillars, each corresponding to a small fragment that we have already preprocessed. We then  carefully tailor these small caterpillars while reusing the results of their preprocessing. We show that this tailoring amortizes to $O(n)$ over all decompositions. This turns out to be quite technical. 
 
 In Section~\ref{section:weighted} we consider the weighted version. 
 Our main result is an $O(n\log n)$ feasibility test (for which we also give
@@ -187,16 +182,7 @@ Note that for any vertex $x$, a valid solution to the feasibility test on $T_x$ 
 \end{enumerate}
 Iterating over the input tree bottom-up as described, will provide us with the solution to the dispersion decision problem as the output for the root of the tree.
 
-\paragraph{Proof of correctness.} \begin{proof}[\unskip\nopunct]
-We shall now prove the correctness of the algorithm. We will do this by proving that Invariant \ref{Maximality of P and distance of closest node invariant} holds for every step of the algorithm.
-
-Let us observe some node of the tree $r$, and prove that the invariant holds for it, assuming that it holds for its children, $r_{1},r_{2},\ldots,r_{k}$. Assume for contradiction that $P'$ is a subset of the vertices of $T_r$, s.t. $f(P')\geq\lambda$ and $|P'| > |P|$. Let us look at the two possible cases:
-\begin{enumerate}
-\item \textbf{\boldmath$P'$ has more certain nodes w.r.t \boldmath$r$ than \boldmath$P'$}: All certain nodes w.r.t $r$, are in subtrees rooted at children of $r$, and so there must be some child of $r$, $r_i$, s.t. $P'_{r_i}$ has more certain nodes w.r.t $r$ than $P_{r_i}$ (where $P'_{r_i}$ is $P'$ restricted to $T_{r_i}$). This can only be if $|P'_{r_i}| > |P_{r_i}|$, or if the closest node to $r_i$ in $P'_{r_i}$ is farther than the closest node in $P_{r_i}$, and so the invariant does not hold for $r_i$.
-\item \textbf{\boldmath$P'$ has the same number of certain nodes w.r.t \boldmath$r$ as \boldmath$P$, but \boldmath$P'$ has a candidate w.r.t \boldmath$r$  and \boldmath$P$ does not}: Denote the candidate node of $P'$ by $u$. We have two possible cases. First, if $u=r$, then there is some node $v \in P$ s.t. $d(u,v)<\lambda$. Assume that $v$ is in the subtree rooted at $r_i$. In this case, either $|P'_{r_i}| \geq |P_{r_i}|$ and the closest node to $r_i$ in $P'_{r_i}$ is farther than the closest node in $P_{r_i}$, and the invariant does not hold for $r_i$, or $|P'_{r_i}|<|P_{r_i}|$ and so there must be some $r_j$ s.t. $|P'_{r_j}|>|P_{r_j}|$, and the invariant does not hold for $r_j$. Second, if $u$ is in one of the subtrees rooted at children of $r$, since all certain nodes w.r.t $r$ are also in these subtrees, there must be one such subtree, $r_l$ s.t. $|P'_{r_l}| > |P_{r_l}|$, and so the invariant does not hold for it.
-\end{enumerate} 
-Thus we have proven that $P$ is of maximal cardinality. Now, assume for contradiction that $P'$ is a subset of the vertices of the subtree rooted at $r$, s.t. $f(P')\geq\lambda$ and $|P'| = |P|$, but the closest node to $r$ in $P$ (denoted by $u$) is closer to $r$ than the closest node to $r$ in $P'$. Assume that $u \neq r$ and denote by $T_{r_i}$ the subtree that $u$ is in. Thus, either $|P'_{r_i}| = |P_{r_i}|$, but the closest vertex to $r_i$ in $P'_{r_i}$ is farther away from $r_i$ than $u$, which means the invariant does not hold for $T_{r_i}$, or $|P'_{r_i}| < |P_{r_i}|$, and it makes up for it in some other subtree where the invariant does not hold. If $u=r$, then since $|P'| = |P|$, there must some child of $r$, $r_i$, s.t. $|P'_{r_i}| > |P_{r_i}|$, and so the invariant does not hold for $r_i$. We have proven that Invariant \ref{Maximality of P and distance of closest node invariant} holds for every node of the input tree, and thus proven the correctness of the algorithm. \end{proof}
-
+A proof of correctness for this algorithm can be found in Appendix~\ref{appendix proof of correctness for linear f.t.}.
 
 This linear time feasibility test can be used to achieve $O(n \log n)$ time for the dispersion optimization problem, by binary searching over all possible values of $\lambda$, using Frederickson's algorithm \cite{Frederickson1983}, which returns the $k$-th longest path in a tree in linear time (as was done in \cite{Bhattacharya1991}).
 
@@ -215,29 +201,7 @@ We would like to partition the tree into fragments s.t. each fragment will be co
 \begin{lemma}\label{basic partitioning lemma}
 For any binary tree on $n$ nodes and a parameter $b$, there is a good partition of the tree.
 \end{lemma}
-\begin{proof}
-We prove the lemma by construction. Call a node \textit{large} if the size of its subtree is at least $b$
-and \textit{small} otherwise. Consider the tree $T_L$ induced by the large nodes of the original tree. 
-For each leaf $u\in T_{L}$, we make each of its children in the original tree a new fragment with no holes.
-Each leaf of leaf of $T_{L}$ is the root of a subtree of size at least $b$ in the original tree, and these subtrees
-are all disjoint, so we have at most $n/b$ leaves in $T_{L}$. Each of them creates up to two fragments
-since the tree is binary, and each of these fragments is of size at most $b$ by definition.
-The natural next step would be to keep cutting off maximal fragments of size $b$ from the remaining
-part of the tree. This does not quite work, as we might create fragments with more than two boundary
-nodes with such a method.
-Therefore, the next step is to consider every branching node in $T_{L}$ instead, and make it a fragment
-consisting of just one node. This also creates up to $n/b$ fragments, since in any tree the number of
-branching nodes is at most the number of leaves.
-Ignoring the already created fragments, we are left with large nodes that form unary chains in $T_{L}$.
-Each of these nodes might also have an off-chain child that is a small node. We have $O(n/b)$ of these chains
-(because each of them corresponds to an edge of a binary tree on at most $n/b$ leaves).
-We scan each of these chains bottom-up and greedily cut them into fragments of size at most $b$.
-Denoting the size of the $i$-th chain by $b_{i}$, and the number of chains by $k$, the number of fragments created in this phase is
-bounded by $$\sum_{i=1}^{k} \left\lceil \frac{b_i}{b} \right\rceil \leq n/b+k=O(n/b).$$
-In total we have created $O(n/b)$ fragments, and each of them is of size at most $b$.
-%By adjusting $b$ we can obtain up to $n/b$ fragments, each of size $O(n)$.
-\end{proof}
-This partitioning is done in $O(n)$ time.
+A constructive proof for the lemma can be found in Appendix \ref{appendix proof of basic partitioning lemma}. The partitioning is done in $O(n)$ time.
 
 \subsection{Preprocessing fragments} \label{Pre-Processing Fragments}
 We now would like to preprocess the fragments s.t. we can later check in constant time for any two nodes in a fragment, $u_1$ and $u_2$, if $d(u_1,u_2)\geq\lambda$, and if $d(u_1,u_2) \geq \frac{\lambda}{2}$, for any possible $\lambda$. The possible values of $\lambda$ in the beginning are of course all the pairwise distances in the input tree. We achieve the ability to perform such queries for most of the fragments, by using a parametric search method by Frederickson that allows us to eliminate some of the possible values of $\lambda$, using our existing feasibility test. By the end of this elimination process, most of the fragments will have the property that any pairwise distance inside them is either smaller then the smallest possible value of $\lambda$ or
@@ -363,49 +327,356 @@ degree $d\geq 3$ node with a binary tree on $d$ leaves. The edges of the binary 
 its artificial inner nodes cannot be taken (notice that our algorithm easily generalises so that for each node
 we can specify if it can be included in a solution).
 
-\section{A Sublinear Feasibility Test with \texorpdfstring{\boldmath$O(n\log^{*}n)$}{O(nlog^*n)} Preprocessing} \label{sectionlog*}
-The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test (or test for short) to get a sublinear one. In order to get the complexity down to $O(n \log ^*n)$ we will use a similar process, iteratively, with growing fragments size, improving in each iteration the performance of our test.
-We start with $O(n/c^{3})$ fragments of size at most $c^3$ for some constant $c$.
-We pay $O(n)$ time for preprocessing and get an $O(\frac{n}{c^3} \cdot \log c)$ time test.
-We use this test to do the same preprocessing again, this time with $O(n/(2^{c})^{3})$ fragments of size at most $(2^c)^3$.
-We will now construct an $O(\frac{n}{2^{3c}} \cdot c)$ time test.
-We do this for $\log ^*n$ iterations until we get to $O(n/\log^{3}n)$ fragments of size at most $\log ^3n$, and have
-an $O(\frac{n \log \log n}{\log ^3n})$ time test. Since we do $\log ^*n$ iterations and linear time work for each
-iteration, the total preprocessing is in $O(n \log ^*n)$ time.
-
-We now describe one iteration of this process. Assuming we have obtained an $O(\frac{n}{b^3} \cdot \log b)$ time 
-test from the previous step, we now find a good partition of the tree with $O(n/B^{3})$ fragments of size at most $B^3$, 
-where $B=2^b$. We perform a heavy path decomposition on each fragment, and process the heavy
-path trees of all fragments bottom up and in parallel. The paths at lower levels have been processed so that each of them is
-reduced to a candidate and a certain node, and so each current path is a caterpillar, that we will now reduce to at most two nodes using Frederickson's method. As we have seen in Section \ref{sublinear f.t.}, after some processing, we can create a matrix 
-with linear number of rows and columns that contains all pairwise distances in such a caterpillar. As before, this is done by pruning the caterpillars so that the distances of leaves from the root and the hole are monotone, thus achieving a matrix that is row and column sorted. For any level of the heavy path decomposition the maximum side length of a matrix is $B^{3}$ (i.e. the parameter $n_j$ in Theorem \ref{Frederickson's theorem} is equal to $B^3$) and of total size of all matrices in the level is at most $n$ ($m=n$).
-We use Frederickson's search (Theorem~\ref{Frederickson's theorem}) with the parameter $p$ set to $\frac{n}{B^7}$. We thus need to use the
-test $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (B^{3}), \log(\frac{n}{n/B^{7}} \rbrace) = O(\log B)$ times, and additionally spend linear time exclusive of the feasibility tests. This allows us to eliminate all pairwise distances in the caterpillars of the heavy paths at the current level for most of the fragments. We proceed to compute the candidate and certain node of each path as we did before, and continue with the next level
-of the heavy path decompositions, until we are left with only the top heavy path of each fragment.
-Since $p>0$, during this preprocessing some fragments become active. Once a fragment becomes active we stop
-its preprocessing. Accounting for all the levels, we use $O(\log^{2}B)$ calls to the previous tests,
-which costs $O(\log ^2B \cdot \frac{n}{b^3} \cdot \log b)=O(\frac{n}{b} \cdot \log b)$. This sums to $O(n)$
-over all iterations.
-Additionally, in every iteration we spend linear time to construct a good partition, then find all heavy
-path decompositions, and finally for the Frederickson's search, so in total $O(n \log ^*n)$. 
-
-After the preprocessing is done, we have at most $\log B \cdot \frac{n}{B^7}\leq \frac{n}{B^{6}}$ active fragments (because we have not eliminated at most $p$ pairwise distances for each level), which we will process in $O(B^{3})$
-time each in the new test. For all other fragments we have obtained a pruned caterpillar, so that we can, in linear time, precompute the required information for any possible eliminated suffix as described in Subsection \ref{Pre-Processing Fragments}. We will process these inactive fragments in logarithmic time in the new test. Thus we have obtained an $O(\frac{n}{B^3} \cdot \log B)$ time test.
-
-We do this iteratively until we have an $O(\frac{n}{\log ^3n} \cdot \log \log n)$ time test, and then use it to
-solve the dispersion optimization problem in linear time (in the same manner as in each of the previous
-$\log ^*n$ iterations, this time with only one fragment of size $n$, and setting $p$ to zero).
-
 
 \section{A Sublinear Feasibility Test with \texorpdfstring{\boldmath$O(n)$}{O(n)} Preprocessing}\label{sectionLinear}
-
-
-In this section, given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with $O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
+The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test to get a sublinear one. We will now use a similar process, iteratively, with growing fragments size (starting from constant size and growing exponentially), improving in each iteration the performance of our feasibility test. Given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with $O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
 After $\log ^*n$ iterations requiring a total of $O(n)$ time, we will have a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time
 which we use to solve the dispersion optimization problem in $O(n)$. 
 
+Partitioning the input tree into fragments independently in each iteration would yield an $O(n \log ^* n)$ algorithm, since each partition would take $O(n)$ time. In order to obtain overall $O(n)$ time, we make each decomposition a refinement of the previous one, i.e. the fragments of the $(\ell+1)$-th partition (called large fragments) are composed of fragments of the $\ell$-th partition (called small fragments). We believe that this simple micro-macro variant is of independent interest. 
+%
+The main difficulty remaining is how to preprocess the fragments. We cannot afford to touch every node of every fragment at every decomposition level. Therefore, we take a closer look at how a (large) fragment decomposes into smaller fragments. 
+We show that a large fragment can be reduced to a concatenation of small caterpillars, each corresponding to a small fragment that we have already preprocessed. We then  carefully tailor these small caterpillars while reusing the results of their preprocessing. We show that this tailoring amortizes to $O(n)$ over all decompositions. This turns out to be quite technical. Due to space constrictions, the full description of the algorithm is in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
 
-In the previous section, we partitioned the input tree into fragments independently for each fragment size. This resulted in $\log^{*}n$ partitions, each preprocessed in $O(n)$ time. In order to obtain overall $O(n)$ time, we first introduce a dependency between the partitions: The fragments of the $(\ell+1)$-th partition (called large fragments) are composed of fragments of the $\ell$-th partition (called small fragments). The partitioning is simple and is given in Subsection~\ref{section:partioioning}.  
+
+
+\section{The Weighted Dispersion Problem}\label{section:weighted}
+We now consider the weighted variant of the dispersion problem, in which the edges have lengths and the nodes have weights. Recall that $f(P)=\min_{u,v\in P} \{d(u,v)\}$. The weighted dispersion problems are defined as follows.
+\begin{itemize} 
+\item {\em The Weighted Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, non-negative node weights, and a number $W$, find a subset of nodes $P$ of weight at least $W$, such that  $f(P)$ is maximized. 
+
+\item {\em The Weighted Dispersion Decision Problem.} Given a tree with non-negative edge lengths, non-negative node weights, a number $W$, and a number $\lambda$, find a subset of nodes  $P$ of weight at least $W$, such that $f(P)\geq\lambda$. 
+\end{itemize}
+
+
+In this section we present an $O(n\log n)$ time algorithm (feasibility test) for the weighted decision problem, and prove that it is optimal, by giving an $\Omega(n\log n)$ lower bound in the algebraic computation tree model.
+With the $O(n\log n)$ feasibility test in hand, we can apply the Frederickson's search technique on a set of
+matrices obtained from the centroid decomposition in $O(n\log n)$ time to solve the weighted optimization
+problem with $O(\log n)$ calls to the feasibility tests, so in $O(n\log^{2}n)$ total time\footnote{As we mentioned in the introduction, it is also possible to use Frederickson's $k$-th path algorithm \cite{Frederickson1983}, as was done by Bhattacharya and Houle \cite{Bhattacharya1991,Bhattacharya1999}, and achieve the same running time.}.
+
+\subsection{An \texorpdfstring{\boldmath$ \Omega (n\log n)$}{Omega(nlogn)} lower bound for the weighted feasibility test}
+
+In the {\em Set Disjointness} problem, we are given two sets of real numbers $X=\lbrace x_1,x_2,\ldots,x_n \rbrace$ and $Y=\lbrace y_1,y_2,\ldots,y_n \rbrace$ and we need to return true iff $X \cap Y = \emptyset$. 
+It is known that solving the set disjointness problem requires $\Omega(n \log n)$ operations in the algebraic
+computation tree model~\cite{BenOr}.
+We present a reduction from the set disjointness problem to the weighted feasibility test problem. We assume without loss of generality that the elements of $X$ and $Y$ are non-negative~\footnote{Otherwise
+we can simply find the minimum element, and subtract the minimum from all the elements.}.
+
+
+Given the two sets $X$ and $Y$, we construct a tree $T$ as follows. We first compute and set
+$K := 2 \cdot \max (X\cup Y) +3$.
+The tree $T$ contains two vertices of weight zero, $u$ and $v$, that are connected by an edge of length $\frac{K}{2}$. In addition, for each element $x_i \in X$, we have a node of weight $x_i+1$, that is connected to $u$ by an edge of length $\frac{K}{2} - x_i -1$. For each element $y_i \in Y$, we have a node of weight $K - y_i -1$, that is connected to $v$ by an edge of length $y_i+1$.
+\begin{lemma}\label{lemma of the reduction to set disjointness}
+$X \cap Y = \emptyset$ iff the weighted feasibility test returns false for $T$ with  parameters $W=K$ and $\lambda =K$.
+\end{lemma}
+
+The proof of the lemma can be found in Appendix~\ref{appendix proof of reduction lemma}.
+
+
+\subsection{An \texorpdfstring{\boldmath$O(n \log ^2 n)$}{O(nlog^2n)} algorithm for the weighted feasibility test}
+We now present an $O(n \log ^2 n)$ time algorithm for the weighted feasibility test, upon which we will base our optimal $O(n \log n)$ time weighted feasibility test.
+
+Similarly to the unweighted case, we would like to compute for each node of the tree, the subset of nodes $P$ in its subtree  s.t. $f(P) \geq \lambda$ and $W(P)$ is maximized. We compute this by going over the nodes of the tree bottom-up. Previously, the situation was simpler, as for any subtree we had just one candidate node (i.e., a node that may or may not be in the optimal solution for the entire input tree). This was true because nodes had uniform weights. This meant that amongst all nodes at distance at most $\lambda$ from the root we could keep as candidate only the farthest one. Now however, when nodes have non-uniform weights, it is not clear which nodes should be kept.
+
+Out of all the already chosen nodes in the subtree rooted at $v$, let $h$ be the node for which $d(h,v)$ is minimized. We call $h$ the {\em closest chosen node} in $v$'s subtree. In our weighted feasibility test, $v$ will store an optimal solution $P$ for any possible value of $d(h,v)$ (up to $\lambda$, since if the closest chosen node is farther, it does not affect nodes outside the subtree). That is, a subset of nodes $P$ in $v$'s subtree of maximum weight $W(P)$ s.t. the closest chosen node is at distance {\em greater or equal} to $d(h,v)$ from $v$, and $d(x_1,x_2) \geq \lambda$ for every  $x_1,x_2\in P$. 
+The values $W(P)$ can be viewed as a monotone polyline, since the weight of $P$ only decreases as the distance of the closest chosen node increases (from zero to $\lambda$). The weight of $P$ can only change at certain points called the {\em breakpoints} of the polyline. Each point of the polyline is a key-value pair, where the key is $d(h,v)$ and the value is $W(P)$. We store with each breakpoint the value of the polyline between it and the next breakpoint. I.e. for some pair of consecutive breakpoints with keys $a$ and $a+b$, we store in the first breakpoint the value of the polyline in the interval $[a,a+b)$. As a special case, the first breakpoint stores the value of the polyline in the interval $(0,a)$ (where $a$ is the key of the second breakpoint), and we store the value for key zero separately. We only store the breakpoints of a polyline in order to represent it.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.6]{polyline}
+\end{center}
+\caption{The polyline represents the weight of the optimal solution $P$ as a function of the distance of the closest chosen node in the subtree. %$v$ is the root of the subtree, and $h$ is the chosen node closest to $v$ in its subtree. 
+The weight of $P$ only decreases at certain points called breakpoints (in bold). Each breakpoint stores the value in the interval between itself and the next breakpoint.
+\label{figure of a polyline}}
+\end{figure}
+
+
+The algorithm computes such a polyline for the subtrees rooted at all the nodes of the tree. As we have mentioned, this computation is done bottom-up, and so in each step of the algorithm we compute the polyline for a subtree rooted at some node $v$, assuming that we have already computed the polylines for the subtrees rooted at $v$'s children. We will show how to achieve this step in time $O(x \log y)$, where $x$ is the number of breakpoints in the polyline with fewer breakpoints, and $y$ the number of breakpoints in the other polyline\footnote{For the same reasoning as in the unweighted case, we assume w.l.o.g. that the input tree is binary.}. This sums up to $O(n \log ^2 n)$ overall.
+
+
+When constructing a polyline, we need to consider several cases, as the closest chosen node $h$ in the subtree of $v$ could be $v$ itself, or it could be in the subtree of one of $v$'s children. This means that for any key $d(h,v)$ in the polyline, the value for that key can represent a solution $P$ in which $h$ is in the subtree rooted $v$'s left child, or in the subtree rooted $v$'s right child, or it could be $v$ itself.
+
+
+\paragraph{Constructing a polyline.} We now present a single step of the algorithm. We postpone the discussion of the data structure used to store the polylines for now, and first describe how to obtain the polyline of $v$ from the polylines of its children. Then, we state the exact interface of the data structure that allows executing such a procedure efficiently, show how to implement such an interface, and finally analyze the complexity of the resulting algorithm.
+
+If $v$ has only one child $u$ (we call $v$ a degree one node), then we build $v$'s polyline by querying $u$'s polyline for the case that $v$ is in the solution (i.e. query $u$'s polyline with distance of the closest chosen node being $\lambda-d(v,u)$), and add to this value the weight of $v$ itself. We then construct the polyline by taking the value we got (which will be the value for $d(h,v)=0$) and merging it with the polyline computed for $u$, shifted to the right by $d(v,u)$ (since we now measure the weight of the solution as a function of the distance of the closest chosen node to $v$, not to $u$). The value between zero and $d(v,u)$ will be the same as the value of the first interval in the polyline constructed for $u$, so the shift is actually done by increasing the keys of all but the first breakpoint by $d(v,u)$.
+
+If $v$ has two children  (we call $v$ a degree two node), denote its left child by $u_1$ and its right child by $u_2$. We have two polylines that represent the solutions inside the subtrees rooted at $u_1$ and $u_2$ (denoted by $p_1$ and $p_2$, respectively), and we want to create the polyline for the subtree rooted at $v$ (denoted by $p$).
+Assume w.l.o.g. that the number of breakpoints in $p_1$ is smaller or equal to the number of breakpoints in $p_2$\footnote{Note that if one of $v$'s children is at distance greater or equal to $\lambda$, the situation is simpler. Suppose that $d(v,u_1) \geq \lambda$. We can compute the polyline for $v$'s subtree as if it were a degree one node, ignoring $u_1$, and then simply increase all the values of the resulting polyline by the value of $p_1$ for key zero.}.
+
+We begin with computing the value of $p$ for key zero. Consider the case where $v$ is in the solution (i.e., $h=v$). In this case we query $p_1$ and $p_2$ for their values with keys $\lambda - d(v,u_1)$ and $\lambda - d(v,u_2)$ respectively (if one of these is negative, we take zero instead), and add them together with the weight of $v$. Another possible case is that there is a better solution (i.e. a subset with greater weight) for the subtree rooted at $v$, where $v$ is not included in the solution. For this we need to check, after constructing the rest of the polyline, whether the value stored at the first breakpoint is greater than the value we computed for the case $v$ is chosen. If so, we store the value of the first breakpoint also as the value for key zero.
+
+We now show how to construct the rest of the polyline $p$. Notice that we need to maintain that $d(h_1,h_2) \geq \lambda$ (where $h_1$ is the closest chosen node in $u_1$'s subtree and $h_2$ is the closest chosen node in $u_2$'s subtree). We proceed in two steps, each computing half of the polyline $p$.
+
+\subsubsection{Constructing the second half of the polyline.} We start by constructing the second half of the polyline, where $d(h,v) \geq \frac{\lambda}{2}$. In this case we query both polylines ($p_1$ and $p_2$) with the same key, since $d(h_1,v) \geq \frac{\lambda}{2}$ and $d(h_2,v) \geq \frac{\lambda}{2}$ implies that $d(h_1,h_2) \geq \lambda$. The naive way to proceed would be to iterate over the second half of both polylines in parallel, and at every point sum the values of the two polylines to get the value of the new polyline. This would not be efficient enough. Therefore, instead of iterating over $p_2$ (the larger polyline) we iterate over all the breakpoints in the second half of $p_1$ (the smaller polyline). These breakpoints induce intervals of $p_2$. For each of these intervals we increase the value of $p_{2}$ by the value in the interval in $p_1$ (see Figure~\ref{figure of constructing the second half of the polyline}). For this we might need to insert some of the breakpoints from $p_1$ if there is no such breakpoint already in $p_2$. Thus, we have obtained the second half of the monotone polyline $p$ by modifying the second half of the monotone polyline $p_{2}$.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=.55]{new_polyline_second_half}
+\end{center}
+\caption{Constructing the second half of the polyline $p$ (in blue). The black polyline is $p_2$. The breakpoints inserted from $p_1$ are in red. In each interval (between consecutive red lines) we raise the polyline by the value in $p_1$.
+\label{figure of constructing the second half of the polyline}}
+\end{figure}
+
+\subsubsection{Constructing the first half of the polyline.} We need to consider two possible cases: first, the case where $d(h_1,v) < d(h_2,v)$ (i.e. the closest chosen node in $v$'s subtree is inside $u_1$'s subtree), and second, the case where $d(h_1,v) > d(h_2,v)$\footnote{Note that in this half of the polyline $d(h,v)<\frac{\lambda}{2}$, and therefore $d(h_1,v) \neq d(h_2,v)$.}. For each of the two cases we will construct the first half of the polyline, and then we take the maximum of the two polylines at every point, in order to have the optimal solution for each key.
+
+\paragraph{Case I: \boldmath$d(h_1,v) < d(h_2,v)$.} Since we are only interested in the first half of the polyline, we know that $d(h_1,v) < \frac{\lambda}{2}$. Since $d(h_2,v) +d(h_1,v)\geq \lambda$ we have that  $d(h_2,v) > \frac{\lambda}{2}$. A naive algorithm could therefore iterate over $p_1$ (from zero up to to $\frac{\lambda}{2}$) while iterating over $p_2$ (from $\lambda$ down to $\frac{\lambda}{2}$) and sum the values of the two. Again, we cannot afford to iterate over the breakpoints of $p_2$, so we need to be more subtle.
+
+We start by splitting $p_1$ at $\frac{\lambda}{2}$ and taking the first half (denoted by $p_1'$). We then split $p_2$ at $\frac{\lambda}{2}$ and take the second half (denoted by $p_2'$). Consider two consecutive breakpoints of $p_1'$ with keys $x$ and $x+y$. For any key $x'$, s.t. $x \leq x' < x+y$, we would like to compute the value of $p_2'$ for the key $\lambda-x'$, and add it to the value of $p_1'$ for the key $x'$. Notice that here we query $p_2'$ with keys $y'$ s.t. $\lambda -x -y < y' \leq \lambda-x$. If we were to actually increase the values of $p_1'$ in such a way, we would obtain a polyline that is not monotonically decreasing, that is, does not account for the fact that for a key $x$ we want the maximum weight $W(P)$ s.t. the closest chosen node is at distance \emph{at leas}t $x$. Therefore, we would have to further prune the polyline by setting the value for each key $x$ to be the maximum value over all keys $x' \geq x$.
+Instead, we can just as well increase the value of $p_{1}'$ in $[x,x+y)$ by the maximal value of $p_{2}'$ in $(\lambda-x-y,\lambda-x]$. Since $p_2'$ is monotonically decreasing, the maximal value will be at the minimal key. This value can be found by a predecessor query on $p_2'$ with key $\lambda-x-y$. Overall, we need to iterate over $p_1'$, and for every pair of consecutive breakpoints with keys $x$ and $x+y$, we add the value of $p_2'$ for key $\lambda-x-y+\epsilon$ to the value stored in the breakpoint of $p_1'$ with key $x$.
+Still, this process might result in a polyline which is not monotonically decreasing, because as we go over the intervals of $p_1'$ from left to right we increase the values there more and more. See Figure~\ref{figure of constructing the first half of the polyline case 1}.
+To complete the construction, we make the polyline monotonically decreasing by scanning it from $\frac{\lambda}{2}$ to zero and deleting unnecessary breakpoints. The time this takes is bounded by the number of breakpoints in $p_{1}$.
+Note that in the above description we have assumed that we have access to the original data structure representing $p_{2}$, but this structure has been already modified to obtain the second half of $p$. However, we started with computing the second half of $p$ only to make the description simpler, and we can simply start with the first half.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.8]{polyline_first_half_construction_case1}
+\end{center}
+\caption{Case I of constructing the first half of the polyline. $p_1'$ (in black) is the first half of $p_1$, $p_2'$ (in blue) is the second half of $p_2$. The red polyline is the result of increasing the values of $p_1$ in the interval between $x$ and $x+y$ by the appropriate values of $p_2'$. The result is non-monotone, so we actually need to increase by the maximal value, i.e. the value of $p_2'$ at $\lambda-x-y+\epsilon$.\label{figure of constructing the first half of the polyline case 1} 
+}
+\end{figure}
+
+\paragraph{Case II: \boldmath$d(h_1,v) > d(h_2,v)$.}
+Symmetrically to the previous case, we can iterate over the first half of $p_2$ and the second half of $p_1$ while increasing values in the intervals of $p_2$ induced by the breakpoints of $p_1$ by the appropriate values of $p_{1}$. Again, the resulting polyline may be non-monotone, but this time we cannot solve the problem as in the previous case (i.e., by scanning the new polyline and deleting breakpoints), since the number of breakpoints in the new polyline is at least as large as the number of breakpoints of $p_2$. Instead, we go over the breakpoints of the second half of $p_1$ from right to left. For each such breakpoint  with key $x$, we find the {\em value} of key $\lambda - x$ in the new polyline. These are the points where we might have increased the value of $p_2$. Denote this value by $y$. We then query the new polyline with a \emph{value predecessor} query: this returns the breakpoint   with the largest key s.t. its key is smaller than $\lambda - x$ and its value is at least $y$. 
+%
+If this breakpoint exists, then the values of the new polyline between its successor breakpoint and $\lambda - x$ should all be $y$ (i.e. we delete all breakpoints in this interval except for the first one whose value we set to $y$). % (if it is the predecessor of $x$ in the list of breakpoints, then this is already the case).
+If it does not exist, then the values between zero and $\lambda - x$ should be $y$ (i.e. we delete all the previous breakpoints). 
+This ensures that the resulting polyline is monotonically decreasing. 
+See  Figure~\ref{figure of the second case in the construction of the first half of the polyline}.
+
+
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.6]{polyline_first_half_construction_case2}
+\end{center}
+\caption{Case II of constructing the first half of the polyline. The first half of $p_2$ is in blue. The vertical black dashed lines are the breakpoints of $p_1$. We increase the values of $p_{2}$ and obtain the red polyline, which is not monotone. To make it monotone, we delete all the breakpoints below the green intervals, which are found with value predecessor queries (the results of these queries are the bold points).\label{figure of the second case in the construction of the first half of the polyline}
+}
+\end{figure}
+
+\paragraph{Merging cases I and II.}
+We now need to build one polyline for the first half of the polyline, taking into account both cases. Let $p_a$ and $p_b$ denote the polylines we have constructed for the two cases, and assume w.l.o.g that $p_a$ is smaller. We first need to shift $p_a$ and $p_b$ to the right by $d(v,u_1)$ and $d(v,u_2)$ respectively, because we want to measure the distance of $h$ from $v$, not from $u_1$ or $u_2$. As we have described for the case where $v$ has one child, this shift is done by increasing the keys of all but the first breakpoint of each of the two polylines.
+
+We now need to take the maximum of the values of $p_a$ and $p_b$, for every key smaller than $\frac{\lambda}{2}$. We do this by finding the intersection points of the two polylines. Notice that since both polylines are monotonically decreasing, these intersections can only occur at (i) the breakpoints of $p_a$, (ii) at most one point between two consecutive breakpoints of $p_a$. We iterate over $p_a$ and, for every pair of consecutive breakpoints, we check which polyline has the higher value at both points. If the answer for both points is the same, we carry on. Otherwise, there must be a single intersection point of the two polylines inside this interval. We find this intersection by running a value predecessor query on $p_b$, with the key being the right endpoint of the interval. After such computation, we know which polyline gives us the best solution for every point between zero and $\frac{\lambda}{2}$, and where are the intersection points where this changes. We can now build the new polyline by doing insertions and deletions in $p_b$ according to the intersection points: For every interval of $p_b$ defined by a pair of consecutive intersection points, we check if the value of $p_a$ is larger than the value of $p_b$ in the interval, and if so, delete all the breakpoints of $p_b$ in the interval, and insert the relevant breakpoints from $p_a$. This can be viewed as deleting all breakpoints in an interval of $p_b$, and then inserting breakpoints between the endpoints of this interval (the endpoints are now consecutive breakpoints, since we have deleted the breakpoints that were between them). Since the intersection points can only be at the breakpoints of $p_a$, and at most at one breakpoint of $p_b$ between two consecutive breakpoints of $p_a$, the number of intersection points is linear in the number of breakpoints of $p_a$ (which is linear in the number of breakpoints of $p_1$), and so, the total number of interval deletions and insertions is linear in the number of breakpoints of $p_1$.
+%TODO Add figure for this merging procedure?
+
+To conclude, the final polyline $p$ is obtained by concatenating the value computed for key zero, the polyline computed for the first half, and the polyline computed for the second half. 
+
+
+\subsubsection{The polyline data structure} We now specify the data structure for storing the polylines. The required interface is:
+\begin{enumerate}
+\item \label{op1} Split the polyline at some key.
+\item \label{op2} Merge two polylines (s.t. all the keys in one polyline are smaller than all keys in the other).
+\item \label{op3} Retrieve the value of the polyline for a certain key $d(h,v)$.
+\item \label{op4}Return a sorted list of the breakpoints of the polyline
+\item \label{op5} Batched interval increase -- Given a list of disjoint intervals of the polyline, and a number for each interval, increase the values of the polyline in each interval by the appropriate number. Each interval is given by the keys of its endpoints.
+\item \label{op6} Batched value predecessor -- Given a list of key-value pairs, $(k_i,v_i)$, find for each $k_i$, the maximal key $k_{i}'$, s.t. $k_{i}' < k_i$ and the value of the polyline at $k_{i}'$ is at least $v_i$.
+\item \label{op7} Batched interval insertions -- Given a list of pairs of consecutive breakpoints in the polyline, insert between each pair a list of breakpoints.
+\item \label{op8} Batched interval deletions -- Given a list of disjoint intervals of the polyline, delete all the breakpoints inside the intervals.
+\end{enumerate}
+
+We now show how to use some standard techniques to implement the required operations, and achieve $O(n \log ^2 n)$ time for our weighted feasibility test.
+We represent a polyline by storing its breakpoints in an augmented 2-3 tree, where the data is stored in the leaves. Each node of the tree stores a key-value pair, and we maintain the following property: the key of each breakpoint is the sum of the keys of the corresponding leaf and of all its ancestors, and similarly for the values. In addition, we store in each node the maximal key and the maximal value of a leaf in its subtree. More precisely, the maximal key is the largest sum of keys on a path from the node to a leaf in its subtree, and similarly for the maximal value. We also store in each node the number of leaves in its subtree.
+
+We now describe the implementation of each operation. We denote the number of breakpoints of $p_1$ (the smaller polyline) by $x$, and the number of breakpoints of $p_2$ (the larger polyline) by $y$ (i.e. $x \leq y$). Note that the input for all four batched operations is given in sorted order (by keys).
+
+ Operations~\ref{op1} and~\ref{op2} can use standard split and join procedures for 2-3 trees in logarithmic time. 
+ Operation~\ref{op3} can be done by running a predecessor query and returning the value at the returned breakpoint in logarithmic time.
+ Operation~\ref{op4} is done by an inorder traversal of the tree. 
+Operations~\ref{op1}-\ref{op3} are performed only a constant number of times per step\footnote{Note that Operation \ref{op3} is used inside the batched operations more than a constant number of times, but this will be accounted for separately.}, and so their total cost is logarithmic (i.e. $O(\log x + \log y)$). Operation~\ref{op4} is also performed a constant number of times to iterate over the breakpoints of $p_{1}$ (in $O(x)$ time). The next four operations are more costly, since each of them is comprised of a batch of $O(x)$ operations on a tree of size $O(y)$.
+
+Operation~\ref{op5} is done by iterating over the intervals. For each interval, we find its left endpoint, and traverse the path from the left endpoint, through the lowest common ancestor (LCA), to the right endpoint.
+The traversal is guided by the maximal keys stored at the nodes. More precisely, we need to access the maximal key of a breakpoint corresponding to a leaf in a subtree of the current node. This can be obtained from the maximal key stored at the current node if we maintain during the traversal the sum of all keys on the path from the root to the current node (excluding the current node itself). This quantity can be easily maintained in constant time while moving to a child or the parent. 
+While traversing the path from the left endpoint to the LCA (from the LCA to the right endpoint), we increase the value of every node hanging to the right (left) of this path. We also update the maximal value field in each node we reach (including the nodes on the path from the LCA to the root). Notice that if one of the endpoints of the interval is not in the structure, we need to insert it. We might also need to delete a breakpoint if it is a starting point of some interval and its new value is now equal to the value of its predecessor. Overall, Operation~\ref{op5} takes time which is linear in the number of traversed nodes, plus the cost of insertions and deletions (whose number is linear in the number of intervals). Because the depth of a 2-3 tree of size $O(y)$ is $O(\log y)$, the total number of visited nodes and hence total time is $O(x \log y$).
+
+%\begin{figure}[h]
+%\begin{center}
+%\includegraphics{interval_increase}
+%\end{center}
+%\caption{A single interval increase. The red path is the path between the endpoints of the blue interval. The red nodes are all the children of nodes on the red path that are ancestors of leaves in the blue interval. In order to increase the values of all the breakpoints in the blue interval, we increase the values of the red nodes. We then traverse the path from the LCA of the endpoints of the interval to the root, and update the maximum value field.}
+%\end{figure}
+
+Operation~\ref{op6} is done by first finding $k_i$ (or its predecessor, if there is no breakpoint at $k_i$). Then, we go up the path in the tree until the maximum value of a breakpoint corresponding to a leaf in the subtree hanging to the left of the path is at least $v_i$. We then keep going down to the rightmost child that has at least $v_i$ as the maximum value of a breakpoint corresponding to a leaf in its subtree. The overall runtime is $O(x \log y)$ since each value predecessor query takes $O(\log y)$ time.
+
+Operation~\ref{op7} is done with standard insertion to 2-3 trees, while updating the subtree maximum fields. We insert at most $O(x)$ new breakpoints, so this operation takes $O(x \log y)$ time.
+
+Operation~\ref{op8} is done by performing, for each interval deletion, a standard split and join on 2-3 trees in $O(\log y)$ time (while maintaining the additional information in every node). This takes $O(x \log y)$ time overall.
+
+%, we do the same traversal as we did for interval increase, and instead of increasing the keys of the roots of subtrees as we did there, we delete these subtrees. We delete a subtree by disconnecting its root, and do the required balancing operations at the end of the operation, after deleting all the subtrees. Recall that when we delete a node from a 2-3 tree, we rebalance the tree by simply making sure we are not left with a "1-node" (i.e. a node with only one child), while maintaining the invariant that all the leaves have the same depth. For a regular deletion, we achieve this by either doing some local rearrangement that solves the problem, or by fusing the 1-node with its brother, and moving the problem up the tree. In our case, we start the rebalancing at each of the endpoints of the interval, and move up to the LCA In our case. During this process , we might encounter a situation that cannot occur for a regular 2-3 tree, where we have a 1-node that is the child of another 1-node.
+
+\begin{lemma} \label{nlog^2n running time for weighted f.t. lemma}
+The above implementation implies an $O(n \log ^2 n)$ weighted feasibility test.
+\end{lemma}
+
+The proof of the lemma can be found in Appendix~\ref{appendix proof of nlog^2n lemma}.
+
+
+\subsection{An \texorpdfstring{\boldmath$O(n \log n)$}{O(nlogn)} algorithm for the weighted feasibility test}\label{section:data structure}
+In this section, we improve the complexity of our weighted feasibility test by implementing the interface we use for operations on polylines more efficiently. Namely, we next show how to speed up the batched operations (operations \ref{op5}-\ref{op8}) from $O(x \log y)$ to $O(x \log (\frac{2y}{x}))$ and then show that this implies an  $O(n \log n)$ feasibility test. 
+
+\paragraph{Operation~\ref{op5} -- batched interval increase.}
+In the previous section we performed each interval increase by traversing the path between the interval's endpoints. This took $O(\log y)$ time since we performed the operations on a balanced tree with $y$ leaves. We would like to perform the operations on smaller trees. The operation therefore begins by splitting the tree into $O(x)$ smaller trees, each with $O(\frac{y}{x})$ leaves. This is done by recursively splitting the tree, first into two trees with $O(\frac{y}{2})$ leaves, then we split each of these trees into two trees with $O(\frac{y}{4})$ leaves, and so on, until we have trees of size $O(\frac{y}{x})$. We then increase the values in the relevant intervals using the small trees. For this, we scan the roots of the small trees, searching for the left endpoint of the first interval. We can check whether the left endpoint is in some tree by using the maximal value stored in the root. Once we have found the left endpoint of the interval, we check if the right endpoint of the interval is in the same tree or not (again, using the maximal value). In the first case, the interval is contained in a single tree, and can be increased in this tree in time $O(\log(\frac{y}{x}))$ using the procedure described in the previous subsection. In the second case, the interval spans several trees, and so we need to do an interval increase in the two trees containing the endpoints of the interval, and additionally increase the value stored in the root of every tree that is entirely contained in the interval. We then continue to the next interval, and proceed in the same manner. 
+%
+Since the intervals are disjoint and we do at most two interval increases on small trees per interval, the total time for the increases in the small trees is $O(x \cdot \log (\frac{y}{x}))$. We also scan the roots of the small trees while checking (in constant time) if the endpoint of the interval is in this small tree. This only adds $O(x)$ to the complexity, leading to 
+ $O(x \cdot \log (\frac{y}{x}) + x) = O(x \log (\frac{2y}{x}))$ overall for processing the small trees.
+ 
+Before the operation terminates, we still need to merge the small trees back into one large tree. We do this using join operations, symmetrically to how we obtained the small trees by splitting. Let us consider the time it takes to obtain the small trees by splitting. We start with a tree that has $y$ leaves, select the middle leaf by traversing from the root and using the number of leaves stored in every node of the tree, and the split the tree into two in $O(\log y)$ time. Then split the resulting two trees in $O(\log(\frac{y}{2}))$ time each, and so on. The cost of this process sums up to:
+\begin{align*}
+ \sum_{i=0}^{\log (\frac{x}{2})} 2^i \cdot \log (\frac{y}{2^i}) & = \sum_{i=0}^{\log (\frac{x}{2})} 2^i \cdot \log y - \sum_{i=0}^{\log (\frac{x}{2})} 2^i \cdot \log (2^i)  \\
+& \leq x \log y - 2 \cdot (2^{ \log ( \frac{x}{2})} \cdot \log ( \frac{x}{2}) - 2^{ \log ( \frac{x}{2})}+1)  \\
+%& = x \log y  -  x \log (\frac{x}{2}) + x - 2 \\ 
+&= x \log (\frac{2y}{x}) + x -2 \\
+& = O(x \log (\frac{2y}{x})) .
+\end{align*}
+The cost of all joins required to patch the small trees together can be bounded by the same calculation, and so the operation takes $O(x \log (\frac{2y}{x}))$ time in total.
+
+\paragraph{Operation~\ref{op6} -- batched value predecessor.}
+As in Operation~\ref{op5}, we first split the tree into small trees with $O(\frac{y}{x})$ leaves and operate on these small trees. We would like to iterate over the given keys and for each $k_{i}$ find its value predecessor $k_i'$. However, now the intervals defined by the pairs $(k_i',k_i)$ are not necessarily disjoint and so we need to be more careful as to not scan over the root of a small tree multiple times.
+
+Recall that we had two uses for the batched value predecessor operation. The first was to prune the non-monotone polyline we have obtained by increasing the intervals of $p_2$ (the larger polyline) induced by the breakpoints of $p_1$ (see Figure~\ref{figure of the second case in the construction of the first half of the polyline}). The pruning is done by deleting the intervals returned by this operation.
+%
+Consider two consecutive keys $k_1$ and $k_2$ ($k_1 \leq k_2$) for which we would like to find their value predecessors $k_1'$ and $k_2'$. If the value of the polyline at $k_1$  is greater or equal to the value  of the polyline at $k_2$, then certainly $k_1 \leq k_2'$, and the intervals are in fact disjoint. Else, the intervals might not be disjoint, but we know that $k_1' \geq k_2'$, and so the interval $(k_1',k_1)$ is contained in the interval $(k_2',k_2)$. Thus, deleting the second interval is enough, meaning that we do not need to run the value predecessor query for $k_1$ at all. Generalizing this observation, before running the value predecessor queries, we can remove keys from the input list
+so that the values of the remaining keys are  monotonically decreasing, in $O(x)$ time\footnote{In this case the values of the polyline at $k_1$ and $k_2$ are in fact $v_1$ and $v_2$ which are given as input, so we don't have to query for them. These values are obtained during the interval increases which precede this pruning of the non-monotone polyline.}. 
+% by scanning them from left to right while maintaining the remaining keys on a stack.
+We can then answer value predecessor queries for this pruned list of keys using our small trees with $O(\frac{y}{x})$ leaves. We process the keys from right to left while simultaneously scanning the small trees (also from right to left). To process a pair $(k_{i},v_{i})$ we first locate the rightmost small tree containing a key not exceeding $k_{i}$. This is done by moving to the previous small tree as long as necessary. Then, we continue moving to the previous small tree as long as the maximal value stored at the root is smaller than $v_{i}$. Once we find the appropriate small subtree, we run a value predecessor query on it (as described in the previous subsection). 
+%
+Therefore, we search for the value predecessor of each key in one small tree in $O(\log(\frac{y}{x}))$ time,
+and additionally sweep through $O(x)$ roots, so the cost is $O(x \log (\frac{2y}{x}))$. We finish by merging the small trees back into one large tree (as in Operation \ref{op5}) which also takes $O(x \log (\frac{2y}{x}))$ time, and so this is also the time complexity of the entire operation.
+
+The second use of this operation was to find the intersection points of two polylines. In this case it is easy to see that the intervals $(k_i',k_i)$ are in fact disjoint, since we query with the keys of the breakpoints of one of the polylines only when there must be an intersection point between this breakpoint and the previous one, and so we do not need any pruning.
+
+\paragraph{Operation~\ref{op7} -- batched interval insertions.}
+Again, we split the tree into small trees with $O(\frac{y}{x})$ leaves. Additionally, for each list of breakpoints that should be inserted between a pair of consecutive breakpoints stored in the same small tree, we split that small tree between these consecutive breakpoints.
+% This can be done by scanning the list of breakpoints to be inserted from left to right, while scanning the roots of the small trees. 
+Since we have at most $x$ such extra splits, each of which takes $O(\log(\frac{y}{x}))$ time, the total time for this is $O(x\log(\frac{2y}{x}))$. We now have $O(x)$ small trees with $O(\frac{y}{x})$ leaves, such that every breakpoint
+that should be inserted falls between two small trees.
+Then, for every such breakpoint we create a small tree containing just a single leaf corresponding to that
+breakpoint. Therefore, we have $O(x)$ small trees with $O(\frac{y}{x})$ leaves that should be now merged
+to obtain one large tree (some of these small trees might be much smaller, of course).
+The merging is done using the same method as in batched interval increase, that is, we first merge the small
+trees into pairs to form $O(\frac{x}{2})$ trees with $O(2\cdot\frac{y}{x})$ leaves, then we merge the resulting
+trees to form $O(\frac{x}{4})$ trees with $O(4\cdot\frac{y}{x})$ leaves, and so on. The total cost can be bounded,
+up to a constant factor, by essentially the same calculation, thus we obtain $O(x \log(\frac{2y}{x}))$ time.
+
+\paragraph{Operation~\ref{op8} -- batched interval deletions.}
+Once again we split our tree into small trees. We then delete the relevant intervals from each of the small trees. Each interval is either contained in a single small tree (and is then deleted by performing one or two split operations and at most one join operation) or it spans several small trees (in which case it is deleted by performing two split operations on the trees containing the interval's endpoints, and maybe deleting some trees entirely). Similarly to Operation~\ref{op5}, this costs $O(x \log(\frac{y}{x}) +x) = O(x \log(\frac{2y}{x}))$ in total.
+
+\begin{theorem}\label{nlogn weighted f.t. theorem}
+The above implementation implies an $O(n \log n)$ weighted feasibility test.
+\end{theorem}
+The proof of the theorem can be found in Appendix \ref{appendix proof of nlogn theorem}.
+
+\bibliography{dispersion}
+
+\newpage
+\appendix
+
+\section{Missing proofs}
+
+\subsection{Proof of correctness for the linear time feasibility test in the unweighted case}\label{appendix proof of correctness for linear f.t.}
+\begin{proof}[\unskip\nopunct]
+We will prove the correctness of the algorithm by proving that Invariant \ref{Maximality of P and distance of closest node invariant} holds for every step of the algorithm.
+
+Let us observe some node of the tree $r$, and prove that the invariant holds for it, assuming that it holds for its children, $r_{1},r_{2},\ldots,r_{k}$. Assume for contradiction that $P'$ is a subset of the vertices of $T_r$, s.t. $f(P')\geq\lambda$ and $|P'| > |P|$. Let us look at the two possible cases:
+\begin{enumerate}
+\item \textbf{\boldmath$P'$ has more certain nodes w.r.t \boldmath$r$ than \boldmath$P'$}: All certain nodes w.r.t $r$, are in subtrees rooted at children of $r$, and so there must be some child of $r$, $r_i$, s.t. $P'_{r_i}$ has more certain nodes w.r.t $r$ than $P_{r_i}$ (where $P'_{r_i}$ is $P'$ restricted to $T_{r_i}$). This can only be if $|P'_{r_i}| > |P_{r_i}|$, or if the closest node to $r_i$ in $P'_{r_i}$ is farther than the closest node in $P_{r_i}$, and so the invariant does not hold for $r_i$.
+\item \textbf{\boldmath$P'$ has the same number of certain nodes w.r.t \boldmath$r$ as \boldmath$P$, but \boldmath$P'$ has a candidate w.r.t \boldmath$r$  and \boldmath$P$ does not}: Denote the candidate node of $P'$ by $u$. We have two possible cases. First, if $u=r$, then there is some node $v \in P$ s.t. $d(u,v)<\lambda$. Assume that $v$ is in the subtree rooted at $r_i$. In this case, either $|P'_{r_i}| \geq |P_{r_i}|$ and the closest node to $r_i$ in $P'_{r_i}$ is farther than the closest node in $P_{r_i}$, and the invariant does not hold for $r_i$, or $|P'_{r_i}|<|P_{r_i}|$ and so there must be some $r_j$ s.t. $|P'_{r_j}|>|P_{r_j}|$, and the invariant does not hold for $r_j$. Second, if $u$ is in one of the subtrees rooted at children of $r$, since all certain nodes w.r.t $r$ are also in these subtrees, there must be one such subtree, $r_l$ s.t. $|P'_{r_l}| > |P_{r_l}|$, and so the invariant does not hold for it.
+\end{enumerate} 
+Thus we have proven that $P$ is of maximal cardinality. Now, assume for contradiction that $P'$ is a subset of the vertices of the subtree rooted at $r$, s.t. $f(P')\geq\lambda$ and $|P'| = |P|$, but the closest node to $r$ in $P$ (denoted by $u$) is closer to $r$ than the closest node to $r$ in $P'$. Assume that $u \neq r$ and denote by $T_{r_i}$ the subtree that $u$ is in. Thus, either $|P'_{r_i}| = |P_{r_i}|$, but the closest vertex to $r_i$ in $P'_{r_i}$ is farther away from $r_i$ than $u$, which means the invariant does not hold for $T_{r_i}$, or $|P'_{r_i}| < |P_{r_i}|$, and it makes up for it in some other subtree where the invariant does not hold. If $u=r$, then since $|P'| = |P|$, there must some child of $r$, $r_i$, s.t. $|P'_{r_i}| > |P_{r_i}|$, and so the invariant does not hold for $r_i$. We have proven that Invariant \ref{Maximality of P and distance of closest node invariant} holds for every node of the input tree, and thus proven the correctness of the algorithm. \end{proof}
+
+
+\subsection{Proof of Lemma~\ref{basic partitioning lemma}}\label{appendix proof of basic partitioning lemma}
+\begin{lemma}
+For any binary tree on $n$ nodes and a parameter $b$, there is a good partition of the tree.
+\end{lemma}
+\begin{proof}
+We prove the lemma by construction. Call a node \textit{large} if the size of its subtree is at least $b$
+and \textit{small} otherwise. Consider the tree $T_L$ induced by the large nodes of the original tree. 
+For each leaf $u\in T_{L}$, we make each of its children in the original tree a new fragment with no holes.
+Each leaf of leaf of $T_{L}$ is the root of a subtree of size at least $b$ in the original tree, and these subtrees
+are all disjoint, so we have at most $n/b$ leaves in $T_{L}$. Each of them creates up to two fragments
+since the tree is binary, and each of these fragments is of size at most $b$ by definition.
+The natural next step would be to keep cutting off maximal fragments of size $b$ from the remaining
+part of the tree. This does not quite work, as we might create fragments with more than two boundary
+nodes with such a method.
+Therefore, the next step is to consider every branching node in $T_{L}$ instead, and make it a fragment
+consisting of just one node. This also creates up to $n/b$ fragments, since in any tree the number of
+branching nodes is at most the number of leaves.
+Ignoring the already created fragments, we are left with large nodes that form unary chains in $T_{L}$.
+Each of these nodes might also have an off-chain child that is a small node. We have $O(n/b)$ of these chains
+(because each of them corresponds to an edge of a binary tree on at most $n/b$ leaves).
+We scan each of these chains bottom-up and greedily cut them into fragments of size at most $b$.
+Denoting the size of the $i$-th chain by $b_{i}$, and the number of chains by $k$, the number of fragments created in this phase is
+bounded by $$\sum_{i=1}^{k} \left\lceil \frac{b_i}{b} \right\rceil \leq n/b+k=O(n/b).$$
+In total we have created $O(n/b)$ fragments, and each of them is of size at most $b$.
+%By adjusting $b$ we can obtain up to $n/b$ fragments, each of size $O(n)$.
+\end{proof}
+
+
+\subsection{Proof of Lemma~\ref{lemma of the reduction to set disjointness}}\label{appendix proof of reduction lemma}
+\begin{lemma} %TODO change the lemma number
+$X \cap Y = \emptyset$ iff the weighted feasibility test returns false for $T$ with  parameters $W=K$ and $\lambda =K$.
+\end{lemma}
+
+\begin{proof}
+We start by proving that if $X \cap Y \neq \emptyset$ then there is a subset of the vertices of the tree, $P \subseteq T$, s.t. $W(P) \geq K$ and $f(P) \geq K$ (where $W(P)$ is the sum of the weights of all the vertices in $P$). Suppose that  $x_i=y_j$. Then, $d(x_i,y_j) = d(x_i,u) + d(u,v) + d(v,y_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} + y_j +1 = K \geq K$. Furthermore, $W(x_i) + W(y_j) = x_i + 1 + K- y_j -1 = K \geq K$, and so the feasibility test should return true due to $P = \lbrace x_i, y_j \rbrace$.
+
+Now we need to prove that if the feasibility test returns true, the sets are not disjoint.
+We start by proving that any feasible subset $P$ cannot have more than one vertex from each of the sets.
+Assume for contradiction that $P'$ is a feasible subset that contains at least two vertices that correspond to elements of $X$. Denote these two vertices by $x_i$ and $x_j$. We assume that $P'$ is a feasible solution, and so $d(x_i,x_j) \geq K$. But, $d(x_i,x_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} - x_j -1 = K - x_i - x_j -2 < K$ (since $x_i$ and $x_j$ are non-negative) and we have a contradiction.
+If $P'$ contains two elements of $Y$, denoted $y_{i}$ and $y_{j}$, we also obtain a contradiction because
+$d(y_{i},y_{j})=y_{i}+1+y_{j}+1<K$.
+Observe that it is also not possible for $P$ to contain only one node, since the weight of any node is strictly less than $K$. So, we now only need to prove that if $P= \{ x_i,y_j \}$ is a feasible solution, then $x_i = y_j$.
+If $P= \{ x_i,y_j \}$ is a feasible solution then on the one hand $d(x_i,y_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} + y_j +1 = K - x_i + y_j \geq K$, implying that $y_j \geq x_i$. On the other hand, $W(P) = x_i + 1 + K - y_j -1 = K + x_i - y_j \geq K$, implying that $x_i \geq y_j$. We conclude that $x_i = y_j$.
+\end{proof}
+
+\subsection{Proof of Lemma~\ref{nlog^2n running time for weighted f.t. lemma}}\label{appendix proof of nlog^2n lemma}
+\begin{lemma} 
+The above implementation implies an $O(n \log ^2 n)$ weighted feasibility test.
+\end{lemma}
+
+\begin{proof}
+
+The running time of the algorithm is the sum of running times required for constructing the polylines of the subtrees rooted at each node of the tree.
+%
+Notice that the number of breakpoints in the polyline of a subtree is at most the number of nodes in this subtree. This is because every breakpoint corresponds to some node that was in the solution becoming too close to the root to be still included.
+
+For any degree one node, constructing its polyline is done with one query to the polyline of its child, and an increase of the keys of all but the first breakpoint (which can be done by increasing the key stored at the root, and decreasing the key stored at the first leaf). This takes $O(\log n)$ time and so the total time over all degree one nodes is $O(n \log n)$.
+ 
+For any degree two node $v$ with two children whose subtree sizes are $x$ and $y$ where $x \leq y$, constructing $v$'s polyline takes $O(x \log y)$ time. This is because operations~\ref{op1}-\ref{op4} take $O(x+ \log y)$ time and operations ~\ref{op5}-\ref{op8} take $O(x \log y)$ time.  The total running time over all degree two nodes is therefore bounded by $O(S \cdot \log n)$, where $S$ is the sum of sizes of the smaller subtrees over all nodes of degree two. 
+%
+We prove by induction that $S \leq n \log n$. Consider some binary tree with $n$ nodes. If the root of the tree has only one child, $S$ is the same for the subtree rooted at the child, and so $S \leq (n-1)\log (n-1) < n \log n$. If the root has two children with subtree sizes $x$ and $y$, let $x\le y$ and $n=1+x+y$. From the induction hypothesis it follows that $S \leq x + x \log x + y \log y$. This is bounded by:
+\begin{align*}
+x + x\log x + y\log y &= x \log (2x) + y\log y \\
+& \leq x \log (x+y) + y\log y \\
+& \leq x \log (x+y) + y \log (x+y) \\
+& = (x+y)\log(x+y) < n \log n.
+\end{align*}
+We conclude that the overall complexity is $O(n \log ^2 n)$.
+\end{proof}
+
+\subsection{Proof of Theorem~\ref{nlogn weighted f.t. theorem}}\label{appendix proof of nlogn theorem}
+\begin{theorem}
+The above implementation implies an $O(n \log n)$ weighted feasibility test.
+\end{theorem}
+The proof of the theorem can be found in Appendix 
+\begin{proof}
+As we have seen in the proof of Lemma \ref{nlog^2n running time for weighted f.t. lemma}, the time spent for all nodes of degree one in the input tree is bounded by $O(n \log n)$, so we only need to analyze the time for degree two nodes.
+%
+As before, the time spent for each node of degree two is bounded by the running time of the batched operations, which is $c\cdot x \log (\frac{2y}{x})$ for some constant $c$, and similarly to the proof of Lemma \ref{nlog^2n running time for weighted f.t. lemma}, we now prove that this sums up to at most $2c \cdot n \log n$ by induction on the size of the  tree: Consider some binary tree with $n$ nodes. Denote the time spent for nodes of degree two while running the weighted feasibility test on the tree by $S$. If the root is of degree one, then by the induction hypothesis $S \leq 2c\cdot (n-1)\log(n-1)\leq 2c\cdot n \log n$. If the root is of degree two, denote the size of its smaller subtree by $x$, and the size of the larger by $y$ (so it holds that $n=x+y+1$, and $x \leq y$). Then, we have that
+\begin{align*}
+S = & \ 2c\cdot x \log x + 2c\cdot y \log y + c\cdot x \log (\frac{2y}{x})\\
+ %= & x\log x+y\log y+\frac{x}{2}+\frac{x}{2}\log y-\frac{x}{2}\log x \\
+%= & \frac{x}{2}\log x+y\log y+\frac{x}{2}+\frac{x}{2}\log y \\
+= & \ 2c\cdot (\frac{x}{2}\log(2x)+(\frac{x}{2}+y)\log y) \\
+\leq & \ 2c\cdot (\frac{x}{2}\log(x+y)+(\frac{x}{2}+y)\log (x+y)) \\
+= & \ 2c\cdot ((x+y)\log(x+y)) \\
+\leq & \ 2c\cdot n \log n.
+\end{align*}
+This concludes the induction and yields our $O(n \log n)$ weighted feasibility test.
+\end{proof}
+
+\section{Full description of the linear algorithm for the dispersion optimization problem}\label{appendix linear algorithm for the dispersion optimization problem}
 
 Consider a large fragment. It is composed of small fragments. Notice that some of these small fragments are active fragments, i.e. have not been reduced to caterpillars in the previous iteration, but most are inactive fragments, which have
 been reduced to caterpillars. The large fragment contains some small fragments whose roots and holes are spine nodes of the large fragment,
@@ -421,7 +692,7 @@ contain several small fragments), see Figure \ref{figure of small fragments insi
 \end{figure}
 
 
-\noindent In Subsection~\ref{section:lemma1} we show how to reduce the hanging subtrees to at most two nodes, one candidate and one certain. Then, in Subsection~\ref{section:lemma2} we reduce the small active fragments on the spine to caterpillars. This turns the entire fragment into a large caterpillar. In Subsection~\ref{section:lemma3} we prune this large caterpillar so that it becomes monotone and without collisions. Finally, in Subsection~\ref{section:lemma4} we preprocess the resulting large caterpillar for eliminated suffix queries. 
+\noindent The partitioning used in the algorithm is presented in Subsection \ref{section:partioioning}. In Subsection~\ref{section:lemma1} we show how to reduce the hanging subtrees to at most two nodes, one candidate and one certain. Then, in Subsection~\ref{section:lemma2} we reduce the small active fragments on the spine to caterpillars. This turns the entire fragment into a large caterpillar. In Subsection~\ref{section:lemma3} we prune this large caterpillar so that it becomes monotone and without collisions. Finally, in Subsection~\ref{section:lemma4} we preprocess the resulting large caterpillar for eliminated suffix queries. 
 
 \subsection{Partitioning into fragments}\label{section:partioioning}
 We would like to partition the tree into fragments of growing sizes, and only spend linear time overall for this. We cannot repeatedly apply Lemma~\ref{basic partitioning lemma} as it is, since the constant hidden in its statement may become non-constant over the $\log^*n$ iterations. We therefore slightly augment the definition of a good partitioning, s.t. for a parameter $b$ it must have at most $n/b$ fragments, each of which is of size $O(b)$ (as opposed to the original definition, where we had $O(n/b)$ fragments of size at most $b$). We can achieve such a partitioning by applying Lemma \ref{basic partitioning lemma} with the parameter set to $b \cdot \alpha$, where $\alpha$ is the constant hidden in the statement of Lemma~\ref{basic partitioning lemma}. This results in a partition with at most $n/b$ fragments, each of size at most $\alpha \cdot b$. The following lemma uses this new definition.
@@ -751,300 +1022,6 @@ which we use to solve the dispersion optimization problem in linear time. All it
 cost $O(n)$ time altogether.
 % why do we stop at fragments of size polylog(n)? Can't we get one large fragment?
 
-
-\section{The Weighted Dispersion Problem}\label{section:weighted}
-We now consider the weighted variant of the dispersion problem, in which the edges have lengths and the nodes have weights. Recall that $f(P)=\min_{u,v\in P} \{d(u,v)\}$. The weighted dispersion problems are defined as follows.
-\begin{itemize} 
-\item {\em The Weighted Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, non-negative node weights, and a number $W$, find a subset of nodes $P$ of weight at least $W$, such that  $f(P)$ is maximized. 
-
-\item {\em The Weighted Dispersion Decision Problem.} Given a tree with non-negative edge lengths, non-negative node weights, a number $W$, and a number $\lambda$, find a subset of nodes  $P$ of weight at least $W$, such that $f(P)\geq\lambda$. 
-\end{itemize}
-
-
-In this section we present an $O(n\log n)$ time algorithm (feasibility test) for the weighted decision problem, and prove that it is optimal, by giving an $\Omega(n\log n)$ lower bound in the algebraic computation tree model.
-With the $O(n\log n)$ feasibility test in hand, we can apply the Frederickson's search technique on a set of
-matrices obtained from the centroid decomposition in $O(n\log n)$ time to solve the weighted optimization
-problem with $O(\log n)$ calls to the feasibility tests, so in $O(n\log^{2}n)$ total time\footnote{As we mentioned in the introduction, it is also possible to use Frederickson's $k$-th path algorithm \cite{Frederickson1983}, as was done by Bhattacharya and Houle \cite{Bhattacharya1991,Bhattacharya1999}, and achieve the same running time.}.
-
-\subsection{An \texorpdfstring{\boldmath$ \Omega (n\log n)$}{Omega(nlogn)} lower bound for the weighted feasibility test}
-
-In the {\em Set Disjointness} problem, we are given two sets of real numbers $X=\lbrace x_1,x_2,\ldots,x_n \rbrace$ and $Y=\lbrace y_1,y_2,\ldots,y_n \rbrace$ and we need to return true iff $X \cap Y = \emptyset$. 
-It is known that solving the set disjointness problem requires $\Omega(n \log n)$ operations in the algebraic
-computation tree model~\cite{BenOr}.
-We present a reduction from the set disjointness problem to the weighted feasibility test problem. We assume without loss of generality that the elements of $X$ and $Y$ are non-negative~\footnote{Otherwise
-we can simply find the minimum element, and subtract the minimum from all the elements.}.
-
-
-Given the two sets $X$ and $Y$, we construct a tree $T$ as follows. We first compute and set
-$K := 2 \cdot \max (X\cup Y) +3$.
-The tree $T$ contains two vertices of weight zero, $u$ and $v$, that are connected by an edge of length $\frac{K}{2}$. In addition, for each element $x_i \in X$, we have a node of weight $x_i+1$, that is connected to $u$ by an edge of length $\frac{K}{2} - x_i -1$. For each element $y_i \in Y$, we have a node of weight $K - y_i -1$, that is connected to $v$ by an edge of length $y_i+1$.
-\begin{lemma}\label{lemma of the reduction to set disjointness}
-$X \cap Y = \emptyset$ iff the weighted feasibility test returns false for $T$ with  parameters $W=K$ and $\lambda =K$.
-\end{lemma}
-
-The proof of the lemma can be found in Appendix~\ref{appendix proof of reduction lemma}.
-
-
-\subsection{An \texorpdfstring{\boldmath$O(n \log ^2 n)$}{O(nlog^2n)} algorithm for the weighted feasibility test}
-We now present an $O(n \log ^2 n)$ time algorithm for the weighted feasibility test, upon which we will base our optimal $O(n \log n)$ time weighted feasibility test.
-
-Similarly to the unweighted case, we would like to compute for each node of the tree, the subset of nodes $P$ in its subtree  s.t. $f(P) \geq \lambda$ and $W(P)$ is maximized. We compute this by going over the nodes of the tree bottom-up. Previously, the situation was simpler, as for any subtree we had just one candidate node (i.e., a node that may or may not be in the optimal solution for the entire input tree). This was true because nodes had uniform weights. This meant that amongst all nodes at distance at most $\lambda$ from the root we could keep as candidate only the farthest one. Now however, when nodes have non-uniform weights, it is not clear which nodes should be kept.
-
-Out of all the already chosen nodes in the subtree rooted at $v$, let $h$ be the node for which $d(h,v)$ is minimized. We call $h$ the {\em closest chosen node} in $v$'s subtree. In our weighted feasibility test, $v$ will store an optimal solution $P$ for any possible value of $d(h,v)$ (up to $\lambda$, since if the closest chosen node is farther, it does not affect nodes outside the subtree). That is, a subset of nodes $P$ in $v$'s subtree of maximum weight $W(P)$ s.t. the closest chosen node is at distance {\em greater or equal} to $d(h,v)$ from $v$, and $d(x_1,x_2) \geq \lambda$ for every  $x_1,x_2\in P$. 
-The values $W(P)$ can be viewed as a monotone polyline, since the weight of $P$ only decreases as the distance of the closest chosen node increases (from zero to $\lambda$). The weight of $P$ can only change at certain points called the {\em breakpoints} of the polyline. Each point of the polyline is a key-value pair, where the key is $d(h,v)$ and the value is $W(P)$. We store with each breakpoint the value of the polyline between it and the next breakpoint. I.e. for some pair of consecutive breakpoints with keys $a$ and $a+b$, we store in the first breakpoint the value of the polyline in the interval $[a,a+b)$. As a special case, the first breakpoint stores the value of the polyline in the interval $(0,a)$ (where $a$ is the key of the second breakpoint), and we store the value for key zero separately. We only store the breakpoints of a polyline in order to represent it.
-
-\begin{figure}[h]
-\begin{center}
-\includegraphics[scale=0.6]{polyline}
-\end{center}
-\caption{The polyline represents the weight of the optimal solution $P$ as a function of the distance of the closest chosen node in the subtree. %$v$ is the root of the subtree, and $h$ is the chosen node closest to $v$ in its subtree. 
-The weight of $P$ only decreases at certain points called breakpoints (in bold). Each breakpoint stores the value in the interval between itself and the next breakpoint.
-\label{figure of a polyline}}
-\end{figure}
-
-
-The algorithm computes such a polyline for the subtrees rooted at all the nodes of the tree. As we have mentioned, this computation is done bottom-up, and so in each step of the algorithm we compute the polyline for a subtree rooted at some node $v$, assuming that we have already computed the polylines for the subtrees rooted at $v$'s children. We will show how to achieve this step in time $O(x \log y)$, where $x$ is the number of breakpoints in the polyline with fewer breakpoints, and $y$ the number of breakpoints in the other polyline\footnote{For the same reasoning as in the unweighted case, we assume w.l.o.g. that the input tree is binary.}. This sums up to $O(n \log ^2 n)$ overall.
-
-
-When constructing a polyline, we need to consider several cases, as the closest chosen node $h$ in the subtree of $v$ could be $v$ itself, or it could be in the subtree of one of $v$'s children. This means that for any key $d(h,v)$ in the polyline, the value for that key can represent a solution $P$ in which $h$ is in the subtree rooted $v$'s left child, or in the subtree rooted $v$'s right child, or it could be $v$ itself.
-
-
-\paragraph{Constructing a polyline.} We now present a single step of the algorithm. We postpone the discussion of the data structure used to store the polylines for now, and first describe how to obtain the polyline of $v$ from the polylines of its children. Then, we state the exact interface of the data structure that allows executing such a procedure efficiently, show how to implement such an interface, and finally analyze the complexity of the resulting algorithm.
-
-If $v$ has only one child $u$ (we call $v$ a degree one node), then we build $v$'s polyline by querying $u$'s polyline for the case that $v$ is in the solution (i.e. query $u$'s polyline with distance of the closest chosen node being $\lambda-d(v,u)$), and add to this value the weight of $v$ itself. We then construct the polyline by taking the value we got (which will be the value for $d(h,v)=0$) and merging it with the polyline computed for $u$, shifted to the right by $d(v,u)$ (since we now measure the weight of the solution as a function of the distance of the closest chosen node to $v$, not to $u$). The value between zero and $d(v,u)$ will be the same as the value of the first interval in the polyline constructed for $u$, so the shift is actually done by increasing the keys of all but the first breakpoint by $d(v,u)$.
-
-If $v$ has two children  (we call $v$ a degree two node), denote its left child by $u_1$ and its right child by $u_2$. We have two polylines that represent the solutions inside the subtrees rooted at $u_1$ and $u_2$ (denoted by $p_1$ and $p_2$, respectively), and we want to create the polyline for the subtree rooted at $v$ (denoted by $p$).
-Assume w.l.o.g. that the number of breakpoints in $p_1$ is smaller or equal to the number of breakpoints in $p_2$\footnote{Note that if one of $v$'s children is at distance greater or equal to $\lambda$, the situation is simpler. Suppose that $d(v,u_1) \geq \lambda$. We can compute the polyline for $v$'s subtree as if it were a degree one node, ignoring $u_1$, and then simply increase all the values of the resulting polyline by the value of $p_1$ for key zero.}.
-
-We begin with computing the value of $p$ for key zero. Consider the case where $v$ is in the solution (i.e., $h=v$). In this case we query $p_1$ and $p_2$ for their values with keys $\lambda - d(v,u_1)$ and $\lambda - d(v,u_2)$ respectively (if one of these is negative, we take zero instead), and add them together with the weight of $v$. Another possible case is that there is a better solution (i.e. a subset with greater weight) for the subtree rooted at $v$, where $v$ is not included in the solution. For this we need to check, after constructing the rest of the polyline, whether the value stored at the first breakpoint is greater than the value we computed for the case $v$ is chosen. If so, we store the value of the first breakpoint also as the value for key zero.
-
-We now show how to construct the rest of the polyline $p$. Notice that we need to maintain that $d(h_1,h_2) \geq \lambda$ (where $h_1$ is the closest chosen node in $u_1$'s subtree and $h_2$ is the closest chosen node in $u_2$'s subtree). We proceed in two steps, each computing half of the polyline $p$.
-
-\subsubsection{Constructing the second half of the polyline.} We start by constructing the second half of the polyline, where $d(h,v) \geq \frac{\lambda}{2}$. In this case we query both polylines ($p_1$ and $p_2$) with the same key, since $d(h_1,v) \geq \frac{\lambda}{2}$ and $d(h_2,v) \geq \frac{\lambda}{2}$ implies that $d(h_1,h_2) \geq \lambda$. The naive way to proceed would be to iterate over the second half of both polylines in parallel, and at every point sum the values of the two polylines to get the value of the new polyline. This would not be efficient enough. Therefore, instead of iterating over $p_2$ (the larger polyline) we iterate over all the breakpoints in the second half of $p_1$ (the smaller polyline). These breakpoints induce intervals of $p_2$. For each of these intervals we increase the value of $p_{2}$ by the value in the interval in $p_1$ (see Figure~\ref{figure of constructing the second half of the polyline}). For this we might need to insert some of the breakpoints from $p_1$ if there is no such breakpoint already in $p_2$. Thus, we have obtained the second half of the monotone polyline $p$ by modifying the second half of the monotone polyline $p_{2}$.
-
-\begin{figure}[h]
-\begin{center}
-\includegraphics[scale=.55]{new_polyline_second_half}
-\end{center}
-\caption{Constructing the second half of the polyline $p$ (in blue). The black polyline is $p_2$. The breakpoints inserted from $p_1$ are in red. In each interval (between consecutive red lines) we raise the polyline by the value in $p_1$.
-\label{figure of constructing the second half of the polyline}}
-\end{figure}
-
-\subsubsection{Constructing the first half of the polyline.} We need to consider two possible cases: first, the case where $d(h_1,v) < d(h_2,v)$ (i.e. the closest chosen node in $v$'s subtree is inside $u_1$'s subtree), and second, the case where $d(h_1,v) > d(h_2,v)$\footnote{Note that in this half of the polyline $d(h,v)<\frac{\lambda}{2}$, and therefore $d(h_1,v) \neq d(h_2,v)$.}. For each of the two cases we will construct the first half of the polyline, and then we take the maximum of the two polylines at every point, in order to have the optimal solution for each key.
-
-\paragraph{Case I: \boldmath$d(h_1,v) < d(h_2,v)$.} Since we are only interested in the first half of the polyline, we know that $d(h_1,v) < \frac{\lambda}{2}$. Since $d(h_2,v) +d(h_1,v)\geq \lambda$ we have that  $d(h_2,v) > \frac{\lambda}{2}$. A naive algorithm could therefore iterate over $p_1$ (from zero up to to $\frac{\lambda}{2}$) while iterating over $p_2$ (from $\lambda$ down to $\frac{\lambda}{2}$) and sum the values of the two. Again, we cannot afford to iterate over the breakpoints of $p_2$, so we need to be more subtle.
-
-We start by splitting $p_1$ at $\frac{\lambda}{2}$ and taking the first half (denoted by $p_1'$). We then split $p_2$ at $\frac{\lambda}{2}$ and take the second half (denoted by $p_2'$). Consider two consecutive breakpoints of $p_1'$ with keys $x$ and $x+y$. For any key $x'$, s.t. $x \leq x' < x+y$, we would like to compute the value of $p_2'$ for the key $\lambda-x'$, and add it to the value of $p_1'$ for the key $x'$. Notice that here we query $p_2'$ with keys $y'$ s.t. $\lambda -x -y < y' \leq \lambda-x$. If we were to actually increase the values of $p_1'$ in such a way, we would obtain a polyline that is not monotonically decreasing, that is, does not account for the fact that for a key $x$ we want the maximum weight $W(P)$ s.t. the closest chosen node is at distance \emph{at leas}t $x$. Therefore, we would have to further prune the polyline by setting the value for each key $x$ to be the maximum value over all keys $x' \geq x$.
-Instead, we can just as well increase the value of $p_{1}'$ in $[x,x+y)$ by the maximal value of $p_{2}'$ in $(\lambda-x-y,\lambda-x]$. Since $p_2'$ is monotonically decreasing, the maximal value will be at the minimal key. This value can be found by a predecessor query on $p_2'$ with key $\lambda-x-y$. Overall, we need to iterate over $p_1'$, and for every pair of consecutive breakpoints with keys $x$ and $x+y$, we add the value of $p_2'$ for key $\lambda-x-y+\epsilon$ to the value stored in the breakpoint of $p_1'$ with key $x$.
-Still, this process might result in a polyline which is not monotonically decreasing, because as we go over the intervals of $p_1'$ from left to right we increase the values there more and more. See Figure~\ref{figure of constructing the first half of the polyline case 1}.
-To complete the construction, we make the polyline monotonically decreasing by scanning it from $\frac{\lambda}{2}$ to zero and deleting unnecessary breakpoints. The time this takes is bounded by the number of breakpoints in $p_{1}$.
-Note that in the above description we have assumed that we have access to the original data structure representing $p_{2}$, but this structure has been already modified to obtain the second half of $p$. However, we started with computing the second half of $p$ only to make the description simpler, and we can simply start with the first half.
-
-\begin{figure}[h]
-\begin{center}
-\includegraphics[scale=0.8]{polyline_first_half_construction_case1}
-\end{center}
-\caption{Case I of constructing the first half of the polyline. $p_1'$ (in black) is the first half of $p_1$, $p_2'$ (in blue) is the second half of $p_2$. The red polyline is the result of increasing the values of $p_1$ in the interval between $x$ and $x+y$ by the appropriate values of $p_2'$. The result is non-monotone, so we actually need to increase by the maximal value, i.e. the value of $p_2'$ at $\lambda-x-y+\epsilon$.\label{figure of constructing the first half of the polyline case 1} 
-}
-\end{figure}
-
-\paragraph{Case II: \boldmath$d(h_1,v) > d(h_2,v)$.}
-Symmetrically to the previous case, we can iterate over the first half of $p_2$ and the second half of $p_1$ while increasing values in the intervals of $p_2$ induced by the breakpoints of $p_1$ by the appropriate values of $p_{1}$. Again, the resulting polyline may be non-monotone, but this time we cannot solve the problem as in the previous case (i.e., by scanning the new polyline and deleting breakpoints), since the number of breakpoints in the new polyline is at least as large as the number of breakpoints of $p_2$. Instead, we go over the breakpoints of the second half of $p_1$ from right to left. For each such breakpoint  with key $x$, we find the {\em value} of key $\lambda - x$ in the new polyline. These are the points where we might have increased the value of $p_2$. Denote this value by $y$. We then query the new polyline with a \emph{value predecessor} query: this returns the breakpoint   with the largest key s.t. its key is smaller than $\lambda - x$ and its value is at least $y$. 
-%
-If this breakpoint exists, then the values of the new polyline between its successor breakpoint and $\lambda - x$ should all be $y$ (i.e. we delete all breakpoints in this interval except for the first one whose value we set to $y$). % (if it is the predecessor of $x$ in the list of breakpoints, then this is already the case).
-If it does not exist, then the values between zero and $\lambda - x$ should be $y$ (i.e. we delete all the previous breakpoints). 
-This ensures that the resulting polyline is monotonically decreasing. 
-See  Figure~\ref{figure of the second case in the construction of the first half of the polyline}.
-
-
-
-\begin{figure}[h]
-\begin{center}
-\includegraphics[scale=0.6]{polyline_first_half_construction_case2}
-\end{center}
-\caption{Case II of constructing the first half of the polyline. The first half of $p_2$ is in blue. The vertical black dashed lines are the breakpoints of $p_1$. We increase the values of $p_{2}$ and obtain the red polyline, which is not monotone. To make it monotone, we delete all the breakpoints below the green intervals, which are found with value predecessor queries (the results of these queries are the bold points).\label{figure of the second case in the construction of the first half of the polyline}
-}
-\end{figure}
-
-\paragraph{Merging cases I and II.}
-We now need to build one polyline for the first half of the polyline, taking into account both cases. Let $p_a$ and $p_b$ denote the polylines we have constructed for the two cases, and assume w.l.o.g that $p_a$ is smaller. We first need to shift $p_a$ and $p_b$ to the right by $d(v,u_1)$ and $d(v,u_2)$ respectively, because we want to measure the distance of $h$ from $v$, not from $u_1$ or $u_2$. As we have described for the case where $v$ has one child, this shift is done by increasing the keys of all but the first breakpoint of each of the two polylines.
-
-We now need to take the maximum of the values of $p_a$ and $p_b$, for every key smaller than $\frac{\lambda}{2}$. We do this by finding the intersection points of the two polylines. Notice that since both polylines are monotonically decreasing, these intersections can only occur at (i) the breakpoints of $p_a$, (ii) at most one point between two consecutive breakpoints of $p_a$. We iterate over $p_a$ and, for every pair of consecutive breakpoints, we check which polyline has the higher value at both points. If the answer for both points is the same, we carry on. Otherwise, there must be a single intersection point of the two polylines inside this interval. We find this intersection by running a value predecessor query on $p_b$, with the key being the right endpoint of the interval. After such computation, we know which polyline gives us the best solution for every point between zero and $\frac{\lambda}{2}$, and where are the intersection points where this changes. We can now build the new polyline by doing insertions and deletions in $p_b$ according to the intersection points: For every interval of $p_b$ defined by a pair of consecutive intersection points, we check if the value of $p_a$ is larger than the value of $p_b$ in the interval, and if so, delete all the breakpoints of $p_b$ in the interval, and insert the relevant breakpoints from $p_a$. This can be viewed as deleting all breakpoints in an interval of $p_b$, and then inserting breakpoints between the endpoints of this interval (the endpoints are now consecutive breakpoints, since we have deleted the breakpoints that were between them). Since the intersection points can only be at the breakpoints of $p_a$, and at most at one breakpoint of $p_b$ between two consecutive breakpoints of $p_a$, the number of intersection points is linear in the number of breakpoints of $p_a$ (which is linear in the number of breakpoints of $p_1$), and so, the total number of interval deletions and insertions is linear in the number of breakpoints of $p_1$.
-%TODO Add figure for this merging procedure?
-
-To conclude, the final polyline $p$ is obtained by concatenating the value computed for key zero, the polyline computed for the first half, and the polyline computed for the second half. 
-
-
-\subsubsection{The polyline data structure} We now specify the data structure for storing the polylines. The required interface is:
-\begin{enumerate}
-\item \label{op1} Split the polyline at some key.
-\item \label{op2} Merge two polylines (s.t. all the keys in one polyline are smaller than all keys in the other).
-\item \label{op3} Retrieve the value of the polyline for a certain key $d(h,v)$.
-\item \label{op4}Return a sorted list of the breakpoints of the polyline
-\item \label{op5} Batched interval increase -- Given a list of disjoint intervals of the polyline, and a number for each interval, increase the values of the polyline in each interval by the appropriate number. Each interval is given by the keys of its endpoints.
-\item \label{op6} Batched value predecessor -- Given a list of key-value pairs, $(k_i,v_i)$, find for each $k_i$, the maximal key $k_{i}'$, s.t. $k_{i}' < k_i$ and the value of the polyline at $k_{i}'$ is at least $v_i$.
-\item \label{op7} Batched interval insertions -- Given a list of pairs of consecutive breakpoints in the polyline, insert between each pair a list of breakpoints.
-\item \label{op8} Batched interval deletions -- Given a list of disjoint intervals of the polyline, delete all the breakpoints inside the intervals.
-\end{enumerate}
-
-We now show how to use some standard techniques to implement the required operations, and achieve $O(n \log ^2 n)$ time for our weighted feasibility test.
-We represent a polyline by storing its breakpoints in an augmented 2-3 tree, where the data is stored in the leaves. Each node of the tree stores a key-value pair, and we maintain the following property: the key of each breakpoint is the sum of the keys of the corresponding leaf and of all its ancestors, and similarly for the values. In addition, we store in each node the maximal key and the maximal value of a leaf in its subtree. More precisely, the maximal key is the largest sum of keys on a path from the node to a leaf in its subtree, and similarly for the maximal value. We also store in each node the number of leaves in its subtree.
-
-We now describe the implementation of each operation. We denote the number of breakpoints of $p_1$ (the smaller polyline) by $x$, and the number of breakpoints of $p_2$ (the larger polyline) by $y$ (i.e. $x \leq y$). Note that the input for all four batched operations is given in sorted order (by keys).
-
- Operations~\ref{op1} and~\ref{op2} can use standard split and join procedures for 2-3 trees in logarithmic time. 
- Operation~\ref{op3} can be done by running a predecessor query and returning the value at the returned breakpoint in logarithmic time.
- Operation~\ref{op4} is done by an inorder traversal of the tree. 
-Operations~\ref{op1}-\ref{op3} are performed only a constant number of times per step\footnote{Note that Operation \ref{op3} is used inside the batched operations more than a constant number of times, but this will be accounted for separately.}, and so their total cost is logarithmic (i.e. $O(\log x + \log y)$). Operation~\ref{op4} is also performed a constant number of times to iterate over the breakpoints of $p_{1}$ (in $O(x)$ time). The next four operations are more costly, since each of them is comprised of a batch of $O(x)$ operations on a tree of size $O(y)$.
-
-Operation~\ref{op5} is done by iterating over the intervals. For each interval, we find its left endpoint, and traverse the path from the left endpoint, through the lowest common ancestor (LCA), to the right endpoint.
-The traversal is guided by the maximal keys stored at the nodes. More precisely, we need to access the maximal key of a breakpoint corresponding to a leaf in a subtree of the current node. This can be obtained from the maximal key stored at the current node if we maintain during the traversal the sum of all keys on the path from the root to the current node (excluding the current node itself). This quantity can be easily maintained in constant time while moving to a child or the parent. 
-While traversing the path from the left endpoint to the LCA (from the LCA to the right endpoint), we increase the value of every node hanging to the right (left) of this path. We also update the maximal value field in each node we reach (including the nodes on the path from the LCA to the root). Notice that if one of the endpoints of the interval is not in the structure, we need to insert it. We might also need to delete a breakpoint if it is a starting point of some interval and its new value is now equal to the value of its predecessor. Overall, Operation~\ref{op5} takes time which is linear in the number of traversed nodes, plus the cost of insertions and deletions (whose number is linear in the number of intervals). Because the depth of a 2-3 tree of size $O(y)$ is $O(\log y)$, the total number of visited nodes and hence total time is $O(x \log y$).
-
-%\begin{figure}[h]
-%\begin{center}
-%\includegraphics{interval_increase}
-%\end{center}
-%\caption{A single interval increase. The red path is the path between the endpoints of the blue interval. The red nodes are all the children of nodes on the red path that are ancestors of leaves in the blue interval. In order to increase the values of all the breakpoints in the blue interval, we increase the values of the red nodes. We then traverse the path from the LCA of the endpoints of the interval to the root, and update the maximum value field.}
-%\end{figure}
-
-Operation~\ref{op6} is done by first finding $k_i$ (or its predecessor, if there is no breakpoint at $k_i$). Then, we go up the path in the tree until the maximum value of a breakpoint corresponding to a leaf in the subtree hanging to the left of the path is at least $v_i$. We then keep going down to the rightmost child that has at least $v_i$ as the maximum value of a breakpoint corresponding to a leaf in its subtree. The overall runtime is $O(x \log y)$ since each value predecessor query takes $O(\log y)$ time.
-
-Operation~\ref{op7} is done with standard insertion to 2-3 trees, while updating the subtree maximum fields. We insert at most $O(x)$ new breakpoints, so this operation takes $O(x \log y)$ time.
-
-Operation~\ref{op8} is done by performing, for each interval deletion, a standard split and join on 2-3 trees in $O(\log y)$ time (while maintaining the additional information in every node). This takes $O(x \log y)$ time overall.
-
-%, we do the same traversal as we did for interval increase, and instead of increasing the keys of the roots of subtrees as we did there, we delete these subtrees. We delete a subtree by disconnecting its root, and do the required balancing operations at the end of the operation, after deleting all the subtrees. Recall that when we delete a node from a 2-3 tree, we rebalance the tree by simply making sure we are not left with a "1-node" (i.e. a node with only one child), while maintaining the invariant that all the leaves have the same depth. For a regular deletion, we achieve this by either doing some local rearrangement that solves the problem, or by fusing the 1-node with its brother, and moving the problem up the tree. In our case, we start the rebalancing at each of the endpoints of the interval, and move up to the LCA In our case. During this process , we might encounter a situation that cannot occur for a regular 2-3 tree, where we have a 1-node that is the child of another 1-node.
-
-\begin{lemma} \label{nlog^2n running time for weighted f.t. lemma}
-The above implementation implies an $O(n \log ^2 n)$ weighted feasibility test.
-\end{lemma}
-
-The proof of the lemma can be found in Appendix~\ref{appendix proof of nlog^2n lemma}.
-
-
-\subsection{An \texorpdfstring{\boldmath$O(n \log n)$}{O(nlogn)} algorithm for the weighted feasibility test}\label{section:data structure}
-In this section, we improve the complexity of our weighted feasibility test by implementing the interface we use for operations on polylines more efficiently. Namely, we next show how to speed up the batched operations (operations \ref{op5}-\ref{op8}) from $O(x \log y)$ to $O(x \log (\frac{2y}{x}))$ and then show that this implies an  $O(n \log n)$ feasibility test. 
-
-\paragraph{Operation~\ref{op5} -- batched interval increase.}
-In the previous section we performed each interval increase by traversing the path between the interval's endpoints. This took $O(\log y)$ time since we performed the operations on a balanced tree with $y$ leaves. We would like to perform the operations on smaller trees. The operation therefore begins by splitting the tree into $O(x)$ smaller trees, each with $O(\frac{y}{x})$ leaves. This is done by recursively splitting the tree, first into two trees with $O(\frac{y}{2})$ leaves, then we split each of these trees into two trees with $O(\frac{y}{4})$ leaves, and so on, until we have trees of size $O(\frac{y}{x})$. We then increase the values in the relevant intervals using the small trees. For this, we scan the roots of the small trees, searching for the left endpoint of the first interval. We can check whether the left endpoint is in some tree by using the maximal value stored in the root. Once we have found the left endpoint of the interval, we check if the right endpoint of the interval is in the same tree or not (again, using the maximal value). In the first case, the interval is contained in a single tree, and can be increased in this tree in time $O(\log(\frac{y}{x}))$ using the procedure described in the previous subsection. In the second case, the interval spans several trees, and so we need to do an interval increase in the two trees containing the endpoints of the interval, and additionally increase the value stored in the root of every tree that is entirely contained in the interval. We then continue to the next interval, and proceed in the same manner. 
-%
-Since the intervals are disjoint and we do at most two interval increases on small trees per interval, the total time for the increases in the small trees is $O(x \cdot \log (\frac{y}{x}))$. We also scan the roots of the small trees while checking (in constant time) if the endpoint of the interval is in this small tree. This only adds $O(x)$ to the complexity, leading to 
- $O(x \cdot \log (\frac{y}{x}) + x) = O(x \log (\frac{2y}{x}))$ overall for processing the small trees.
- 
-Before the operation terminates, we still need to merge the small trees back into one large tree. We do this using join operations, symmetrically to how we obtained the small trees by splitting. Let us consider the time it takes to obtain the small trees by splitting. We start with a tree that has $y$ leaves, select the middle leaf by traversing from the root and using the number of leaves stored in every node of the tree, and the split the tree into two in $O(\log y)$ time. Then split the resulting two trees in $O(\log(\frac{y}{2}))$ time each, and so on. The cost of this process sums up to:
-\begin{align*}
- \sum_{i=0}^{\log (\frac{x}{2})} 2^i \cdot \log (\frac{y}{2^i}) & = \sum_{i=0}^{\log (\frac{x}{2})} 2^i \cdot \log y - \sum_{i=0}^{\log (\frac{x}{2})} 2^i \cdot \log (2^i)  \\
-& \leq x \log y - 2 \cdot (2^{ \log ( \frac{x}{2})} \cdot \log ( \frac{x}{2}) - 2^{ \log ( \frac{x}{2})}+1)  \\
-%& = x \log y  -  x \log (\frac{x}{2}) + x - 2 \\ 
-&= x \log (\frac{2y}{x}) + x -2 \\
-& = O(x \log (\frac{2y}{x})) .
-\end{align*}
-The cost of all joins required to patch the small trees together can be bounded by the same calculation, and so the operation takes $O(x \log (\frac{2y}{x}))$ time in total.
-
-\paragraph{Operation~\ref{op6} -- batched value predecessor.}
-As in Operation~\ref{op5}, we first split the tree into small trees with $O(\frac{y}{x})$ leaves and operate on these small trees. We would like to iterate over the given keys and for each $k_{i}$ find its value predecessor $k_i'$. However, now the intervals defined by the pairs $(k_i',k_i)$ are not necessarily disjoint and so we need to be more careful as to not scan over the root of a small tree multiple times.
-
-Recall that we had two uses for the batched value predecessor operation. The first was to prune the non-monotone polyline we have obtained by increasing the intervals of $p_2$ (the larger polyline) induced by the breakpoints of $p_1$ (see Figure~\ref{figure of the second case in the construction of the first half of the polyline}). The pruning is done by deleting the intervals returned by this operation.
-%
-Consider two consecutive keys $k_1$ and $k_2$ ($k_1 \leq k_2$) for which we would like to find their value predecessors $k_1'$ and $k_2'$. If the value of the polyline at $k_1$  is greater or equal to the value  of the polyline at $k_2$, then certainly $k_1 \leq k_2'$, and the intervals are in fact disjoint. Else, the intervals might not be disjoint, but we know that $k_1' \geq k_2'$, and so the interval $(k_1',k_1)$ is contained in the interval $(k_2',k_2)$. Thus, deleting the second interval is enough, meaning that we do not need to run the value predecessor query for $k_1$ at all. Generalizing this observation, before running the value predecessor queries, we can remove keys from the input list
-so that the values of the remaining keys are  monotonically decreasing, in $O(x)$ time\footnote{In this case the values of the polyline at $k_1$ and $k_2$ are in fact $v_1$ and $v_2$ which are given as input, so we don't have to query for them. These values are obtained during the interval increases which precede this pruning of the non-monotone polyline.}. 
-% by scanning them from left to right while maintaining the remaining keys on a stack.
-We can then answer value predecessor queries for this pruned list of keys using our small trees with $O(\frac{y}{x})$ leaves. We process the keys from right to left while simultaneously scanning the small trees (also from right to left). To process a pair $(k_{i},v_{i})$ we first locate the rightmost small tree containing a key not exceeding $k_{i}$. This is done by moving to the previous small tree as long as necessary. Then, we continue moving to the previous small tree as long as the maximal value stored at the root is smaller than $v_{i}$. Once we find the appropriate small subtree, we run a value predecessor query on it (as described in the previous subsection). 
-%
-Therefore, we search for the value predecessor of each key in one small tree in $O(\log(\frac{y}{x}))$ time,
-and additionally sweep through $O(x)$ roots, so the cost is $O(x \log (\frac{2y}{x}))$. We finish by merging the small trees back into one large tree (as in Operation \ref{op5}) which also takes $O(x \log (\frac{2y}{x}))$ time, and so this is also the time complexity of the entire operation.
-
-The second use of this operation was to find the intersection points of two polylines. In this case it is easy to see that the intervals $(k_i',k_i)$ are in fact disjoint, since we query with the keys of the breakpoints of one of the polylines only when there must be an intersection point between this breakpoint and the previous one, and so we do not need any pruning.
-
-\paragraph{Operation~\ref{op7} -- batched interval insertions.}
-Again, we split the tree into small trees with $O(\frac{y}{x})$ leaves. Additionally, for each list of breakpoints that should be inserted between a pair of consecutive breakpoints stored in the same small tree, we split that small tree between these consecutive breakpoints.
-% This can be done by scanning the list of breakpoints to be inserted from left to right, while scanning the roots of the small trees. 
-Since we have at most $x$ such extra splits, each of which takes $O(\log(\frac{y}{x}))$ time, the total time for this is $O(x\log(\frac{2y}{x}))$. We now have $O(x)$ small trees with $O(\frac{y}{x})$ leaves, such that every breakpoint
-that should be inserted falls between two small trees.
-Then, for every such breakpoint we create a small tree containing just a single leaf corresponding to that
-breakpoint. Therefore, we have $O(x)$ small trees with $O(\frac{y}{x})$ leaves that should be now merged
-to obtain one large tree (some of these small trees might be much smaller, of course).
-The merging is done using the same method as in batched interval increase, that is, we first merge the small
-trees into pairs to form $O(\frac{x}{2})$ trees with $O(2\cdot\frac{y}{x})$ leaves, then we merge the resulting
-trees to form $O(\frac{x}{4})$ trees with $O(4\cdot\frac{y}{x})$ leaves, and so on. The total cost can be bounded,
-up to a constant factor, by essentially the same calculation, thus we obtain $O(x \log(\frac{2y}{x}))$ time.
-
-\paragraph{Operation~\ref{op8} -- batched interval deletions.}
-Once again we split our tree into small trees. We then delete the relevant intervals from each of the small trees. Each interval is either contained in a single small tree (and is then deleted by performing one or two split operations and at most one join operation) or it spans several small trees (in which case it is deleted by performing two split operations on the trees containing the interval's endpoints, and maybe deleting some trees entirely). Similarly to Operation~\ref{op5}, this costs $O(x \log(\frac{y}{x}) +x) = O(x \log(\frac{2y}{x}))$ in total.
-
-\begin{theorem}\label{nlogn weighted f.t. theorem}
-The above implementation implies an $O(n \log n)$ weighted feasibility test.
-\end{theorem}
-The proof of the theorem can be found in Appendix \ref{appendix proof of nlogn theorem}.
-
-\bibliography{dispersion}
-
-\newpage
-\appendix
-
-\section{Proof of Lemma~\ref{lemma of the reduction to set disjointness}}\label{appendix proof of reduction lemma}
-\begin{lemma} %TODO change the lemma number
-$X \cap Y = \emptyset$ iff the weighted feasibility test returns false for $T$ with  parameters $W=K$ and $\lambda =K$.
-\end{lemma}
-
-\begin{proof}
-We start by proving that if $X \cap Y \neq \emptyset$ then there is a subset of the vertices of the tree, $P \subseteq T$, s.t. $W(P) \geq K$ and $f(P) \geq K$ (where $W(P)$ is the sum of the weights of all the vertices in $P$). Suppose that  $x_i=y_j$. Then, $d(x_i,y_j) = d(x_i,u) + d(u,v) + d(v,y_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} + y_j +1 = K \geq K$. Furthermore, $W(x_i) + W(y_j) = x_i + 1 + K- y_j -1 = K \geq K$, and so the feasibility test should return true due to $P = \lbrace x_i, y_j \rbrace$.
-
-Now we need to prove that if the feasibility test returns true, the sets are not disjoint.
-We start by proving that any feasible subset $P$ cannot have more than one vertex from each of the sets.
-Assume for contradiction that $P'$ is a feasible subset that contains at least two vertices that correspond to elements of $X$. Denote these two vertices by $x_i$ and $x_j$. We assume that $P'$ is a feasible solution, and so $d(x_i,x_j) \geq K$. But, $d(x_i,x_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} - x_j -1 = K - x_i - x_j -2 < K$ (since $x_i$ and $x_j$ are non-negative) and we have a contradiction.
-If $P'$ contains two elements of $Y$, denoted $y_{i}$ and $y_{j}$, we also obtain a contradiction because
-$d(y_{i},y_{j})=y_{i}+1+y_{j}+1<K$.
-Observe that it is also not possible for $P$ to contain only one node, since the weight of any node is strictly less than $K$. So, we now only need to prove that if $P= \{ x_i,y_j \}$ is a feasible solution, then $x_i = y_j$.
-If $P= \{ x_i,y_j \}$ is a feasible solution then on the one hand $d(x_i,y_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} + y_j +1 = K - x_i + y_j \geq K$, implying that $y_j \geq x_i$. On the other hand, $W(P) = x_i + 1 + K - y_j -1 = K + x_i - y_j \geq K$, implying that $x_i \geq y_j$. We conclude that $x_i = y_j$.
-\end{proof}
-
-\section{Proof of Lemma~\ref{nlog^2n running time for weighted f.t. lemma}}\label{appendix proof of nlog^2n lemma}
-\begin{lemma} 
-The above implementation implies an $O(n \log ^2 n)$ weighted feasibility test.
-\end{lemma}
-
-\begin{proof}
-
-The running time of the algorithm is the sum of running times required for constructing the polylines of the subtrees rooted at each node of the tree.
-%
-Notice that the number of breakpoints in the polyline of a subtree is at most the number of nodes in this subtree. This is because every breakpoint corresponds to some node that was in the solution becoming too close to the root to be still included.
-
-For any degree one node, constructing its polyline is done with one query to the polyline of its child, and an increase of the keys of all but the first breakpoint (which can be done by increasing the key stored at the root, and decreasing the key stored at the first leaf). This takes $O(\log n)$ time and so the total time over all degree one nodes is $O(n \log n)$.
- 
-For any degree two node $v$ with two children whose subtree sizes are $x$ and $y$ where $x \leq y$, constructing $v$'s polyline takes $O(x \log y)$ time. This is because operations~\ref{op1}-\ref{op4} take $O(x+ \log y)$ time and operations ~\ref{op5}-\ref{op8} take $O(x \log y)$ time.  The total running time over all degree two nodes is therefore bounded by $O(S \cdot \log n)$, where $S$ is the sum of sizes of the smaller subtrees over all nodes of degree two. 
-%
-We prove by induction that $S \leq n \log n$. Consider some binary tree with $n$ nodes. If the root of the tree has only one child, $S$ is the same for the subtree rooted at the child, and so $S \leq (n-1)\log (n-1) < n \log n$. If the root has two children with subtree sizes $x$ and $y$, let $x\le y$ and $n=1+x+y$. From the induction hypothesis it follows that $S \leq x + x \log x + y \log y$. This is bounded by:
-\begin{align*}
-x + x\log x + y\log y &= x \log (2x) + y\log y \\
-& \leq x \log (x+y) + y\log y \\
-& \leq x \log (x+y) + y \log (x+y) \\
-& = (x+y)\log(x+y) < n \log n.
-\end{align*}
-We conclude that the overall complexity is $O(n \log ^2 n)$.
-\end{proof}
-
-\section{Proof of Theorem~\ref{nlogn weighted f.t. theorem}}\label{appendix proof of nlogn theorem}
-\begin{theorem}
-The above implementation implies an $O(n \log n)$ weighted feasibility test.
-\end{theorem}
-The proof of the theorem can be found in Appendix 
-\begin{proof}
-As we have seen in the proof of Lemma \ref{nlog^2n running time for weighted f.t. lemma}, the time spent for all nodes of degree one in the input tree is bounded by $O(n \log n)$, so we only need to analyze the time for degree two nodes.
-%
-As before, the time spent for each node of degree two is bounded by the running time of the batched operations, which is $c\cdot x \log (\frac{2y}{x})$ for some constant $c$, and similarly to the proof of Lemma \ref{nlog^2n running time for weighted f.t. lemma}, we now prove that this sums up to at most $2c \cdot n \log n$ by induction on the size of the  tree: Consider some binary tree with $n$ nodes. Denote the time spent for nodes of degree two while running the weighted feasibility test on the tree by $S$. If the root is of degree one, then by the induction hypothesis $S \leq 2c\cdot (n-1)\log(n-1)\leq 2c\cdot n \log n$. If the root is of degree two, denote the size of its smaller subtree by $x$, and the size of the larger by $y$ (so it holds that $n=x+y+1$, and $x \leq y$). Then, we have that
-\begin{align*}
-S = & \ 2c\cdot x \log x + 2c\cdot y \log y + c\cdot x \log (\frac{2y}{x})\\
- %= & x\log x+y\log y+\frac{x}{2}+\frac{x}{2}\log y-\frac{x}{2}\log x \\
-%= & \frac{x}{2}\log x+y\log y+\frac{x}{2}+\frac{x}{2}\log y \\
-= & \ 2c\cdot (\frac{x}{2}\log(2x)+(\frac{x}{2}+y)\log y) \\
-\leq & \ 2c\cdot (\frac{x}{2}\log(x+y)+(\frac{x}{2}+y)\log (x+y)) \\
-= & \ 2c\cdot ((x+y)\log(x+y)) \\
-\leq & \ 2c\cdot n \log n.
-\end{align*}
-This concludes the induction and yields our $O(n \log n)$ weighted feasibility test.
-\end{proof}
 
 \end{document}
 
