@@ -168,32 +168,35 @@ application we need various non-standard batch operations on the lists, and henc
 Instead, we present a simpler approach for merging polylines in Section~\ref{O(nlogn) weighted f.t.} that efficiently supports the required batch operations and works with essentially any balanced search
 tree with split and join capabilities. We believe that this is of independent interest due to its simplicity.
 
-\section{A Linear Feasibility Test}\label{linear F.T.}
+\section{A Linear Time Feasibility Test}\label{linear F.T.}
 
-The feasibility test processes the tree bottom-up and computes, for every subtree $T_{r}$ rooted at a node $r$, a valid solution with maximal cardinality.
-If $P$ is a valid solution for the subtree $T_{r}$ (i.e., $f(P)\geq\lambda$), we call a node $u\in P$, s.t. $d(r,u)<\frac{\lambda}{2}$, the \emph{candidate} node of the subtree (or a candidate with respect to $r$). There is at most one such candidate node.
+Given a tree $T$ with non-negative lengths and a number $\lambda$, the feasibility tests finds a subset of nodes $P$ such that $f(P)\geq\lambda$
+and $|P|$ is maximized, and then checks if $|P|\geq k$.
+To this end, the tree is processed bottom-up while computing, for every subtree $T_{r}$ rooted at a node $r$, a subset of nodes $P$ such that
+$f(P)\geq\lambda$, $|P|$ is maximized, and in case of a tie $\min_{u\in P}d(r,u)$ is additionally maximized.
+We call node $u\in P$, s.t. $d(r,u)<\frac{\lambda}{2}$, the \emph{candidate} node of the subtree (or a candidate with respect to $r$). There is at most one such candidate node.
 The remaining nodes in $P$ are called \emph{certain} (w.r.t. $r$) and the one that is nearest to the root is called the certain node.
 When clear from the context, we will not explicitly say which subtree we are referring to.
 
-In each step we are given a node $r$, its children nodes $r_{1},r_{2},\ldots,r_{k}$, and for each child $r_{i}$ we are given a maximal valid
-solution $P_{i}$ for the feasibility test on $T_{r_{i}}$. We would like to produce a maximal valid solution for the feasibility test on $r$'s subtree.
-Denote by $P_{1},\ldots,P_{k}$ the solutions for the feasibility test on each subtree rooted at a child of $r$. We obtain a maximal valid solution $P$
-for the feasibility test on $T_{r}$ as follows:
+In each step we are given a node $r$, its children nodes $r_{1},r_{2},\ldots,r_{k}$, and, for each child $r_{i}$, a maximal valid
+solution $P_{i}$ for the feasibility test on $T_{r_{i}}$ together with the corresponding candidate and certain nodes.
+We obtain a maximal valid solution $P$ for the feasibility test on $T_{r}$ as follows:
 \begin{enumerate}
-\item Take all the vertices in $P_{1},\ldots,P_{k}$, except for the candidate vertices.
+\item Take all the nodes in $P_{1},\ldots,P_{k}$, except for the candidate nodes.
 \item Take all candidate nodes $u$ s.t. $d(u,r) \geq \frac{\lambda}{2}$ (i.e., they are certain w.r.t. $r$).
-\item If it exists, take $u'$, the candidate node farthest from $r$ s.t. $d(u',r) < \frac{\lambda}{2}$ and $d(u',x)\geq \lambda$, where $x$ is the closest node to $u'$ we have taken so far.
-\item Check if it is possible to add $r$ to $P$ by looking at the closest vertex to it we have already put in $P$, and if so take $r$.
+\item If it exists, take $u'$, the candidate node farthest from $r$ s.t. $d(u',r) < \frac{\lambda}{2}$ and $d(u',x)\geq \lambda$, where $x$ is 
+the already taken node nearest to $u'$.\label{linear time step 3}
+\item Take $r$ if $d(r,x)\geq\lambda$, where $x$ is the already taken node nearest to $r$.
 \end{enumerate}
-Iterating over the input tree bottom-up as described results in a valid solution $P$ for the whole tree. To solve the dispersion decision problem,
-we check if $|P|\geq k$.
 A proof of correctness of this algorithm can be found in Appendix~\ref{appendix proof of correctness for linear f.t.}.
+To implement the whole test in linear time, we only have to show that a single step takes $O(k)$ time. This holds because
+in step \ref{linear time step 3} it is enough to consider $x$ being the already taken node nearest to $r$, and any $d(u,v)$
+can be computed in $O(1)$ time after storing the distance of every node to the root of the whole tree and using lowest common
+ancestor queries~\cite{Bender2000}.
 
-%This linear time feasibility test can be used to achieve $O(n \log n)$ time for the dispersion optimization problem, by binary searching over all possible values of $\lambda$, using Frederickson's algorithm \cite{Frederickson1983}, which returns the $k$-th longest path in a tree in linear time (as was done in \cite{Bhattacharya1991}).
+\section{A Sublinear Time Feasibility Test with \texorpdfstring{\boldmath$O(n\log\log n)$}{O(nloglogn)} Preprocessing}\label{sublinear f.t.}
 
-\section{A Sublinear Feasibility Test with \texorpdfstring{\boldmath$O(n\log\log n)$}{O(nloglogn)} Preprocessing}\label{sublinear f.t.}
-
-To accelerate the linear-time feasibility test described in Section~\ref{linear F.T.}, we want to partition the tree into fragments.
+To accelerate the linear-time feasibility test described in Section~\ref{linear F.T.}, we will partition the tree into fragments.
 Then, the fragments are preprocessed so that in query time we can process them in sublinear time.
 To this end, we need a specific way of partitioning the tree into fragments, where
 each fragment is connected to the rest of the tree by at most two vertices and consists of at most $b$ nodes,
@@ -239,8 +242,8 @@ In our case, $m=b \log b \cdot \frac{n}{b} = n \log b$ and we set $p$ to be $n/b
 We call fragments with the property that any pairwise distance (and any pairwise distance multiplied by 2) inside is either smaller than
 $\lambda_{1}$ or larger or equal to $\lambda_{2}$ \text{inactive}, and all other fragments \textit{active}.
 By the choice of parameters, we have at most $n/b^{2}$ active fragments (out of all $n/b$) and we also pay $O(n \log b)$ exclusive of the feasibility tests.
-For an inactive fragment, we can now check if the distance between two nodes inside is at least $\lambda$ or $\lambda/2$ by first calculating
-the distance in $O(1)$ time (using lowest common ancestor queries~\cite{Bender2000}) and comparing it to $\lambda_{1}$.
+For an inactive fragment, we can now check if the distance between two nodes inside is at least $\lambda$ or $\lambda/2$
+by comparing it to $\lambda_{1}$.
 This allows us to preprocess each inactive fragment in $O(b)$ time as follows:
 
 \begin{enumerate}
@@ -329,7 +332,7 @@ After processing all heavy paths we finally have a maximal valid solution for th
 Notice that throughout our algorithm we process caterpillars, and do not consider taking spine nodes to our solution. 
 This is fine, since we can attach to every such spine node an artificial leaf connected with an edge of length zero.
 
-\section{A Sublinear Feasibility Test with \texorpdfstring{\boldmath$O(n)$}{O(n)} Preprocessing}\label{sectionLinear}
+\section{A Sublinear Time Feasibility Test with \texorpdfstring{\boldmath$O(n)$}{O(n)} Preprocessing}\label{sectionLinear}
 The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test to get a sublinear one. We will now use a similar process, iteratively, with growing fragments size (starting from constant size and growing exponentially), improving in each iteration the performance of our feasibility test. Given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with $O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
 After $\log ^*n$ iterations requiring a total of $O(n)$ time, we will have a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time
 which we use to solve the dispersion optimization problem in $O(n)$. 
@@ -517,15 +520,15 @@ The proof of the theorem can be found in Appendix \ref{appendix proof of nlogn t
 \subsection{Proof of correctness for the linear time feasibility test in the unweighted case}\label{appendix proof of correctness for linear f.t.}
 
 To prove correctness of the algorithm, we will argue by induction that the following invariant holds: for every node $r$ of the tree, the algorithm
-produces $P$, a subset of the vertices of the subtree rooted at $r$, s.t. $f(P)\geq\lambda$ and $|P|$ is maximal. Out of all such valid subsets
-with maximal cardinality, the distance between $r$ and the node closest to it is maximized in $P$. The proof is by induction.
+produces $P$, a subset of the vertices of the subtree rooted at $r$, s.t. $f(P)\geq\lambda$ and $|P|$ is maximal. If there is a tie, we
+additionally maximize the distance of the nearest chosen node to $r$. The proof is by induction.
 
-Consider a node $r$ of the tree and and assume that the invariant golds for all of its children $r_{1},r_{2},\ldots,r_{k}$.
+Consider a node $r$ of the tree and and assume that the invariant holds for all of its children $r_{1},r_{2},\ldots,r_{k}$.
 We want to show that the invariant also holds for $r$.
 Assume for contradiction that $P'$ is a subset of the vertices of $T_r$, s.t. $f(P')\geq\lambda$ and $|P'| > |P|$. Let us look at the two possible cases:
 \begin{enumerate}
-\item \textbf{\boldmath$P'$ has more certain nodes w.r.t \boldmath$r$ than \boldmath$P'$}: All certain nodes w.r.t $r$, are in subtrees rooted at children of $r$, and so there must be some child of $r$, $r_i$, s.t. $P'_{r_i}$ has more certain nodes w.r.t $r$ than $P_{r_i}$ (where $P'_{r_i}$ is $P'$ restricted to $T_{r_i}$). This can only be if $|P'_{r_i}| > |P_{r_i}|$, or if the closest node to $r_i$ in $P'_{r_i}$ is farther than the closest node in $P_{r_i}$, and so the invariant does not hold for $r_i$.
-\item \textbf{\boldmath$P'$ has the same number of certain nodes w.r.t \boldmath$r$ as \boldmath$P$, but \boldmath$P'$ has a candidate w.r.t \boldmath$r$  and \boldmath$P$ does not}: Denote the candidate node of $P'$ by $u$. We have two possible cases. First, if $u=r$, then there is some node $v \in P$ s.t. $d(u,v)<\lambda$. Assume that $v$ is in the subtree rooted at $r_i$. In this case, either $|P'_{r_i}| \geq |P_{r_i}|$ and the closest node to $r_i$ in $P'_{r_i}$ is farther than the closest node in $P_{r_i}$, and the invariant does not hold for $r_i$, or $|P'_{r_i}|<|P_{r_i}|$ and so there must be some $r_j$ s.t. $|P'_{r_j}|>|P_{r_j}|$, and the invariant does not hold for $r_j$. Second, if $u$ is in one of the subtrees rooted at children of $r$, since all certain nodes w.r.t $r$ are also in these subtrees, there must be one such subtree, $r_l$ s.t. $|P'_{r_l}| > |P_{r_l}|$, and so the invariant does not hold for it.
+\item \textbf{\boldmath$P'$ has more certain nodes w.r.t. \boldmath$r$ than \boldmath$P'$}: All certain nodes w.r.t. $r$, are in subtrees rooted at children of $r$, and so there must be some child of $r$, $r_i$, s.t. $P'_{r_i}$ has more certain nodes w.r.t. $r$ than $P_{r_i}$ (where $P'_{r_i}$ is $P'$ restricted to $T_{r_i}$). This can only be if $|P'_{r_i}| > |P_{r_i}|$, or if the closest node to $r_i$ in $P'_{r_i}$ is farther than the closest node in $P_{r_i}$, and so the invariant does not hold for $r_i$.
+\item \textbf{\boldmath$P'$ has the same number of certain nodes w.r.t. \boldmath$r$ as \boldmath$P$, but \boldmath$P'$ has a candidate w.r.t. \boldmath$r$  and \boldmath$P$ does not}: Denote the candidate node of $P'$ by $u$. We have two possible cases. First, if $u=r$, then there is some node $v \in P$ s.t. $d(u,v)<\lambda$. Assume that $v$ is in the subtree rooted at $r_i$. In this case, either $|P'_{r_i}| \geq |P_{r_i}|$ and the closest node to $r_i$ in $P'_{r_i}$ is farther than the closest node in $P_{r_i}$, and the invariant does not hold for $r_i$, or $|P'_{r_i}|<|P_{r_i}|$ and so there must be some $r_j$ s.t. $|P'_{r_j}|>|P_{r_j}|$, and the invariant does not hold for $r_j$. Second, if $u$ is in one of the subtrees rooted at children of $r$, since all certain nodes w.r.t. $r$ are also in these subtrees, there must be one such subtree, $r_l$ s.t. $|P'_{r_l}| > |P_{r_l}|$, and so the invariant does not hold for it.
 \end{enumerate} 
 Thus we have proven that $P$ is of maximal cardinality. Now, assume for contradiction that $P'$ is a subset of the vertices of the subtree rooted at $r$, s.t. $f(P')\geq\lambda$ and $|P'| = |P|$, but the closest node to $r$ in $P$ (denoted by $u$) is closer to $r$ than the closest node to $r$ in $P'$. Assume that $u \neq r$ and denote by $T_{r_i}$ the subtree that $u$ is in. Thus, either $|P'_{r_i}| = |P_{r_i}|$, but the closest vertex to $r_i$ in $P'_{r_i}$ is farther away from $r_i$ than $u$, which means the invariant does not hold for $T_{r_i}$, or $|P'_{r_i}| < |P_{r_i}|$, and it makes up for it in some other subtree where the invariant does not hold. If $u=r$, then since $|P'| = |P|$, there must some child of $r$, $r_i$, s.t. $|P'_{r_i}| > |P_{r_i}|$, and so the invariant does not hold for $r_i$. We have proven that the invariant holds also for $r$ and, consequently, the algorithm indeed is correct.
 
