@@ -175,12 +175,7 @@ solution $P_{i}$ for the feasibility test on $T_{r_{i}}$, together with the cand
 \item Check if it is possible to add $r$ to $P$ by looking at the closest vertex to it we have already put in $P$, and if so take $r$.
 \end{enumerate}
 Iterating over the input tree bottom-up as described results in a valid solution $P$ for the whole tree. To solve the dispersion decision problem,
-we check if $|P|\geq k$. It is easy to see that each such step takes $O(\ell)$ time and so the total running time is $O(n)$.
-A proof of correctness of this algorithm can be found in Appendix~\ref{appendix proof of correctness for linear f.t.}.
-To implement the whole test in linear time, we only have to show that a single step takes $O(k)$ time. This holds because
-in step \ref{linear time step 3} it is enough to consider $x$ being the already taken node nearest to $r$, and any $d(u,v)$
-can be computed in $O(1)$ time after storing the distance of every node to the root of the whole tree and using lowest common
-ancestor queries~\cite{Bender2000}.
+we check if $|P|\geq k$. We can do linear time preprocessing and store the distance of every node to the root of the whole tree, so that using lowest common ancestor queries~\cite{Bender2000}, we can compute any pairwise distance in the tree, and specifically the distance of a candidate node to the subtree's root. Now we can perform each step in $O(\ell)$ time, and so the running time of the algorithm is $O(n)$. A proof of correctness of this algorithm can be found in Appendix~\ref{appendix proof of correctness for linear f.t.}.
 
 \section{An \texorpdfstring{\boldmath$O(n\log\log n)$}{O(nloglogn)} Time Algorithm for the Dispersion Problem}
 \label{sublinear f.t.}
