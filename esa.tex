@@ -365,16 +365,18 @@ this is $O(n)$ plus $O(\log^{2}n)$ calls to the feasibility test. Setting $b=\lo
 \section{A Linear Time Algorithm for the Dispersion Problem}
 \label{sectionLinear}
 
-The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test to get a sublinear one. We will now use a similar process, iteratively, with growing fragments size (starting from constant size and growing exponentially), improving in each iteration the performance of our feasibility test. Given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with $O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
-After $\log ^*n$ iterations requiring a total of $O(n)$ time, we will have a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time
+To accelerate the $O(n\log\log n)$ time algorithm, we construct a hierarchy of feasibility tests by partitioning the input tree
+into larger and larger fragments, starting from the linear-time implementation described in Section~\ref{linear F.T.}. 
+Given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with
+$O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
+After $\log ^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time
 which we use to solve the dispersion optimization problem in $O(n)$. 
 
-Partitioning the input tree into fragments independently in each iteration would yield an $O(n \log ^* n)$ algorithm, since each partition would take $O(n)$ time. In order to obtain overall $O(n)$ time, we make each decomposition a refinement of the previous one, i.e. the fragments of the $(\ell+1)$-th partition (called large fragments) are composed of fragments of the $\ell$-th partition (called small fragments). We believe that this simple micro-macro variant is of independent interest. 
-%
-The main difficulty remaining is how to preprocess the fragments. We cannot afford to touch every node of every fragment at every decomposition level. Therefore, we take a closer look at how a (large) fragment decomposes into smaller fragments. 
-We show that a large fragment can be reduced to a concatenation of small caterpillars, each corresponding to a small fragment that we have already preprocessed. We then  carefully tailor these small caterpillars while reusing the results of their preprocessing. We show that this tailoring amortizes to $O(n)$ over all decompositions. This turns out to be quite technical. Due to space constrictions, the full description of the algorithm is in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
-
-
+There are multiple technical difficulties that need to be overcome in order to keep the preprocessing time $O(\frac{n}{b})$.
+We must make each partition into fragments a refinement of the previous one, i.e. the fragments of the $(\ell+1)$-th partition (called large fragments)
+are composed of fragments of the $\ell$-th partition (called small fragments). We believe that this simple micro-macro variant is of independent interest. 
+Further, we cannot afford to touch every node of every fragment at every decomposition level. Therefore, we take a closer look at how a (large) fragment decomposes into smaller fragments. 
+We show that a large fragment can be reduced to a concatenation of small caterpillars, each corresponding to a small fragment that we have already preprocessed. We then carefully tailor these small caterpillars while reusing the results of their preprocessing. We show that this tailoring amortizes to $O(n)$ over all decompositions. Due to space constraints, the full description of the algorithm is in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
 
 \section{The Weighted Dispersion Problem}\label{section:weighted}
 We now consider the weighted variant of the dispersion problem, in which the edges have lengths and the nodes have weights. Recall that $f(P)=\min_{u,v\in P} \{d(u,v)\}$. The weighted dispersion problems are defined as follows.
@@ -703,7 +705,7 @@ Define $T'$ as the tree obtained by collapsing each fragment of the given partit
 \noindent The entire partition is obtained by applying Lemma~\ref{good partition refinement lemma} $\log^{*}n$ times. 
 If $b_{\ell}$ denotes the value of the parameter $b$ in the $\ell$-th application, then  $b_{\ell+1}=2^{b_{\ell}}$. The time to construct the $(\ell+1)$-th partition is $O(n/(b_{\ell})^{4})=O(n/b_{\ell})$. The overall time to construct all partitions is therefore 
 $$ O(\sum_{\ell} {n}/{b_{\ell}}) = O(\sum_{\ell} {n}/{2^{\ell}}) = O(n).$$
-Observe that the size of a (large) fragment in the $(\ell+1)$-th partition is at most $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$ which is at most $O((b_{\ell+1})^5)$ for a large enough $\ell$ (i.e., an $\ell$ s.t $\alpha^{\ell+1}\leq 2^{2^{\ell+1}}$ and $b_{\ell+1}\geq 2^{2^{\ell+1}}$).  Denoting by $b=b_{\ell}$ and $B=b_{\ell+1}$  we get that every large fragment is of size $O(B^5)$ and is composed of (small) fragments of the $\ell$-th partition (each of size $O(b^5)$). 
+Observe that the size of a (large) fragment in the $(\ell+1)$-th partition is at most $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$ which is at most $O((b_{\ell+1})^5)$ for a large enough $\ell$ (i.e., an $\ell$ s.t. $\alpha^{\ell+1}\leq 2^{2^{\ell+1}}$ and $b_{\ell+1}\geq 2^{2^{\ell+1}}$).  Denoting by $b=b_{\ell}$ and $B=b_{\ell+1}$  we get that every large fragment is of size $O(B^5)$ and is composed of (small) fragments of the $\ell$-th partition (each of size $O(b^5)$). 
 
 
 
