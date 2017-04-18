@@ -5,6 +5,11 @@
 \usepackage[utf8]{inputenc}
 \usepackage[noadjust]{cite}
 \usepackage{floatrow}
+\usepackage{amsthm,thmtools,thm-restate}
+
+\theoremstyle{plain}
+\newtheorem{lemmarestatable}[theorem]{Lemma}
+\newtheorem{theoremrestatable}[theorem]{Theorem}
 
 \newcommand{\jump}{\text{jump}}
 \newcommand{\Oh}{{O}}
@@ -52,7 +57,6 @@
 \begin{document}
 
 \maketitle
-
 
 \begin{abstract}
 In the $k$-dispersion problem, we need to select $k$ nodes of a given graph so as to maximize
@@ -195,9 +199,10 @@ The proof of the following lemma can be found in Appendix \ref{appendix proof of
 Note that we can assume that the input tree is binary: given a non-binary tree, we can replace every degree $d\geq 3$ node with a binary tree on
 $d$ leaves. The edges of the binary tree are all of length zero and its artificial inner nodes cannot be taken.
 
-\begin{lemma}\label{basic partitioning lemma}
+\begin{restatable}{lemmarestatable}{basicpartitioninglemma}
+\label{basic partitioning lemma}
 For any binary tree on $n$ nodes and a parameter $b$, a good partition of the tree can be found in $O(n)$ time.
-\end{lemma}
+\end{restatable}
 
 \begin{figure}
 \floatbox[{\capbeside\thisfloatsetup{capbesideposition={right,bottom},capbesidewidth=9.7cm}}]{figure}[\FBwidth]
@@ -498,9 +503,10 @@ Since the intervals are disjoint and we do at most two interval increases on sma
 
 Before the operation terminates, we still need to merge the small trees back into one large tree. We do this using join operations, symmetrically to how we obtained the small trees by splitting. 
 
-\begin{lemma}\label{running time to obtain small trees lemma}
+\begin{restatable}{lemmarestatable}{runningtimetoobtainsmalltreeslemma}
+\label{running time to obtain small trees lemma}
 The time to obtain the small trees is $O(x \log (\frac{2y}{x}))$.
-\end{lemma}
+\end{restatable}
 The calculation proving this lemma is in Appendix \ref{appendix proof of running time to obtain small trees lemma}.
 
 The cost of all joins required to patch the small trees together can be bounded by the same calculation as the cost of the splits made to obtain them, and so the operation takes $O(x \log (\frac{2y}{x}))$ time in total.
@@ -522,9 +528,10 @@ up to a constant factor, by essentially the same calculation as in Lemma \ref{ru
 \paragraph{Operation~\ref{op8} -- batched interval deletions.}
 Once again we split our tree into small trees. We then delete the relevant intervals from each of the small trees. Each interval is either contained in a single small tree (and is then deleted by performing one or two split operations and at most one join operation) or it spans several small trees (in which case we might also need to delete some trees entirely). Similarly to the previous operations, this takes $O(x \log(\frac{2y}{x}))$ time in total.
 
-\begin{theorem}\label{nlogn weighted f.t. theorem}
+\begin{restatable}{theoremrestatable}{nlognweighted}
+\label{nlogn weighted f.t. theorem}
 The above implementation implies an $O(n \log n)$ weighted feasibility test.
-\end{theorem}
+\end{restatable}
 The proof of the theorem can be found in Appendix \ref{appendix proof of nlogn theorem}.
 
 \bibliography{dispersion}
@@ -534,7 +541,7 @@ The proof of the theorem can be found in Appendix \ref{appendix proof of nlogn t
 
 \section{Missing proofs}
 
-\subsection{Proof of correctness for the linear time feasibility test in the unweighted case}\label{appendix proof of correctness for linear f.t.}
+\subsection{Proof of correctness for the linear time feasibility test}\label{appendix proof of correctness for linear f.t.}
 
 To prove correctness of the algorithm, we will argue by induction that the following invariant holds: for every node $r$ of the tree, the algorithm
 produces $P$, a subset of the vertices of the subtree rooted at $r$, s.t. $f(P)\geq\lambda$ and $|P|$ is maximal and, if there are multiple
@@ -551,9 +558,8 @@ Thus we have proven that $P$ is of maximal cardinality. Now, assume for contradi
 
 \subsection{Proof of Lemma~\ref{basic partitioning lemma}}\label{appendix proof of basic partitioning lemma}
 
-\begin{lemma}
-For any binary tree on $n$ nodes and a parameter $b$, a good partition of the tree can be found in $O(n)$ time.
-\end{lemma}
+\basicpartitioninglemma*
+
 \begin{proof}
 We prove the lemma by construction. Call a node \textit{large} if the size of its subtree is at least $b$
 and \textit{small} otherwise. Consider the tree $T_L$ induced by the large nodes of the original tree. 
@@ -579,9 +585,8 @@ The whole construction can be implemented by scanning the tree twice bottom-up i
 
 
 \subsection{Proof of Lemma \ref{running time to obtain small trees lemma}}\label{appendix proof of running time to obtain small trees lemma}
-\begin{lemma}
-The time to obtain the small trees by splitting is $O(x \log (\frac{2y}{x}))$.
-\end{lemma}
+
+\runningtimetoobtainsmalltreeslemma*
 
 \begin{proof}
 We start with a tree that has $y$ leaves, select the middle leaf by traversing from the root and using the number of leaves stored in every node of the tree, and the split the tree into two in $O(\log y)$ time. Then split the resulting two trees in $O(\log(\frac{y}{2}))$ time each, and so on. The cost of this process sums up to:
@@ -590,15 +595,14 @@ We start with a tree that has $y$ leaves, select the middle leaf by traversing f
 & \leq x \log y - 2 \cdot (2^{ \log ( \frac{x}{2})} \cdot \log ( \frac{x}{2}) - 2^{ \log ( \frac{x}{2})}+1)  \\
 %& = x \log y  -  x \log (\frac{x}{2}) + x - 2 \\ 
 &= x \log (\frac{2y}{x}) + x -2 \\
-& = O(x \log (\frac{2y}{x})) .
+& = O(x \log (\frac{2y}{x})) .\qedhere
 \end{align*}
 \end{proof}
 
 
 \subsection{Proof of Theorem~\ref{nlogn weighted f.t. theorem}}\label{appendix proof of nlogn theorem}
-\begin{theorem}
-The above implementation implies an $O(n \log n)$ weighted feasibility test.
-\end{theorem}
+
+\nlognweighted*
 
 \begin{proof}The running time of the algorithm is the sum of running times required for constructing the polylines of the subtrees rooted at each node of the tree.
 %
