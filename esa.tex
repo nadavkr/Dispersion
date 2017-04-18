@@ -102,8 +102,7 @@ Both \cite{Bhattacharya1991} and \cite{Bhattacharya1999} present efficient feasi
  
 \paragraph{Our solution for the unweighted dispersion problem.}
 We are able to decrease the total time to $O(n)$ by
-developing a feasibility test that requires {\em linear} preprocessing and can then be queried in \emph{sublinear} time. This was the approach of Fredrickson for $k$-partitioning and $k$-center and it is plausible that his framework can be adapted to solve our problem as well. 
-However, we do not know how to achieve such adaptation. Instead, our (slightly different) take on $k$-dispersion allows us to develop a  simpler and more structured algorithm, and hence might be of independent interest.
+developing a feasibility test that requires {\em linear} preprocessing and can then be queried in \emph{sublinear} time. This was the approach of Fredrickson for $k$-partitioning and $k$-center. It is plausible that his framework can be adapted to solve our problem as well, however, this to date has not been done. Our (slightly different) take on $k$-dispersion allows us to develop a  simpler and more structured algorithm, and hence might be of independent interest.
 Equipped with such sublinear feasibility test, it is still not clear how to solve the whole problem in $O(n)$ time, as in such complexity we cannot afford to represent all the pairwise
 distances between nodes. To cope with this, the algorithm maintains % a current interval $[\lambda_1,\lambda_2)$ s.t. %$\lambda_1$ is the largest value we have tested and is feasible, and $\lambda_2$ is the smallest value we have tested and found not feasible (which implies that 
 %the optimal value $\lambda^*$ lies within the interval, and generates,
