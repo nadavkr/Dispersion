@@ -402,19 +402,19 @@ We now show how to construct the rest of the polyline $p$. Notice that we need t
 
 \paragraph{Case I: \boldmath$d(h_1,v) < d(h_2,v)$.} Since we are only interested in the first half of the polyline, we know that $d(h_1,v) < \frac{\lambda}{2}$. Since $d(h_2,v) +d(h_1,v)\geq \lambda$ we have that  $d(h_2,v) > \frac{\lambda}{2}$. A naive algorithm could therefore iterate over $p_1$ (from zero up to to $\frac{\lambda}{2}$) while iterating over $p_2$ (from $\lambda$ down to $\frac{\lambda}{2}$) and sum the values of the two. Again, we cannot afford to iterate over the breakpoints of $p_2$, so we need to be more subtle.
 
-We start by splitting $p_1$ at $\frac{\lambda}{2}$ and taking the first half (denoted by $p_1'$). We then split $p_2$ at $\frac{\lambda}{2}$ and take the second half (denoted by $p_2'$). Consider two consecutive breakpoints of $p_1'$ with keys $x$ and $x+y$. For any key $x'$, s.t. $x \leq x' < x+y$, we would like to compute the value of $p_2'$ for the key $\lambda-x'$, and add it to the value of $p_1'$ for the key $x'$. Notice that here we query $p_2'$ with keys $y'$ s.t. $\lambda -x -y < y' \leq \lambda-x$. If we were to actually increase the values of $p_1'$ in such a way, we would obtain a polyline that is not monotonically decreasing, that is, does not account for the fact that for a key $x$ we want the maximum weight $W(P)$ s.t. the closest chosen node is at distance \emph{at leas}t $x$. Therefore, we would have to further prune the polyline by setting the value for each key $x$ to be the maximum value over all keys $x' \geq x$.
-Instead, we can just as well increase the value of $p_{1}'$ in $[x,x+y)$ by the maximal value of $p_{2}'$ in $(\lambda-x-y,\lambda-x]$. Since $p_2'$ is monotonically decreasing, the maximal value will be at the minimal key. This value can be found by a predecessor query on $p_2'$ with key $\lambda-x-y$. Overall, we need to iterate over $p_1'$, and for every pair of consecutive breakpoints with keys $x$ and $x+y$, we add the value of $p_2'$ for key $\lambda-x-y+\epsilon$ to the value stored in the breakpoint of $p_1'$ with key $x$.
-Still, this process might result in a polyline which is not monotonically decreasing, because as we go over the intervals of $p_1'$ from left to right we increase the values there more and more. See Figure~\ref{figure of constructing the first half of the polyline case 1}.
+We start by splitting $p_1$ at $\frac{\lambda}{2}$ and taking the first half (denoted by $p_1'$). We then split $p_2$ at $\frac{\lambda}{2}$ and take the second half (denoted by $p_2'$). Consider two consecutive breakpoints of $p_1'$ with keys $x$ and $x+y$. For any key $x'$, s.t. $x \leq x' < x+y$, we would like to compute the value of $p_2'$ for the key $\lambda-x'$, and add it to the value of $p_1'$ for the key $x'$. Notice that here we query $p_2'$ with keys $y'$ s.t. $\lambda -x -y < y' \leq \lambda-x$. Since for a key $x$ we want the maximum weight $W(P)$ s.t. the closest chosen node is at distance \emph{at least} $x$, we actually need the $y'$ that has the largest value in $p_2'$. $p_2'$ is monotonically decreasing, and so the maximal value will be at the minimal key, i.e. $\lambda-x-y+\epsilon$. We increase the value of $p_1$ in the interval $[x,x+y)$ by the value of $p_2'$ for this key.
+
+This process might result in a polyline which is not monotonically decreasing, because as we go over the intervals of $p_1'$ from left to right we increase the values there more and more.
 To complete the construction, we make the polyline monotonically decreasing by scanning it from $\frac{\lambda}{2}$ to zero and deleting unnecessary breakpoints. The time this takes is bounded by the number of breakpoints in $p_{1}$.
 Note that in the above description we have assumed that we have access to the original data structure representing $p_{2}$, but this structure has been already modified to obtain the second half of $p$. However, we started with computing the second half of $p$ only to make the description simpler, and we can simply start with the first half.
 
-\begin{figure}[h]
-\begin{center}
-\includegraphics[scale=0.8]{polyline_first_half_construction_case1}
-\end{center}
-\caption{Case I of constructing the first half of the polyline. $p_1'$ (in black) is the first half of $p_1$, $p_2'$ (in blue) is the second half of $p_2$. The red polyline is the result of increasing the values of $p_1$ in the interval between $x$ and $x+y$ by the appropriate values of $p_2'$. The result is non-monotone, so we actually need to increase by the maximal value, i.e. the value of $p_2'$ at $\lambda-x-y+\epsilon$.\label{figure of constructing the first half of the polyline case 1} 
-}
-\end{figure}
+%\begin{figure}[h]
+%\begin{center}
+%\includegraphics[scale=0.8]{polyline_first_half_construction_case1}
+%\end{center}
+%\caption{Case I of constructing the first half of the polyline. $p_1'$ (in black) is the first half of $p_1$, $p_2'$ (in blue) is the second half of $p_2$. The red polyline is the result of increasing the values of $p_1$ in the interval between $x$ and $x+y$ by the appropriate values of $p_2'$. The result is non-monotone, so we actually need to increase by the maximal value, i.e. the value of $p_2'$ at $\lambda-x-y+\epsilon$.\label{figure of constructing the first half of the polyline case 1} 
+%}
+%\end{figure}
 
 \paragraph{Case II: \boldmath$d(h_1,v) > d(h_2,v)$.}
 Symmetrically to the previous case, we can iterate over the first half of $p_2$ and the second half of $p_1$ while increasing values in the intervals of $p_2$ induced by the breakpoints of $p_1$ by the appropriate values of $p_{1}$. Again, the resulting polyline may be non-monotone, but this time we cannot solve the problem by scanning the new polyline and deleting breakpoints, since the number of breakpoints in the new polyline can be even larger than the number of breakpoints of $p_2$. Instead, we go over the breakpoints of the second half of $p_1$ from right to left. For each such breakpoint  with key $x$, we find the {\em value} of key $\lambda - x$ in the new polyline. These are the points where we might have increased the value of $p_2$. Denote this value by $y$. We then query the new polyline with a \emph{value predecessor} query: this returns the breakpoint   with the largest key s.t. its key is smaller than $\lambda - x$ and its value is at least $y$. 
@@ -461,7 +461,7 @@ We next describe the implementation of each operation. We denote the number of b
  Operations~\ref{op1} and~\ref{op2} can use standard split and join procedures for 2-3 trees in logarithmic time. 
  Operation~\ref{op3} can be done by running a predecessor query and returning the value at the returned breakpoint in logarithmic time.
  Operation~\ref{op4} is done by an inorder traversal of the tree. 
-Operations~\ref{op1}-\ref{op3} are performed only a constant number of times per step\footnote{Note that Operation \ref{op3} is used inside the batched operations more than a constant number of times, but this will be accounted for separately.}, and so their total cost is logarithmic (i.e. $O(\log x + \log y)$). Operation~\ref{op4} is also performed a constant number of times to iterate over the breakpoints of $p_{1}$ (in $O(x)$ time). The next four operations are more costly, since each of them is comprised of a batch of $O(x)$ operations on a tree of size $O(y)$.\footnote{Note that the input for all four batched operations is given in sorted order (by keys).}
+Operations~\ref{op1}-\ref{op3} are performed only a constant number of times per step, and so their total cost is logarithmic (i.e. $O(\log x + \log y)$). Operation~\ref{op4} is also performed a constant number of times to iterate over the breakpoints of $p_{1}$ (in $O(x)$ time). The next four operations are more costly, since each of them is comprised of a batch of $O(x)$ operations on a tree of size $O(y)$.\footnote{Note that the input for all four batched operations is given in sorted order (by keys).}
 
 
 \paragraph{Operation~\ref{op5} -- batched interval increase.}
@@ -992,6 +992,7 @@ Observe that it is also not possible for $P$ to contain only one node, since the
 If $P= \{ x_i,y_j \}$ is a feasible solution then on the one hand $d(x_i,y_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} + y_j +1 = K - x_i + y_j \geq K$, implying that $y_j \geq x_i$. On the other hand, $W(P) = x_i + 1 + K - y_j -1 = K + x_i - y_j \geq K$, implying that $x_i \geq y_j$. We conclude that $x_i = y_j$.
 \end{proof}
 
+\section{Operation~\ref{op6} -- batched value predecessor}\label{appendix batched value predecessor}
 Similarly to Operation~\ref{op5}, we start by describing a procedure that works on one tree, then apply the same trick of splitting the tree into small trees, and work on them.
 
 We start each value predecessor query by first finding $k_i$ (or its predecessor, if there is no breakpoint at $k_i$). Then, we go up the path in the tree until the maximum value of a leaf in a subtree hanging to the left of the path is at least $v_i$. We then keep going down to the rightmost child that has at least $v_i$ as the maximum value in its subtree. The overall runtime is $O(x \log y)$ since each value predecessor query takes $O(\log y)$ time.
