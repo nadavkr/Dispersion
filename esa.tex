@@ -182,7 +182,7 @@ When clear from the context, we will not explicitly say which subtree we are ref
 In each step we are given a node $r$, its children nodes $r_{1},r_{2},\ldots,r_{\ell}$, and for each child $r_{i}$ we are given: a maximal valid
 solution $P_{i}$ for the feasibility test on $T_{r_{i}}$, together with the candidate node and the certain node. We obtain a maximal valid solution $P$ for the feasibility test on $T_{r}$ as follows:
 \begin{enumerate}
-\item Take all the node in $P_{1},\ldots,P_{\ell}$, except for the candidate nodes.
+\item Take all nodes in $P_{1},\ldots,P_{\ell}$, except for the candidate nodes.
 \item Take all candidate nodes $u$ s.t. $d(u,r) \geq \frac{\lambda}{2}$ (i.e., they are certain w.r.t. $r$).
 \item If it exists, take $u'$, the candidate node farthest from $r$ s.t. $d(u',r) < \frac{\lambda}{2}$ and $d(u',x)\geq \lambda$, where $x$ is the closest node to $u'$ we have taken so far.\label{linear time step 3}
 \item Check if it is possible to add $r$ to $P$ by looking at the closest vertex to it we have already put in $P$, and if so take $r$.
@@ -293,7 +293,16 @@ We call $u_{1},u_{2},\ldots,u_{i}$ a {\em prefix} of the caterpillar and, simila
 For every possible prefix, we would like to precompute the result of running the linear-time feasibility
 test on that prefix. In Section~\ref{sec:feasibility test} we will show that, in fact, this is enough to efficiently
 simulate running the linear-time feasibility test on the whole subtree rooted at $r$ if we know the candidate
-and the certain node w.r.t. the hole. 
+and the certain node w.r.t. the hole. Consider running the feasibility test on $u_{1},u_{2},\ldots,u_{i}$,
+and recall that its goal is to choose as many nodes as possible, and in case of a tie to maximize the distance of the
+nearest chosen node to $r$. Then, due to distances of the leaves to $r$ being non-decreasing, it is clear that
+$u_{i}$ should be chosen. Then, consider largest $i'<i$ such that $d(u_{i'},u_{i})\geq \lambda$ (recall that
+such a test is actually done by comparing to $\lambda_{1}$). Due to distances of the leaves to the hole
+being non-decreasing, nodes $u_{i'+1},u_{i'+2},\ldots,u_{i-1}$ cannot be chosen and furthermore $d(u_{j},u_{i}\geq \lambda$
+for any $j=1,2,\ldots,i'$. Therefore, to continue the simulation we have to run the procedure on $u_{1},u_{2},u_{i'}$.
+
+
+
 
 
 
