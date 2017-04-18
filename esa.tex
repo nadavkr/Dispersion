@@ -376,10 +376,8 @@ We now consider the weighted variant of the dispersion problem, in which the edg
 \end{itemize}
 
 
-In this section we present an $O(n\log n)$ time algorithm (feasibility test) for the weighted decision problem. A matching lower bound follows by a reduction from the set disjointness problem (see Appendix \ref{appendix weighted f.t. lower bound}).
-With the $O(n\log n)$ feasibility test in hand, we can apply the Frederickson's search technique on a set of
-matrices obtained from the centroid decomposition in $O(n\log n)$ time to solve the weighted optimization
-problem with $O(\log n)$ calls to the feasibility tests, so in $O(n\log^{2}n)$ total time.
+In this section we present an $O(n\log n)$ time algorithm for the weighted decision problem. A matching lower bound follows by a reduction from the set disjointness problem (see Appendix \ref{appendix weighted f.t. lower bound}).
+With the $O(n\log n)$ feasibility test in hand, we can use Frederickson's algorithm for finding the $k$-th longest path \cite{Frederickson1983} to binary search over the possible values of $\lambda$ and solve the optimization problem with $O(\log n)$ calls to the feasibility test, and $O(n\log^{2}n)$ time overall.
 
 
 
@@ -481,9 +479,7 @@ To conclude, the final polyline $p$ is obtained by concatenating the value compu
 \item \label{op8} Batched interval deletions -- Given a list of disjoint intervals of the polyline, delete all the breakpoints inside the intervals.
 \end{enumerate}
 
-We now describe the data structure we use for polylines, which will allow us to implement the above interface efficiently. We represent a polyline by storing its breakpoints in an augmented 2-3 tree, where the data is stored in the leaves. Each node of the tree stores a key-value pair, and we maintain the following property: the key of each breakpoint is the sum of the keys of the corresponding leaf and of all its ancestors, and similarly for the values. In addition, we store in each node the maximal key and the maximal value of a breakpoint that corresponds to a leaf in its subtree. We also store in each node the number of leaves in its subtree.
-
-We next describe the implementation of each operation.
+We now describe the data structure we use for polylines, which will allow us to implement the above interface efficiently. We represent a polyline by storing its breakpoints in an augmented 2-3 tree, where the data is stored in the leaves. Each node of the tree stores a key-value pair, and we maintain the following property: the key of each breakpoint is the sum of the keys of the corresponding leaf and of all its ancestors, and similarly for the values. In addition, we store in each node the maximal key and the maximal value of a breakpoint that corresponds to a leaf in its subtree. We also store in each node the number of leaves in its subtree. We next describe the implementation of each operation.
 
  Operations~\ref{op1} and~\ref{op2} can use standard split and join procedures for 2-3 trees in logarithmic time. 
  Operation~\ref{op3} can be done by running a predecessor query and returning the value at the returned breakpoint in logarithmic time.
@@ -512,21 +508,20 @@ The calculation proving this lemma is in Appendix \ref{appendix proof of running
 The cost of all joins required to patch the small trees together can be bounded by the same calculation as the cost of the splits made to obtain them, and so the operation takes $O(x \log (\frac{2y}{x}))$ time in total.
 
 \paragraph{Operation~\ref{op6} -- batched value predecessor.}
-For this operation we use the same trick of splitting the tree and then working with smaller trees. Notice that in Operation \ref{op5} we only spend $O(x)$ time for scanning the roots of the small trees, since the intervals we are given are disjoint. Here this is not guaranteed, and so there is some additional technical difficulty. We solve this by considering our use of this operation when constructing a polyline, and showing that we can prune the input s.t. the resulting intervals (i.e. $(k_i',k_i)$) are disjoint. The full description of the operation is in Appendix \ref{appendix batched value predecessor}.
+For this operation we use the same trick of splitting the tree and then working with smaller trees. Notice that in Operation \ref{op5} we only spend $O(x)$ time for scanning the roots of the small trees, since the intervals we are given are disjoint. Here this is not guaranteed. We solve this problem by considering our use of this operation, and showing that we can prune the input s.t. the resulting intervals (i.e. $(k_i',k_i)$) are disjoint. The full description of the operation is in Appendix \ref{appendix batched value predecessor}.
 
 \paragraph{Operation~\ref{op7} -- batched interval insertions.}
-Again, we split the tree into small trees with $O(\frac{y}{x})$ leaves. Additionally, for each list of breakpoints that should be inserted between a pair of consecutive breakpoints stored in the same small tree, we split that small tree between these consecutive breakpoints.
-% This can be done by scanning the list of breakpoints to be inserted from left to right, while scanning the roots of the small trees. 
-Since we have at most $x$ such extra splits, each of which takes $O(\log(\frac{y}{x}))$ time, the total time for this is $O(x\log(\frac{2y}{x}))$. We now have $O(x)$ small trees with $O(\frac{y}{x})$ leaves, such that every breakpoint
+Again, we split the tree into small trees with $O(\frac{y}{x})$ leaves. Additionally, we split the small trees s.t. every interval
 that should be inserted falls between two small trees.
+Since we have at most $x$ such extra splits, each of which takes $O(\log(\frac{y}{x}))$ time, the total time for this is $O(x\log(\frac{2y}{x}))$.
 Then, for every such breakpoint we create a small tree containing just a single leaf corresponding to that
 breakpoint. Therefore, we have $O(x)$ small trees with $O(\frac{y}{x})$ leaves that should be now merged
-to obtain one large tree (some of these small trees might be much smaller, of course).
+to obtain one large tree.
 The merging is done as in the previous operations, and the total cost can be bounded,
 up to a constant factor, by essentially the same calculation as in Lemma \ref{running time to obtain small trees lemma}. Therefore, the overall time for the operation is $O(x \log(\frac{2y}{x}))$.
 
 \paragraph{Operation~\ref{op8} -- batched interval deletions.}
-Once again we split our tree into small trees. We then delete the relevant intervals from each of the small trees. Each interval is either contained in a single small tree (and is then deleted by performing one or two split operations and at most one join operation) or it spans several small trees (in which case we might also need to delete some trees entirely). Similarly to the previous operations, this takes $O(x \log(\frac{2y}{x}))$ time in total.
+Once again we split our tree into small trees. We then delete the relevant intervals from each of the small trees. Each interval is either contained in a single small tree (and is then deleted by performing one or two split operations and at most one join operation) or it spans several small trees (in which case we might also need to delete some trees entirely). This takes $O(x \log(\frac{2y}{x}))$ time in total.
 
 \begin{restatable}{theoremrestatable}{nlognweighted}
 \label{nlogn weighted f.t. theorem}
