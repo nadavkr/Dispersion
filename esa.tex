@@ -86,7 +86,7 @@ A related problem, also suggested in the early 80's  \cite{Becker1982,Perl1981},
 %
 Finally, and the focus of this paper, is the  {\em $k$-dispersion} problem, where we wish to designate $k$ nodes as facilities so as to maximize the distances among the facilities.  In other words, we wish to select $k$ nodes that are as spread-apart as possible. This can be seen as a generalization of the classical maximum independent set problem (that can be solved by binary searching for the largest value of $k$ for which the minimum distance is at least 2).  
 %
-It turns out that the $k$-dispersion and the $k$-partitioning problems are actually equivalent in the one-dimensional case (i.e. when the tree is a path).\footnote{The reduction simply creates a new path, whose edges correspond to nodes in the original path and vice versa. The original edge weights are now assigned to the nodes so we can run the $k$-partitioning solution.} However, such equivalence does not apply to general trees, on which $k$-dispersion seems more difficult than $k$-partitioning. In particular, until the present work, no linear time solution for $k$-dispersion was known. The fastest solution was the $O(n \log n)$ solution given in the late 90's by Bhattacharya and Houle \cite{Bhattacharya1991}. Bhattacharya and Houle also considered the weighted version (where nodes have weights and the goal is to select nodes with total weight at least $k$)  for which they gave an $\Oh(n\log^4 n)$ time solution \cite{Bhattacharya1999}.
+It turns out that the $k$-dispersion and the $k$-partitioning problems are actually equivalent in the one-dimensional case (i.e. when the tree is a path).\footnote{The reduction simply creates a new path whose edges correspond to nodes in the original path and whose nodes (and their weights) correspond to edges (and their weights) in the original path.} However, such equivalence does not apply to general trees, on which $k$-dispersion seems more difficult than $k$-partitioning. In particular, until the present work, no linear time solution for $k$-dispersion was known. The fastest solution was the $O(n \log n)$ solution given in the late 90's by Bhattacharya and Houle \cite{Bhattacharya1991}. Bhattacharya and Houle also considered the weighted version (where nodes have weights and the goal is to select nodes with total weight at least $k$)  for which they gave an $\Oh(n\log^4 n)$ time solution \cite{Bhattacharya1999}.
 
 \paragraph{The dispersion problem.}
 Consider the unweighted $k$-dispersion problem. This optimization problem can be solved by repeatedly querying a {\em feasibility test} that solves the decision version of this problem. More formally, let $d(u,v)$ denote the distance between nodes $u$ and $v$, and for a subset of nodes $P$ let $f(P)=\min_{u,v\in P} \{d(u,v)\}$:
@@ -422,7 +422,7 @@ We now show how to construct the rest of the polyline $p$. Notice that we need t
 \label{figure of constructing the second half of the polyline}}
 \end{figure}
 
-\subsubsection{Constructing the first half of the polyline.} We need to consider two possible cases: first, the case where $d(h_1,v) < d(h_2,v)$ (i.e. the closest chosen node in $v$'s subtree is inside $u_1$'s subtree), and second, the case where $d(h_1,v) > d(h_2,v)$\footnote{Note that in this half of the polyline $d(h,v)<\frac{\lambda}{2}$, and therefore $d(h_1,v) \neq d(h_2,v)$.}. For each of the two cases we will construct the first half of the polyline, and then we take the maximum of the two polylines at every point, in order to have the optimal solution for each key.
+\subsubsection{Constructing the first half of the polyline.} We need to consider two possible cases: either $d(h_1,v) < d(h_2,v)$ (i.e. the closest chosen node in $v$'s subtree is inside $u_1$'s subtree), or $d(h_1,v) > d(h_2,v)$ (note that in this half of the polyline $d(h,v)<\frac{\lambda}{2}$, and therefore $d(h_1,v) \neq d(h_2,v)$). For each of the two cases we will construct the first half of the polyline, and then we take the maximum of the two polylines at every point, in order to have the optimal solution for each key.
 
 \paragraph{Case I: \boldmath$d(h_1,v) < d(h_2,v)$.} Since we are only interested in the first half of the polyline, we know that $d(h_1,v) < \frac{\lambda}{2}$. Since $d(h_2,v) +d(h_1,v)\geq \lambda$ we have that  $d(h_2,v) > \frac{\lambda}{2}$. Again, we cannot afford to iterate over the breakpoints of $p_2$, so we need to be more subtle.
 
@@ -483,7 +483,7 @@ We now describe the data structure we use for polylines, which will allow us to 
  Operations~\ref{op1} and~\ref{op2} can use standard split and join procedures for 2-3 trees in logarithmic time. 
  Operation~\ref{op3} can be done by running a predecessor query and returning the value at the returned breakpoint in logarithmic time.
  Operation~\ref{op4} is done by an inorder traversal of the tree. 
-Operations~\ref{op1}-\ref{op3} are performed only a constant number of times per step, and so their total cost is logarithmic (i.e. $O(\log x + \log y)$). Operation~\ref{op4} is also performed a constant number of times to iterate over the breakpoints of $p_{1}$ (in $O(x)$ time). The next four operations are more costly, since each of them is comprised of a batch of $O(x)$ operations on a tree of size $O(y)$.\footnote{Note that the input for all four batched operations is given in sorted order (by keys).}
+Operations~\ref{op1}-\ref{op3} are performed only a constant number of times per step, and so their total cost is logarithmic (i.e. $O(\log x + \log y)$). Operation~\ref{op4} is also performed a constant number of times to iterate over the breakpoints of $p_{1}$ (in $O(x)$ time). The next four operations are more costly, since each of them is comprised of a batch of $O(x)$ operations on a tree of size $O(y)$. The input to all these four batched operations is assumed to be given in sorted order (by keys).
 
 
 \paragraph{Operation~\ref{op5} -- batched interval increase.}
@@ -693,7 +693,7 @@ Define $T'$ as the tree obtained by collapsing each fragment of the given partit
 \noindent The entire partition is obtained by applying Lemma~\ref{good partition refinement lemma} $\log^{*}n$ times. 
 If $b_{\ell}$ denotes the value of the parameter $b$ in the $\ell$-th application, then  $b_{\ell+1}=2^{b_{\ell}}$. The time to construct the $(\ell+1)$-th partition is $O(n/(b_{\ell})^{4})=O(n/b_{\ell})$. The overall time to construct all partitions is therefore 
 $$ O(\sum_{\ell} {n}/{b_{\ell}}) = O(\sum_{\ell} {n}/{2^{\ell}}) = O(n).$$
-Observe that the size of a (large) fragment in the $(\ell+1)$-th partition is at most $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$ which is at most $O((b_{\ell+1})^5)$ for a large enough $\ell$.\footnote{For sufficiently large $\ell$ we have that $\alpha^{\ell+1}\leq 2^{2^{\ell+1}}$ and $b_{\ell+1}\geq 2^{2^{\ell+1}}$.}  Denoting by $b=b_{\ell}$ and $B=b_{\ell+1}$  we get that every large fragment is of size $O(B^5)$ and is composed of (small) fragments of the $\ell$-th partition (each of size $O(b^5)$). 
+Observe that the size of a (large) fragment in the $(\ell+1)$-th partition is at most $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$ which is at most $O((b_{\ell+1})^5)$ for a large enough $\ell$ (i.e., an $\ell$ s.t $\alpha^{\ell+1}\leq 2^{2^{\ell+1}}$ and $b_{\ell+1}\geq 2^{2^{\ell+1}}$).  Denoting by $b=b_{\ell}$ and $B=b_{\ell+1}$  we get that every large fragment is of size $O(B^5)$ and is composed of (small) fragments of the $\ell$-th partition (each of size $O(b^5)$). 
 
 
 
@@ -1010,8 +1010,8 @@ cost $O(n)$ time altogether.
 In the {\em Set Disjointness} problem, we are given two sets of real numbers $X=\lbrace x_1,x_2,\ldots,x_n \rbrace$ and $Y=\lbrace y_1,y_2,\ldots,y_n \rbrace$ and we need to return true iff $X \cap Y = \emptyset$. 
 It is known that solving the set disjointness problem requires $\Omega(n \log n)$ operations in the algebraic
 computation tree model~\cite{BenOr}.
-We present a reduction from the set disjointness problem to the weighted feasibility test problem. We assume without loss of generality that the elements of $X$ and $Y$ are non-negative~\footnote{Otherwise
-we can simply find the minimum element, and subtract the minimum from all the elements.}.
+We present a reduction from the set disjointness problem to the weighted feasibility test problem. We assume without loss of generality that the elements of $X$ and $Y$ are non-negative (otherwise,
+we find the minimum element and subtract it from all elements).
 
 
 Given the two sets $X$ and $Y$, we construct a tree $T$ as follows. We first compute and set
