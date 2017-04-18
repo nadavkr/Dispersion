@@ -388,7 +388,7 @@ We now consider the weighted variant of the dispersion problem, in which the edg
 
 
 In this section we present an $O(n\log n)$ time algorithm for the weighted decision problem. A matching lower bound follows by a reduction from the set disjointness problem (see Appendix \ref{appendix weighted f.t. lower bound}).
-With the $O(n\log n)$ feasibility test in hand, we can use Frederickson's algorithm for finding the $k$-th longest path \cite{Frederickson1983} to binary search over the possible values of $\lambda$ and solve the optimization problem with $O(\log n)$ calls to the feasibility test, and $O(n\log^{2}n)$ time overall.
+Using Frederickson's algorithm for finding the $k$-th longest path \cite{Frederickson1983} we can binary search over the possible values of $\lambda$ and solve the optimization problem with $O(\log n)$ calls to the $O(n \log n)$ time feasibility test, and $O(n\log^{2}n)$ time overall.
 
 Similarly to the unweighted case, we would like to compute for each node of the tree, the subset of nodes $P$ in its subtree  s.t. $f(P) \geq \lambda$ and $W(P)$ is maximized. We compute this by going over the nodes of the tree bottom-up. Previously, the situation was simpler, as for any subtree we had just one candidate node (i.e., a node that may or may not be in the optimal solution for the entire input tree). This was true because nodes had uniform weights. Now however, there could be many candidates in a subtree, as the certain nodes are the ones that are at distance at least $\lambda$ from the root (and not $\frac{\lambda}{2}$ as in the unweighted case).
 
