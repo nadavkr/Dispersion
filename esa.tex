@@ -167,7 +167,7 @@ application we need various non-standard batch operations on the lists, and henc
 Instead, we present a simpler approach for merging polylines in Section~\ref{O(nlogn) weighted f.t.} that efficiently supports the required batch operations and works with essentially any balanced search
 tree with split and join capabilities. We believe that this is of independent interest due to its simplicity.
 
-\section{A Linear Feasibility Test}\label{linear F.T.}
+\section{A Linear Time Feasibility Test}\label{linear F.T.}
 
 The feasibility test processes the tree bottom-up and computes, for every subtree $T_{r}$ rooted at a node $r$, a valid solution with maximal cardinality.
 If $P$ is a valid solution for the subtree $T_{r}$ (i.e., $f(P)\geq\lambda$), we call a node $u\in P$, s.t. $d(r,u)<\frac{\lambda}{2}$, the \emph{candidate} node of the subtree (or a candidate with respect to $r$). There is at most one such candidate node.
