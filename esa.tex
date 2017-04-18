@@ -293,23 +293,20 @@ We call $u_{1},u_{2},\ldots,u_{i}$ a {\em prefix} of the caterpillar and, simila
 For every possible prefix, we would like to precompute the result of running the linear-time feasibility
 test on that prefix. In Section~\ref{sec:feasibility test} we will show that, in fact, this is enough to efficiently
 simulate running the linear-time feasibility test on the whole subtree rooted at $r$ if we know the candidate
-and the certain node w.r.t. the hole. Consider running the feasibility test on $u_{1},u_{2},\ldots,u_{i}$,
-and recall that its goal is to choose as many nodes as possible, and in case of a tie to maximize the distance of the
+and the certain node w.r.t. the hole. Consider running the feasibility test on $u_{1},u_{2},\ldots,u_{i}$.
+Recall that its goal is to choose as many nodes as possible, and in case of a tie to maximize the distance of the
 nearest chosen node to $r$. Then, due to distances of the leaves to $r$ being non-decreasing, it is clear that
 $u_{i}$ should be chosen. Then, consider largest $i'<i$ such that $d(u_{i'},u_{i})\geq \lambda$ (recall that
 such a test is actually done by comparing to $\lambda_{1}$). Due to distances of the leaves to the hole
 being non-decreasing, nodes $u_{i'+1},u_{i'+2},\ldots,u_{i-1}$ cannot be chosen and furthermore $d(u_{j},u_{i}\geq \lambda$
-for any $j=1,2,\ldots,i'$. Therefore, to continue the simulation we have to run the procedure on $u_{1},u_{2},u_{i'}$.
-
-
-
-
-
-
-In query time we want to process each fragment after its hole has already been processed.
-We call a set of consecutive leaves of the caterpillar, that contains the closest leaf to the hole, a \emph{suffix} of the caterpillar. Similarly we can define the caterpillar's \emph{prefix}.
-Assuming we know what is the closest chosen node in the fragment's hole, we can eliminate an entire suffix of the caterpillar (because of the monotonicity of the distances of candidate nodes from the hole). We can compute in preprocessing, for any possible eliminated suffix, which nodes in the fragment should be chosen, and also which nodes are the candidate node and certain node we need to pass to the next fragment.
-In order to precompute this, scan the caterpillar from top to bottom. For every possible prefix of the caterpillar we would like to store the numbers of nodes chosen, the certain node and the candidate node, assuming all nodes that are not in the prefix are eliminated as they are too close to the hole. Consider the bottom node of the current prefix. If the distance of this node to the fragment's root is less than $\frac{\lambda}{2}$\footnote{We do not actually know $\lambda$ in preprocessing, but due to the previous steps, such a query of a node inside the fragment would produce the same result for any possible $\lambda$.}, store it as the candidate node, zero as the number of chosen nodes, and NULL as the certain node (if this fragment has a hole, we will consider its candidate and certain node in query time). Else (the node's distance to the root is larger or equal to $\frac{\lambda}{2}$), binary search to find the closest node above it, that is at distance of at least $\lambda$. If such a node exists, add 1 to the number of chosen nodes stored in the node we found, and copy the candidate node and certain node stored there (both of which could be the node itself). If such a node does not exist, the bottom node is the certain node, we store NULL as the candidate node, and the number of chosen nodes is one. This would take $O(b \log b)$ time. We can improve this by not binary searching for the first node far enough, but instead saving it for each prefix, and then only going down from the previous node found. This would only take $O(b)$ time.
+for any $j=1,2,\ldots,i'$. Therefore, to continue the simulation we should repeat the reasoning $u_{1},u_{2},u_{i'}$.
+This suggest the following implementation: can the caterpillar from top to bottom and store, for every prefix $u_{1},u_{2},\ldots,u_{i}$,
+the number of chosen nodes, the certain node and the candidate node. While scanning we maintain $i'$,
+it is easy to see that after increasing $i$ we only have to keep increasing $i'$ as long as $d(u_{i},u_{i'})<\lambda$.
+To store the information for the current prefix, we copy the already computed information for $u_{1},u_{2},u_{i'}$
+and increase the number of chosen nodes by one. Then, if the candidate node is set to NULL and $d(r,u_{i})<\lambda/2$
+we set the candidate node to $u_{i}$, and else similarly if the certain node is set to NULL we set the certain node to $u_{i}$.
+We spend only amortized constant time per $i$, so the total preprocessing time is $O(b)$.
 \end{enumerate}
 
 \subsection{Feasibility test}
