@@ -74,7 +74,7 @@ In the early 90's, an optimal $\Oh(n)$ time solution was given by Frederickson~\
 parametric search, also for two other versions where points on edges can be designated as facilities or where we minimize over points on edges.
 In yet another variant, called $k$-center with weighted demands, every node has a positive weight and we wish to minimize the maximum weight of a node multiplied
 by the distance to its closest facility. Megiddo et al.~\cite{Megiddo1981} solved this in $\Oh(n\log^{2}n)$ time, and
-Megiddo and Tamir~\cite{Megiddo1983} designed an $\Oh(n\log^{2}n\log\log n)$ time algorithm when allowing points on edges can be
+Megiddo and Tamir~\cite{Megiddo1983} designed an $\Oh(n\log^{2}n\log\log n)$ time algorithm when allowing points on edges to be
 designated as facilities. The latter complexity can be further improved to $\Oh(n\log^{2}n)$ using a technique of Cole~\cite{Cole87}. 
 %
 A related problem, also suggested in the early 80's  \cite{Becker1982,Perl1981}, is \emph{$k$-partitioning}. In this problem the nodes have weight and we wish to delete $k$ edges in the tree so as to maximize the weight of the lightest resulting subtree. This problem was also solved by Fredrickson in $\Oh(n)$ time \cite{Frederickson1991} using his parametric search framework. 
@@ -84,17 +84,16 @@ Finally, and the focus of this paper, is the  {\em $k$-dispersion} problem, wher
 It turns out that the $k$-dispersion and the $k$-partitioning problems are actually equivalent in the one-dimensional case (i.e. when the tree is a path).\footnote{The reduction simply creates a new path, whose edges correspond to nodes in the original path and vice versa. The original edge weights are now assigned to the nodes so we can run the $k$-partitioning solution.} However, such equivalence does not apply to general trees, on which $k$-dispersion seems more difficult than $k$-partitioning. In particular, until the present work, no linear time solution for $k$-dispersion was known. The fastest solution was the $O(n \log n)$ solution given in the late 90's by Bhattacharya and Houle \cite{Bhattacharya1991}. Bhattacharya and Houle also considered the weighted version (where nodes have weights and the goal is to select nodes with total weight at least $k$)  for which they gave an $\Oh(n\log^4 n)$ time solution \cite{Bhattacharya1999}.
 
 \paragraph{The dispersion problem.}
-Consider the unweighted $k$-dispersion problem. This optimization problem can be solved by repeatedly querying a {\em feasibility test} that solves the decision version of this problem. More formally, for a subset of nodes $P$ let $d(u,v)$ denote the distance between nodes $u$ and $v$ and let $f(P)=\min_{u,v\in P} \{d(u,v)\}$:
+Consider the unweighted $k$-dispersion problem. This optimization problem can be solved by repeatedly querying a {\em feasibility test} that solves the decision version of this problem. More formally, let $d(u,v)$ denote the distance between nodes $u$ and $v$, and for a subset of nodes $P$ let $f(P)=\min_{u,v\in P} \{d(u,v)\}$:
 
 
 \begin{itemize} 
-\item {\em The Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, and a  number $k$, find a subset of nodes $P$ of size $k$ such that $f(P)$ is maximized. 
+\item {\em The Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, and a  number $k$, find a subset $P$ of nodes of size $k$ such that $f(P)$ is maximized. 
 
-\item  {\em The Dispersion Decision Problem (feasibility test).}  Given a tree with non-negative edge lengths, a number $k$, and a number $\lambda$, find a subset of nodes $P$ of size $k$ such that  $f(P)\geq\lambda$. 
+\item  {\em The Dispersion Decision Problem (feasibility test).}  Given a tree with non-negative edge lengths, a number $k$, and a number $\lambda$, find a subset $P$ of nodes of size $k$ such that  $f(P)\geq\lambda$. 
 \end{itemize}
 
-Both \cite{Bhattacharya1991} and \cite{Bhattacharya1999} present efficient feasibility tests, and use a result by Fredrickson \cite{Frederickson1983} that allows them to binary search over the possible values of $\lambda$ (which are all pairwise distances in the tree). This implies $O(n \log n + \tau \cdot \log n)$ time algorithms for the dispersion optimization problems (in both the weighted and unweighted cases), where $\tau$ is the running time of the feasibility test.
-For completeness, in Section~\ref{linear F.T.} we present a simplified version of the linear time feasibility test for the unweighted case presented in \cite{Bhattacharya1991}.
+Both \cite{Bhattacharya1991} and \cite{Bhattacharya1999} present efficient feasibility tests, and use a result by Fredrickson \cite{Frederickson1983} that allows them to binary search over the possible values of $\lambda$ (which are all pairwise distances in the tree). This implies $O(n \log n + \tau \cdot \log n)$ time algorithms for the dispersion optimization problems (in both the weighted and unweighted cases), where $\tau$ is the running time of the feasibility test. In Section~\ref{linear F.T.} we present a simplified version of the linear time feasibility test for the unweighted case presented in \cite{Bhattacharya1991}.
 %, improving on an earlier $\Oh(kn+n\log n)$ solution for single-path trees given by Wang and Kuo~\cite{Wang1988}. 
 %We present a faster $\Oh(n\log^2 n)$ time algorithm. 
 %Using this feasibility test, the optimization problem can then be solved by parametric search: Since the answer is always
@@ -110,7 +109,7 @@ distances between nodes. To cope with this, the algorithm maintains % a current 
 %the optimal value $\lambda^*$ lies within the interval, and generates,
 %in every step, 
 (an implicit representation of) only a subset of these distances.
-The representation consists of matrices which are monotone in both rows and columns. Then, we run feasibility tests with a few values from 
+The representation consists of matrices where both rows and columns are sorted. Then, we run feasibility tests with a few values from 
 the matrices that allow us to eliminate many entries of the matrices each time. Then, we are able to prune the tree accordingly and repeat.
 Again, this is the same as in Frederickson's approach, but our algorithm differs in which distances are represented in every step and how the
 tree is pruned.
