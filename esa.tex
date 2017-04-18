@@ -13,7 +13,8 @@
 
 \newcommand{\jump}{\text{jump}}
 \newcommand{\Oh}{{O}}
-\newtheorem{invariant}{Invariant}
+\newcommand{\head}{\textsf{head}}
+\newcommand{\tail}{\textsf{tail}}
 
 \bibliographystyle{plainurl}% the recommended bibstyle
 
@@ -217,7 +218,7 @@ if $d(u_1,u_2)\geq\lambda$ or $d(u_1,u_2) \geq \frac{\lambda}{2}$, for any possi
 This is done with the parametric search method by Frederickson as follows. We maintain an interval $[\lambda_1,\lambda_2)$ such that
 $\lambda^{*}$ that we are searching for in the optimization problem is surely inside the interval, that is, $\lambda_{1}$ is feasible
 while $\lambda_{2}$ is not. In the beginning, the interval is simply $[0,\infty)$. Then, we use $O(\log b)$ calls to the
-linear-time feasibility test to decrease the interval, so that most of the fragments have the property that any pairwise distance
+linear-time feasibility test to further decrease the interval, so that most of the fragments have the property that any pairwise distance
 (and also any pairwise distance multiplied by 2) inside is either smaller than $\lambda_{1}$ or larger or equal to $\lambda_{2}$.
 A method of choosing which tests to perform to achieve this is the gist of Frederickson's method.
 
@@ -246,6 +247,7 @@ the candidate and the certain node for each of them. The fragment is now reduced
 spine node: the candidate node and the certain node.
 \item\label{removing certain nodes}
 \textbf{Find candidate nodes that cannot be taken into the solution:}\\
+\label{removing impossible candidate nodes}
 For every candidate node we want to find the nearest certain node. Then, we can compare their distance to $\lambda$ and remove the
 candidate node if it cannot be taken. To find the nearest certain node, we first scan all nodes bottom-up (according to the natural order
 on the spine nodes they are attached to) and compute for each of them the nearest certain node below it. Then, we repeat the scan
@@ -325,46 +327,56 @@ $O(\frac{n}{b} \cdot \log b) + O(\frac{n}{b^2} \cdot b) = O(\frac{n}{b}\cdot \lo
 
 \subsection{\texorpdfstring{\boldmath$O(n\log\log n)$}{O(nloglogn)} Time Algorithm} 
 
-The general idea of the algorithm is to use the heavy path decomposition. We are searching for $\lambda^*$, which is the distance between some two nodes in the tree, and the largest number for which a feasibility test would return true.
-\begin{definition}[Heavy Path Decomposition] \cite{Sleator1983} Given a rooted tree, define the \emph{heavy edge} of each non-leaf node of the tree as the edge to the child that has the greatest number of descendants. These heavy edges form a decomposition of the tree into heavy paths. The heavy path decomposition induces a \emph{heavy path tree}, where each node corresponds to a path of the heavy path decomposition. For a path $p$ of the heavy path decomposition, $p$'s parent in the heavy path tree is the path that contains the parent of $p$'s topmost node. The heavy path tree has depth of at most $\log n$. 
-\end{definition}
-We go through the heavy path tree bottom-up, and process all heavy paths at a specific depth in parallel, until we are left with a certain and candidate node for each of them. We maintain an interval $[\lambda_1,\lambda_2)$ as previously. The interval will get smaller and smaller throughout the run.
+The general idea of the algorithm is to use the heavy path decomposition to solve the optimization  problem
+with $O(\log^{2}n)$ calls to the feasibility test. The {\em heavy edge} of a non-leaf node of the tree is the edge leading to the child
+with the largest number of descendants. These heavy edges define a decomposition of the nodes into heavy paths. Each heavy
+path $p$ starts with a head $\head(p)$ and ends with a tail $\tail(p)$ such that $\tail(p)$ is a descendant of $\head(p)$,
+and its depth is the number of heavy paths $p'$ such that $\head(p')$ is an ancestor of $\head(p)$. The depth of any heavy path is 
+$O(\log n)$~\cite{Sleator1983}.
 
-We now describe the processing of a heavy path, which is very similar to the preprocessing of inactive fragments presented in Subsection \ref{Pre-Processing Fragments}. Notice that the traversal is bottom-up, so we have already processed all of the path's children in the heavy path tree. Because we have determined $\lambda^*$ with sufficient accuracy (i.e. reduced the size of the maintained interval), each subtree hanging off a heavy path can be replaced by its candidate and certain node attached by single edges to the heavy path\footnote{The heavy paths in these hanging subtrees are all descendants of the current heavy path in the heavy path tree, and so they have already been processed.}. Hence, each such heavy path is a caterpillar, with at most two leaves attached to each spine node. We would like to reduce the current heavy path to at most two nodes (a certain node and a candidate node).
-Assume that the caterpillar has $k$ nodes. As we have defined before, let the $i$-th leaf be connected by an edge of length $y_i$ to a spine node at distance $x_i$ from the root of the caterpillar. Notice that $x_1 < x_2 < \ldots < x_k$.
-\begin{enumerate}
-\item\textbf{Find the candidate nodes that will certainly not be taken:}
+We process all heavy paths at the same depth together while maintaining an interval $[\lambda_{1},\lambda_{2})$ such that
+$\lambda_{1}$ is feasible while $\lambda_{2}$ is not, that is, the sought $\lambda^{*}$ belongs to the interval.
+The goal of processing the heavy paths at depth $d$ is to further shrink the interval so that the result of running the feasibility
+test on any subtree rooted at $\head(p)$ is the same for any $\lambda\in[\lambda_{1},\lambda_{2})$ and therefore can
+be already determined, for any heavy path $p$ at depth $d$. We start with the heavy paths of maximal depth and terminate
+with $\lambda^{*}=\lambda_{1}$ after having determined the result of running the feasibility test on the whole tree.
+Let $n_{d}$ denote the total size of all heavy paths at depth $d$.
 
-This is done as in step \ref{removing certain nodes} in Subsection \ref{Pre-Processing Fragments}.
-\item\textbf{Prune the caterpillar so that the distances of leaves from the root and the hole are monotone:}	
+Let $n_{d}$ denote the total size of all heavy paths at depth $d$. For every such heavy path we construct a caterpillar by replacing
+every hanging off subtree by the certain and the candidate node (this is possible, because we have already determined the result of
+running the feasibility test on that subtree). To account for the possibility of including a node of the heavy path in the solution,
+we attach an artificial leaf connected with an zero-length edge to every such node.
+The caterpillar is then pruned similarly to steps (\ref{removing impossible candidate nodes})-(making distances from the hole monotone)
+from Section~\ref{Pre-Processing Fragments}, except that after having found the nearest certain node for every candidate
+node we cannot simply compare their distance to $\lambda_{1}$. Instead, we create an $1\times 1$ matrix storing the relevant
+distance for every candidate node. Then, we apply Theorem~\ref{Frederickson's theorem} with $p=0$ to the obtained set of
+$O(n_{d})$ matrices of dimension $1\times 1$. This allows us to determine, using only $O(\log n)$ feasibility tests and
+$O(n_{d})$ time exclusive of the feasibility tests, which distances are larger than $\lambda^{*}$, so that we can prune
+the caterpillars and work only with the remaining candidate nodes. Then, for every caterpillar we create a row- and column-sorted matrix
+storing pairwise distance between its leaves. By applying Theorem~\ref{Frederickson's theorem} with $p=0$ on the obtained set of
+square matrices of total side length $O(n_{d})$ we can determine, with $O(\log n)$ feasibility tests and $O(n_{d})$ time
+exclusive of the feasibility tests, which distances are larger than $\lambda^{*}$. This allows us to run the bottom-up
+procedure described in Section~\ref{linear F.T.} to produce the candidate and the certain node for every subtree rooted
+at $\head(p)$, where $p$ is a heavy path at depth $d$.
 
-This is done as in steps \ref{making distances from the root monotone} and \ref{making distances from the hole monotone} in Subsection \ref{Pre-Processing Fragments}.
-\item\textbf{Construct a row and column sorted matrix storing all pairwise distances in the caterpillar:}
-
-We have obtained a caterpillar with one child for every spine node, s.t the distances of leaves are monotone. It is easy to see that arranging the matrix in the natural order will produce a triangular matrix with monotone rows and columns \footnote{Again, we cannot afford to explicitly store this matrix, but we can compute any pairwise distance in $O(1)$ time.}.
-\item\textbf{Run a searching algorithm on the sorted matrices of all the heavy paths at the current level:}
-
-We now use Theorem \ref{Frederickson's theorem} to search the sorted matrices containing all pairwise distances in the heavy paths of the current level. We need to eliminate all of the entries, and so we set $p$ to zero. We thus narrow down our interval $[\lambda_1,\lambda_2)$ so that it does not contain any pairwise distance in the caterpillar. Now, we can use the same bottom up procedure we used for the linear feasibility test in Section \ref{linear F.T.}, and produce a candidate and a certain node of the caterpillar that will be valid for any value of $\lambda^*$.
-\end{enumerate}
-Since the number of vertices in the heavy paths of the current level is at most $n$, we need to use $O(\log n)$ feasibility tests for each level. There are at most $\log n$ levels in the heavy path tree, so we use $O(\log ^2n)$ calls to our sublinear feasibility test in total. This yields a time complexity of $O(n \log \log n)$ (the time needed for the search exclusive of the feasibility tests is linear).
-
-After processing all heavy paths we finally have a maximal valid solution for the whole tree.
-Notice that throughout our algorithm we process caterpillars, and do not consider taking spine nodes to our solution. 
-This is fine, since we can attach to every such spine node an artificial leaf connected with an edge of length zero.
+All in all, for every $d$ we spend $O(n_{d})$ time and execute $O(\log n)$ feasibility tests. Summing over all depths $d$,
+this is $O(n)$ plus $O(\log^{2}n)$ calls to the feasibility test. Setting $b=\log^{2}n$, the total time is thus $O(n+n\log\log n+\frac{n}{\log^{2}n}\cdot\log\log n\cdot \log^{2}n)=O(n\log\log n)$.
 
 \section{A Linear Time Algorithm for the Dispersion Problem}
 \label{sectionLinear}
 
-The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test to get a sublinear one. We will now use a similar process, iteratively, with growing fragments size (starting from constant size and growing exponentially), improving in each iteration the performance of our feasibility test. Given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with $O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
-After $\log ^*n$ iterations requiring a total of $O(n)$ time, we will have a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time
+To accelerate the $O(n\log\log n)$ time algorithm, we construct a hierarchy of feasibility tests by partitioning the input tree
+into larger and larger fragments, starting from the linear-time implementation described in Section~\ref{linear F.T.}. 
+Given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with
+$O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
+After $\log ^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time
 which we use to solve the dispersion optimization problem in $O(n)$. 
 
-Partitioning the input tree into fragments independently in each iteration would yield an $O(n \log ^* n)$ algorithm, since each partition would take $O(n)$ time. In order to obtain overall $O(n)$ time, we make each decomposition a refinement of the previous one, i.e. the fragments of the $(\ell+1)$-th partition (called large fragments) are composed of fragments of the $\ell$-th partition (called small fragments). We believe that this simple micro-macro variant is of independent interest. 
-%
-The main difficulty remaining is how to preprocess the fragments. We cannot afford to touch every node of every fragment at every decomposition level. Therefore, we take a closer look at how a (large) fragment decomposes into smaller fragments. 
-We show that a large fragment can be reduced to a concatenation of small caterpillars, each corresponding to a small fragment that we have already preprocessed. We then  carefully tailor these small caterpillars while reusing the results of their preprocessing. We show that this tailoring amortizes to $O(n)$ over all decompositions. This turns out to be quite technical. Due to space constrictions, the full description of the algorithm is in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
-
-
+There are multiple technical difficulties that need to be overcome in order to keep the preprocessing time $O(\frac{n}{b})$.
+We must make each partition into fragments a refinement of the previous one, i.e. the fragments of the $(\ell+1)$-th partition (called large fragments)
+are composed of fragments of the $\ell$-th partition (called small fragments). We believe that this simple micro-macro variant is of independent interest. 
+Further, we cannot afford to touch every node of every fragment at every decomposition level. Therefore, we take a closer look at how a (large) fragment decomposes into smaller fragments. 
+We show that a large fragment can be reduced to a concatenation of small caterpillars, each corresponding to a small fragment that we have already preprocessed. We then carefully tailor these small caterpillars while reusing the results of their preprocessing. We show that this tailoring amortizes to $O(n)$ over all decompositions. Due to space constraints, the full description of the algorithm is in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
 
 \section{The Weighted Dispersion Problem}\label{section:weighted}
 We now consider the weighted variant of the dispersion problem, in which the edges have lengths and the nodes have weights. Recall that $f(P)=\min_{u,v\in P} \{d(u,v)\}$. The weighted dispersion problems are defined as follows.
@@ -690,7 +702,7 @@ Define $T'$ as the tree obtained by collapsing each fragment of the given partit
 \noindent The entire partition is obtained by applying Lemma~\ref{good partition refinement lemma} $\log^{*}n$ times. 
 If $b_{\ell}$ denotes the value of the parameter $b$ in the $\ell$-th application, then  $b_{\ell+1}=2^{b_{\ell}}$. The time to construct the $(\ell+1)$-th partition is $O(n/(b_{\ell})^{4})=O(n/b_{\ell})$. The overall time to construct all partitions is therefore 
 $$ O(\sum_{\ell} {n}/{b_{\ell}}) = O(\sum_{\ell} {n}/{2^{\ell}}) = O(n).$$
-Observe that the size of a (large) fragment in the $(\ell+1)$-th partition is at most $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$ which is at most $O((b_{\ell+1})^5)$ for a large enough $\ell$ (i.e., an $\ell$ s.t $\alpha^{\ell+1}\leq 2^{2^{\ell+1}}$ and $b_{\ell+1}\geq 2^{2^{\ell+1}}$).  Denoting by $b=b_{\ell}$ and $B=b_{\ell+1}$  we get that every large fragment is of size $O(B^5)$ and is composed of (small) fragments of the $\ell$-th partition (each of size $O(b^5)$). 
+Observe that the size of a (large) fragment in the $(\ell+1)$-th partition is at most $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$ which is at most $O((b_{\ell+1})^5)$ for a large enough $\ell$ (i.e., an $\ell$ s.t. $\alpha^{\ell+1}\leq 2^{2^{\ell+1}}$ and $b_{\ell+1}\geq 2^{2^{\ell+1}}$).  Denoting by $b=b_{\ell}$ and $B=b_{\ell+1}$  we get that every large fragment is of size $O(B^5)$ and is composed of (small) fragments of the $\ell$-th partition (each of size $O(b^5)$). 
 
 
 
