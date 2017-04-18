@@ -167,7 +167,7 @@ application we need various non-standard batch operations on the lists, and henc
 Instead, we present a simpler approach for merging polylines in Section~\ref{O(nlogn) weighted f.t.} that efficiently supports the required batch operations and works with essentially any balanced search
 tree with split and join capabilities. We believe that this is of independent interest due to its simplicity.
 
-\section{A Linear Time Unweighted Feasibility Test}
+\section{A Linear Time Feasibility Test}
 \label{linear F.T.}
 
 Given a tree $T$ with non-negative lengths and a number $\lambda$, the feasibility tests finds a subset of nodes $P$ such that $f(P)\geq\lambda$
@@ -194,7 +194,7 @@ in step \ref{linear time step 3} it is enough to consider $x$ being the already 
 can be computed in $O(1)$ time after storing the distance of every node to the root of the whole tree and using lowest common
 ancestor queries~\cite{Bender2000}.
 
-\section{\texorpdfstring{\boldmath$O(n\log\log n)$}{O(nloglogn)} Time Algorithm for the Unweighted Dispersion Problem}
+\section{An \texorpdfstring{\boldmath$O(n\log\log n)$}{O(nloglogn)} Time Algorithm for the Dispersion Problem}
 \label{sublinear f.t.}
 
 To accelerate the linear-time feasibility test described in Section~\ref{linear F.T.}, we will partition the tree into $O(n/b)$ fragments of size at most
@@ -233,11 +233,9 @@ linear-time feasibility test to decrease the interval, so that {\em most} of the
 A method of choosing which tests to perform to achieve this is the gist of Frederickson's method.
 
 For each fragment, we construct an implicit representation of $O(b)$ matrices of total side length $O(b\log b)$, that are row- and column-sorted,
-and any pairwise distance inside is an entry in some matrix. This is done using the standard centroid decomposition as described
-in Appendix \ref{appendix constructing sorted matrices using centroid decomp.} in $O(n/b\cdot b\log b)=O(n\log b)$ total time.
-Then, intuitively, by carefully choosing an entry in one of
-these matrices and using the linear-time feasibility test, we can actually eliminate a large piece of the matrix, because the
-matrices are row- and column-sorted. More precisely, we use the following theorem:
+and any pairwise distance (and any pairwise distance multiplied by 2) inside is an entry in some matrix. This is done using the standard centroid 
+decomposition as described in Appendix \ref{appendix constructing sorted matrices using centroid decomp.} in $O(n/b\cdot b\log b)=O(n\log b)$
+total time. Then we use the following theorem:
 
 \begin{theorem}[\cite{Frederickson1991}]\label{Frederickson's theorem}
 Let  ${M_1, M_2, . . . , M_N}$ be a collection of sorted matrices in which matrix $M_j$ is of dimension $m_j \times n_j$, $m_j \leq n_j$, and $\sum_{j=1}^{N} m_j = m$.
@@ -256,9 +254,9 @@ This allows us to preprocess each inactive fragment in $O(b)$ time as follows:
 A fragment consists of the spine and the subtrees hanging off the spine. Because for any two nodes inside the fragment we can compare
 their distance to $\lambda$ and $\lambda/2$, we can run our linear-time feasibility test on the subtrees hanging off the spine to obtain
 the candidate and the certain node for each of them. The fragment is now reduced to a caterpillar with at most two leaves attached to each
-spine node: a candidate node and a certain node.
+spine node: the candidate node and the certain node.
 \item\label{removing certain nodes}
-\textbf{Find candidate nodes that cannot be taken:}\\
+\textbf{Find candidate nodes that cannot be taken into the solution:}\\
 For every candidate node we want to find the nearest certain node. Then, we can compare their distance to $\lambda$ and remove the
 candidate node if it cannot be taken. To find the nearest certain node, we first scan all nodes bottom-up (according to the natural order
 on the spine nodes they are attached to) and compute for each of them the nearest certain node below it. Then, we repeat the scan
@@ -290,6 +288,14 @@ remaining leaves from the root are non-decreasing.
 \textbf{Prune leaves to make their distances to the hole non-decreasing:}\\
 This is done as in the previous step.
 \item\textbf{Precompute for any candidate node with respect to the hole:}\\
+We call $u_{1},u_{2},\ldots,u_{i}$ a {\em prefix} of the caterpillar and, similarly, $u_{i+1},u_{i+2}, \ldots$ a {\em suffix}.
+For every possible prefix, we would like to precompute the result of running the linear-time feasibility
+test on that prefix. In Section~\ref{sec:feasibility test} we will show that, in fact, this is enough to efficiently
+simulate running the linear-time feasibility test on the whole subtree rooted at $r$ if we know the candidate
+and the certain node w.r.t. the hole. 
+
+
+
 In query time we want to process each fragment after its hole has already been processed.
 We call a set of consecutive leaves of the caterpillar, that contains the closest leaf to the hole, a \emph{suffix} of the caterpillar. Similarly we can define the caterpillar's \emph{prefix}.
 Assuming we know what is the closest chosen node in the fragment's hole, we can eliminate an entire suffix of the caterpillar (because of the monotonicity of the distances of candidate nodes from the hole). We can compute in preprocessing, for any possible eliminated suffix, which nodes in the fragment should be chosen, and also which nodes are the candidate node and certain node we need to pass to the next fragment.
@@ -297,6 +303,7 @@ In order to precompute this, scan the caterpillar from top to bottom. For every 
 \end{enumerate}
 
 \subsection{Feasibility test}
+\label{sec:feasibility test}
 We now scan the whole tree, and for each inactive fragment we would like to produce in $O(\log b)$ time: the number of chosen nodes in the fragment, the candidate node, and the certain node. In this procedure we use the caterpillars we have created in the preprocessing. We run this procedure bottom-up, so we assume that the fragment rooted at the hole of the current one has already been processed. Notice that now we are given $\lambda$..
 
 We start by considering the case where the hole does not have a candidate node. Denote the hole's certain node by $u$. We compute the suffix of the fragment that cannot be taken. We do this by binary searching for the first node of the fragment that is at distance at least $\lambda$ (which is given now) from $u$. We have precomputed all we need to know once we have the relevant prefix (i.e. the nodes we choose in the current fragment, including the certain and candidate nodes).
@@ -337,7 +344,7 @@ After processing all heavy paths we finally have a maximal valid solution for th
 Notice that throughout our algorithm we process caterpillars, and do not consider taking spine nodes to our solution. 
 This is fine, since we can attach to every such spine node an artificial leaf connected with an edge of length zero.
 
-\section{A Linear Time Algorithm for the Unweighted Dispersion Problem}
+\section{A Linear Time Algorithm for the Dispersion Problem}
 \label{sectionLinear}
 
 The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test to get a sublinear one. We will now use a similar process, iteratively, with growing fragments size (starting from constant size and growing exponentially), improving in each iteration the performance of our feasibility test. Given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with $O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
