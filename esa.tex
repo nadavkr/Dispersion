@@ -486,23 +486,7 @@ The calculation proving this lemma is in Appendix \ref{appendix proof of running
 The cost of all joins required to patch the small trees together can be bounded by the same calculation as the cost of the splits made to obtain them, and so the operation takes $O(x \log (\frac{2y}{x}))$ time in total.
 
 \paragraph{Operation~\ref{op6} -- batched value predecessor.}
-Similarly to Operation~\ref{op5}, we start by describing a procedure that works on one tree, then apply the same trick of splitting the tree into small trees, and work on them.
-
-We start each value predecessor query by first finding $k_i$ (or its predecessor, if there is no breakpoint at $k_i$). Then, we go up the path in the tree until the maximum value of a leaf in a subtree hanging to the left of the path is at least $v_i$. We then keep going down to the rightmost child that has at least $v_i$ as the maximum value in its subtree. The overall runtime is $O(x \log y)$ since each value predecessor query takes $O(\log y)$ time.
-
-We now apply the same splitting procedure as in Operation \ref{op5}, and obtain $O(x)$ trees with $O(\frac{y}{x})$ leaves each. We would like to iterate over the given keys and run value predecessor queries. However, unlike in Operation \ref{op5}, now the intervals defined by the pairs $(k_i',k_i)$ are not necessarily disjoint and so we need to be more careful as to not spend more than constant time for each root of a small tree when we scan the roots.
-
-Recall that we had two uses for the batched value predecessor operation. The first was to prune the non-monotone polyline we have obtained by increasing intervals of $p_2$ (see Figure~\ref{figure of the second case in the construction of the first half of the polyline}). The pruning is done by deleting the intervals returned by this operation.
-%
-Consider two consecutive keys $k_1$ and $k_2$ ($k_1 \leq k_2$) for which we would like to find their value predecessors $k_1'$ and $k_2'$. If the value of the polyline at $k_1$  is greater or equal to the value  of the polyline at $k_2$, then certainly $k_1 \leq k_2'$, and the intervals are in fact disjoint. Else, the intervals might not be disjoint, but we know that $k_1' \geq k_2'$, and so the interval $(k_1',k_1)$ is contained in the interval $(k_2',k_2)$. Thus, deleting the second interval is enough, meaning that we do not need to run the value predecessor query for $k_1$ at all. Generalizing this observation, before running the value predecessor queries, we can remove keys from the input list
-so that the values of the remaining keys are  monotonically decreasing, in $O(x)$ time\footnote{In this case the values of the polyline at $k_1$ and $k_2$ are in fact $v_1$ and $v_2$ which are given as input, so we don't have to query for them. These values are obtained during the interval increases which precede this pruning of the non-monotone polyline.}. 
-% by scanning them from left to right while maintaining the remaining keys on a stack.
-We can then answer value predecessor queries for this pruned list of keys using our small trees with $O(\frac{y}{x})$ leaves. We process the keys from right to left while simultaneously scanning the small trees (also from right to left). To process a pair $(k_{i},v_{i})$ we first $k_{i}$, then we continue moving to the previous small tree as long as the maximal value stored at the root is smaller than $v_{i}$. Once we find the appropriate small subtree, we run a value predecessor query on it (similarly to what we described for one tree). 
-%
-Therefore, we search for the value predecessor of each key in one small tree in $O(\log(\frac{y}{x}))$ time,
-and additionally sweep through $O(x)$ roots, so the cost is $O(x \log (\frac{2y}{x}))$. We finish by merging the small trees back into one large tree (as in Operation \ref{op5}) which also takes $O(x \log (\frac{2y}{x}))$ time, and so this is also the time complexity of the entire operation.
-
-The second use of this operation was to find the intersection points of two polylines. In this case it is easy to see that the intervals $(k_i',k_i)$ are in fact disjoint, since we query with the keys of the breakpoints of one of the polylines only when there must be an intersection point between this breakpoint and the previous one, and so we do not need any pruning.
+For this operation we use the same trick of splitting the tree and then working with smaller trees. Notice that in Operation \ref{op5} we only spend $O(x)$ time for scanning the roots of the small trees, since the intervals we are given are disjoint. Here this is not guaranteed, and so there is some additional technical difficulty. We solve this by considering our use of this operation when constructing a polyline, and showing that we can prune the input s.t. the resulting intervals (i.e. $(k_i',k_i)$) are disjoint. The full description of the operation is in Appendix \ref{appendix batched value predecessor}.
 
 \paragraph{Operation~\ref{op7} -- batched interval insertions.}
 Again, we split the tree into small trees with $O(\frac{y}{x})$ leaves. Additionally, for each list of breakpoints that should be inserted between a pair of consecutive breakpoints stored in the same small tree, we split that small tree between these consecutive breakpoints.
@@ -1030,6 +1014,25 @@ $d(y_{i},y_{j})=y_{i}+1+y_{j}+1<K$.
 Observe that it is also not possible for $P$ to contain only one node, since the weight of any node is strictly less than $K$. So, we now only need to prove that if $P= \{ x_i,y_j \}$ is a feasible solution, then $x_i = y_j$.
 If $P= \{ x_i,y_j \}$ is a feasible solution then on the one hand $d(x_i,y_j) = \frac{K}{2} - x_i -1 + \frac{K}{2} + y_j +1 = K - x_i + y_j \geq K$, implying that $y_j \geq x_i$. On the other hand, $W(P) = x_i + 1 + K - y_j -1 = K + x_i - y_j \geq K$, implying that $x_i \geq y_j$. We conclude that $x_i = y_j$.
 \end{proof}
+
+Similarly to Operation~\ref{op5}, we start by describing a procedure that works on one tree, then apply the same trick of splitting the tree into small trees, and work on them.
+
+We start each value predecessor query by first finding $k_i$ (or its predecessor, if there is no breakpoint at $k_i$). Then, we go up the path in the tree until the maximum value of a leaf in a subtree hanging to the left of the path is at least $v_i$. We then keep going down to the rightmost child that has at least $v_i$ as the maximum value in its subtree. The overall runtime is $O(x \log y)$ since each value predecessor query takes $O(\log y)$ time.
+
+We now apply the same splitting procedure as in Operation \ref{op5}, and obtain $O(x)$ trees with $O(\frac{y}{x})$ leaves each. We would like to iterate over the given keys and run value predecessor queries. However, unlike in Operation \ref{op5}, now the intervals defined by the pairs $(k_i',k_i)$ are not necessarily disjoint and so we need to be more careful as to not spend more than constant time for each root of a small tree when we scan the roots.
+
+Recall that we had two uses for the batched value predecessor operation. The first was to prune the non-monotone polyline we have obtained by increasing intervals of $p_2$ (see Figure~\ref{figure of the second case in the construction of the first half of the polyline}). The pruning is done by deleting the intervals returned by this operation.
+%
+Consider two consecutive keys $k_1$ and $k_2$ ($k_1 \leq k_2$) for which we would like to find their value predecessors $k_1'$ and $k_2'$. If the value of the polyline at $k_1$  is greater or equal to the value  of the polyline at $k_2$, then certainly $k_1 \leq k_2'$, and the intervals are in fact disjoint. Else, the intervals might not be disjoint, but we know that $k_1' \geq k_2'$, and so the interval $(k_1',k_1)$ is contained in the interval $(k_2',k_2)$. Thus, deleting the second interval is enough, meaning that we do not need to run the value predecessor query for $k_1$ at all. Generalizing this observation, before running the value predecessor queries, we can remove keys from the input list
+so that the values of the remaining keys are  monotonically decreasing, in $O(x)$ time\footnote{In this case the values of the polyline at $k_1$ and $k_2$ are in fact $v_1$ and $v_2$ which are given as input, so we don't have to query for them. These values are obtained during the interval increases which precede this pruning of the non-monotone polyline.}. 
+% by scanning them from left to right while maintaining the remaining keys on a stack.
+We can then answer value predecessor queries for this pruned list of keys using our small trees with $O(\frac{y}{x})$ leaves. We process the keys from right to left while simultaneously scanning the small trees (also from right to left). To process a pair $(k_{i},v_{i})$ we first $k_{i}$, then we continue moving to the previous small tree as long as the maximal value stored at the root is smaller than $v_{i}$. Once we find the appropriate small subtree, we run a value predecessor query on it (similarly to what we described for one tree). 
+%
+Therefore, we search for the value predecessor of each key in one small tree in $O(\log(\frac{y}{x}))$ time,
+and additionally sweep through $O(x)$ roots, so the cost is $O(x \log (\frac{2y}{x}))$. We finish by merging the small trees back into one large tree (as in Operation \ref{op5}) which also takes $O(x \log (\frac{2y}{x}))$ time, and so this is also the time complexity of the entire operation.
+
+The second use of this operation was to find the intersection points of two polylines. In this case it is easy to see that the intervals $(k_i',k_i)$ are in fact disjoint, since we query with the keys of the breakpoints of one of the polylines only when there must be an intersection point between this breakpoint and the previous one, and so we do not need any pruning.
+
 
 \section{Additional figures}
 
