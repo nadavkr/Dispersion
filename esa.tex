@@ -276,8 +276,7 @@ remaining leaves from the root are non-decreasing.
 \item \label{making distances from the hole monotone}
 \textbf{Prune leaves to make their distances to the hole non-increasing:}\\
 This is done as in the previous step, except that we scan in the other direction.
-\item\textbf{Precompute for any candidate node with respect to the hole:}\\
-\label{precompute for any candidate node}
+\item\label{precompute for any candidate node}\textbf{Precompute for any candidate node with respect to the hole:}\\
 We call $u_{1},u_{2},\ldots,u_{i}$ a {\em prefix} of the caterpillar and, similarly, $u_{i+1},u_{i+2}, \ldots,u_{s}$ a {\em suffix}.
 For every possible prefix, we would like to precompute the result of running the linear-time feasibility
 test on that prefix. In Section~\ref{sec:feasibility test} we will show that, in fact, this is enough to efficiently
@@ -285,10 +284,10 @@ simulate running the linear-time feasibility test on the whole subtree rooted at
 and the certain node w.r.t. the hole. Consider running the feasibility test on $u_{1},u_{2},\ldots,u_{i}$.
 Recall that its goal is to choose as many nodes as possible, and in case of a tie to maximize the distance of the
 nearest chosen node to $r$. Due to distances of the leaves to $r$ being non-decreasing, it is clear that
-$u_{i}$ should be chosen. Then, consider largest $i'<i$ such that $d(u_{i'},u_{i})\geq \lambda$ (recall that
+$u_{i}$ should be chosen. Then, consider the largest $i'<i$ such that $d(u_{i'},u_{i})\geq \lambda$ (recall that
 such a test is actually done by comparing to $\lambda_{1}$). Due to distances of the leaves to the hole
 being non-decreasing, nodes $u_{i'+1},u_{i'+2},\ldots,u_{i-1}$ cannot be chosen and furthermore $d(u_{j},u_{i})\geq \lambda$
-for any $j=1,2,\ldots,i'$. Therefore, to continue the simulation we should repeat the reasoning for $u_{1},u_{2},u_{i'}$.
+for any $j=1,2,\ldots,i'$. Therefore, to continue the simulation we should repeat the reasoning for $u_{1},u_{2},\ldots,u_{i'}$.
 This suggest the following implementation: scan the caterpillar from top to bottom and store, for every prefix $u_{1},u_{2},\ldots,u_{i}$,
 the number of chosen nodes, the certain node and the candidate node. While scanning we maintain $i'$ in amortized constant time per $i$,
 it is easy to see that after increasing $i$ we have to keep increasing $i'$ as long as $d(u_{i},u_{i'})<\lambda$.
