@@ -4,6 +4,7 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[noadjust]{cite}
+\usepackage{floatrow}
 
 \newcommand{\jump}{\text{jump}}
 \newcommand{\Oh}{{O}}
@@ -168,7 +169,8 @@ application we need various non-standard batch operations on the lists, and henc
 Instead, we present a simpler approach for merging polylines in Section~\ref{O(nlogn) weighted f.t.} that efficiently supports the required batch operations and works with essentially any balanced search
 tree with split and join capabilities. We believe that this is of independent interest due to its simplicity.
 
-\section{A Linear Time Feasibility Test}\label{linear F.T.}
+\section{A Linear Time Unweighted Feasibility Test}
+\label{linear F.T.}
 
 Given a tree $T$ with non-negative lengths and a number $\lambda$, the feasibility tests finds a subset of nodes $P$ such that $f(P)\geq\lambda$
 and $|P|$ is maximized, and then checks if $|P|\geq k$.
@@ -194,13 +196,19 @@ in step \ref{linear time step 3} it is enough to consider $x$ being the already 
 can be computed in $O(1)$ time after storing the distance of every node to the root of the whole tree and using lowest common
 ancestor queries~\cite{Bender2000}.
 
-\section{A Sublinear Time Feasibility Test with \texorpdfstring{\boldmath$O(n\log\log n)$}{O(nloglogn)} Preprocessing}\label{sublinear f.t.}
+\section{\texorpdfstring{\boldmath$O(n\log\log n)$}{O(nloglogn)} Time Algorithm for the Unweighted Dispersion Problem}
+\label{sublinear f.t.}
 
-To accelerate the linear-time feasibility test described in Section~\ref{linear F.T.}, we will partition the tree into fragments.
-Then, the fragments are preprocessed so that in query time we can process them in sublinear time.
-To this end, we need a specific way of partitioning the tree into fragments, where
-each fragment is connected to the rest of the tree by at most two vertices and consists of at most $b$ nodes,
-and there are only $O(n/b)$ fragments. Each fragment is defined by its border vertices $u$ and $v$, s.t. $v$ is a descendant of $u$, and consists of $u$'s subtree without $v$'s subtree ($v$ itself is not part of the fragment). We call the path from $u$ to $v$, the fragment's \textit{spine}, and $v$'s subtree the \textit{hole} of the fragment. In the case where the fragment has only one border vertex, i.e. the fragment is a subtree of the input tree, we say the fragment has no hole. We call such a partition of the tree a \emph{good partition}.
+To accelerate the linear-time feasibility test described in Section~\ref{linear F.T.}, we will partition the tree into $O(n/b)$ fragments of size at most
+$b$ each. Each fragment is then preprocessed so that in query time we can process it in sublinear $O(\log b)$ time and the overall preprocessing time
+is $O(\frac{n}{b}\cdot \log b)$. Then, we show how to solve the unweighted dispersion problem with $O(\log^{2}n)$ calls to the sublinear
+feasibility test and $O(n)$ time exclusive of the feasibility tests, so that by setting $b=\log^{2}n$ we obtain an $O(n\log\log n)$ time algorithm.
+
+Each fragment consists is connected to the rest of the tree by at most two border nodes $u$ and $v$, such that $v$ is a
+descendant of $u$, and the fragment consists of the subtree of $u$ without the subtree of $v$ ($v$ itself not belonging to
+the fragment).  We call the path from $u$ to $v$ the fragment's \textit{spine}, and $v$'s subtree its \textit{hole}. If the
+fragment has only one border node, i.e., the fragment is a subtree of the input tree, we say that there is no hole.
+A partition of a tree into $O(n/b)$ such fragments is called a \emph{good partition}.
 The proof of the following lemma can be found in Appendix \ref{appendix proof of basic partitioning lemma}.
 Note that we can assume that the input tree is binary: given a non-binary tree, we can replace every degree $d\geq 3$ node with a binary tree on
 $d$ leaves. The edges of the binary tree are all of length zero and its artificial inner nodes cannot be taken.
@@ -209,26 +217,25 @@ $d$ leaves. The edges of the binary tree are all of length zero and its artifici
 For any binary tree on $n$ nodes and a parameter $b$, a good partition of the tree can be found in $O(n)$ time.
 \end{lemma}
 
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[scale=0.7]{fragment}
-\end{center}
-\caption{A fragment in a good partition consists of the subtree of $u$ without the subtree of $v$.
-$u$ is the root, $v$ is the hole, and the path from $u$ to $v$ is the spine of the fragment.}
+\begin{figure}
+\floatbox[{\capbeside\thisfloatsetup{capbesideposition={right,center},capbesidewidth=9.7cm}}]{figure}[\FBwidth]
+{\caption{A fragment in a good partition consists of the subtree of $u$ without the subtree of $v$.
+$u$ is the root, $v$ is the hole, and the path from $u$ to $v$ is the spine of the fragment.}}
+{\includegraphics[scale=0.7]{fragment}}
 \end{figure}
 
 \subsection{Preprocessing fragments} \label{Pre-Processing Fragments}
 We now would like to preprocess the fragments, so that for any two nodes $u_{1}$ and $u_{2}$ in the same fragment we know
 if $d(u_1,u_2)\geq\lambda$ or $d(u_1,u_2) \geq \frac{\lambda}{2}$, for any possible $\lambda$ specified in query time. 
-This is done with the parametric search method by Frederickson as follows. We maintain an interval $[\lambda_1,\lambda_2)$ and
-$\lambda^{*}$ that we are searching for in the optimization problem is surely inside the interval, that is, $\lambda_{1}$ is feasibly
-while $\lambda_{2}$ is not. In the beginning, the interval is simply $[0,\infty)$. Then, we use $O(\log\log n)$ calls to the
-linear-time feasibility test to decrease the interval, so that most of the fragments have the property that any pairwise distance
+This is done with the parametric search method by Frederickson as follows. We maintain an interval $[\lambda_1,\lambda_2)$ such that
+$\lambda^{*}$ that we are searching for in the optimization problem is surely inside the interval, that is, $\lambda_{1}$ is feasible
+while $\lambda_{2}$ is not. In the beginning, the interval is simply $[0,\infty)$. Then, we use $O(\log b)$ calls to the
+linear-time feasibility test to decrease the interval, so that {\em most} of the fragments have the property that any pairwise distance
 (and also any pairwise distance multiplied by 2) inside is either smaller than $\lambda_{1}$ or larger or equal to $\lambda_{2}$.
 A method of choosing which tests to perform to achieve this is the gist of Frederickson's method.
 
 For each fragment, we construct an implicit representation of $O(b)$ matrices of total side length $O(b\log b)$, that are row- and column-sorted,
-and any pairwise distance inside is an entry is some matrix. This is done using the standard centroid decomposition as described
+and any pairwise distance inside is an entry in some matrix. This is done using the standard centroid decomposition as described
 in Appendix \ref{appendix constructing sorted matrices using centroid decomp.} in $O(n/b\cdot b\log b)=O(n\log b)$ total time.
 Then, intuitively, by carefully choosing an entry in one of
 these matrices and using the linear-time feasibility test, we can actually eliminate a large piece of the matrix, because the
@@ -236,7 +243,7 @@ matrices are row- and column-sorted. More precisely, we use the following theore
 
 \begin{theorem}[\cite{Frederickson1991}]\label{Frederickson's theorem}
 Let  ${M_1, M_2, . . . , M_N}$ be a collection of sorted matrices in which matrix $M_j$ is of dimension $m_j \times n_j$, $m_j \leq n_j$, and $\sum_{j=1}^{N} m_j = m$.
-Let p be nonnegative. The number of feasibility tests needed to discard all but at most $p$ of the elements is $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace)$, and the total running time exclusive of feasibility tests is $O(\sum_{j=1}^{N} m_j \cdot \log (2n_j/m_j))$.
+Let p be nonnegative. The number of feasibility tests needed to discard all but at most $p$ of the elements is $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace)$, and the total running time exclusive of the feasibility tests is $O(\sum_{j=1}^{N} m_j \cdot \log (2n_j/m_j))$.
 \end{theorem}
 In our case, $m=b \log b \cdot \frac{n}{b} = n \log b$ and we set $p$ to be $n/b^2$. The theorem implies that we can use $O(\log b)$ feasibility tests and discard all but $n/b^2$ elements of the matrices.
 We call fragments with the property that any pairwise distance (and any pairwise distance multiplied by 2) inside is either smaller than
@@ -304,7 +311,7 @@ We now consider the second case, where the hole does have a candidate node. Deno
 Each feasibility test costs us $O(\log b)$ for each inactive fragment, and $O(b)$ for each active one. In total $O(\frac{n}{b} \cdot \log b) + O(\frac{n}{b^2} \cdot b) = O(\frac{n \log \log n}{\log ^2n})$.
 
 
-\subsection{\texorpdfstring{\boldmath$O(n\log\log n)$}{O(nloglogn)} Preprocessing} 
+\subsection{\texorpdfstring{\boldmath$O(n\log\log n)$}{O(nloglogn)} Preprocessing}
 The general idea of the algorithm is to use the heavy path decomposition. We are searching for $\lambda^*$, which is the distance between some two nodes in the tree, and the largest number for which a feasibility test would return true.
 \begin{definition}[Heavy Path Decomposition] \cite{Sleator1983} Given a rooted tree, define the \emph{heavy edge} of each non-leaf node of the tree as the edge to the child that has the greatest number of descendants. These heavy edges form a decomposition of the tree into heavy paths. The heavy path decomposition induces a \emph{heavy path tree}, where each node corresponds to a path of the heavy path decomposition. For a path $p$ of the heavy path decomposition, $p$'s parent in the heavy path tree is the path that contains the parent of $p$'s topmost node. The heavy path tree has depth of at most $\log n$. 
 \end{definition}
@@ -332,7 +339,9 @@ After processing all heavy paths we finally have a maximal valid solution for th
 Notice that throughout our algorithm we process caterpillars, and do not consider taking spine nodes to our solution. 
 This is fine, since we can attach to every such spine node an artificial leaf connected with an edge of length zero.
 
-\section{A Sublinear Time Feasibility Test with \texorpdfstring{\boldmath$O(n)$}{O(n)} Preprocessing}\label{sectionLinear}
+\section{A Linear Time Algorithm for the Unweighted Dispersion Problem}
+\label{sectionLinear}
+
 The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test to get a sublinear one. We will now use a similar process, iteratively, with growing fragments size (starting from constant size and growing exponentially), improving in each iteration the performance of our feasibility test. Given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with $O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
 After $\log ^*n$ iterations requiring a total of $O(n)$ time, we will have a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time
 which we use to solve the dispersion optimization problem in $O(n)$. 
@@ -736,7 +745,7 @@ fragments), and reduce them to caterpillars (again by constructing the heavy pat
 Frederickson's search with $p$ set to $\frac{n}{B^{10}}$). In each fragment we have $O(\log b)$ levels of the heavy
 path decomposition, and for each level we need $O(\log B)$ calls to the feasibility test, which takes
 $O(\frac{n}{b^4} \cdot \log b \cdot \log B \cdot \log b) = O(\frac{n}{b})$ time in total. We also do linear
-work exclusive of feasibility tests. This processing of small active fragments takes $O(n)$ time over all
+work exclusive of the feasibility tests. This processing of small active fragments takes $O(n)$ time over all
 $\log ^*n$ iterations, by the same reasoning as for the hanging subtrees.
 \end{proof}
 
@@ -793,7 +802,7 @@ To apply Frederickson's search, we would like to create a matrix of dimension $1
 for each of the $O(\frac{n}{b^{4}})$ small caterpillars in the whole tree. The total size of all small
 caterpillars is at most $m=n$, so setting $p$ to $\frac{n}{B^9}$ would imply
 $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (b^{5}), \log(\frac{n}{n/B^{9}} \rbrace) = O(\log B)$ calls to the $O(\frac{n}{b^{4}} \cdot \log b)$ time test.
-There are two difficulties, though. First, we cannot guarantee that the processing exclusive of feasibility tests
+There are two difficulties, though. First, we cannot guarantee that the processing exclusive of the feasibility tests
 would sum up to $O(n)$ over all iterations. Second, it is not clear how to provide constant time access
 to these matrices, as the candidates nodes inside every small caterpillar are stored in a doubly-linked list,
 so we are not able to retrieve any of them in constant time. 
@@ -812,7 +821,7 @@ step. Otherwise we have already determined the small caterpillar's prefix that s
 $O(\frac{n}{b^{4}}\cdot \log b \cdot \log b \cdot \log B) = O(\frac{n}{b})$. 
 Observe that the total length of all arrays constructed during this procedure is bounded by the number
 of eliminated candidate nodes multiplied by 4. Consequently, both the time necessary
-to extract the top candidate nodes (and arrange them in an array) and the time exclusive of feasibility tests sums up to $O(n)$
+to extract the top candidate nodes (and arrange them in an array) and the time exclusive of the feasibility tests sums up to $O(n)$
 over all iterations. During this process we might declare another $O(\frac{n}{B^9})$ large fragments active
 by the choice of $p$.
 \end{proof}
