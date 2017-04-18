@@ -256,7 +256,8 @@ candidate node if it cannot be taken. To find the nearest certain node, we first
 on the spine nodes they are attached to) and compute for each of them the nearest certain node below it. Then, we repeat the scan
 in the other direction to compute the nearest certain node above. This gives us, for every candidate node, the nearest certain node above
 and below. We delete all candidate nodes for which one of these distances is smaller than $\lambda_{1}$.
-From now on we ignore the certain nodes, and only deal with the remaining candidate nodes.
+We store the certain node that is nearest to the root, the certain node that is nearest to the hole and the total number of certain nodes,
+and from now on ignore certain nodes and only deal with the remaining candidate nodes.
 \item\label{making distances from the root monotone}
 \textbf{Prune leaves to make their distances to the root non-decreasing:}\\
 Let the $i$-th leaf, $u_{i}$, be connected with an edge of length $y_{i}$ to a spine node at distance $x_{i}$ from the root,
@@ -281,7 +282,6 @@ remaining leaves from the root are non-decreasing.
 \textbf{Prune leaves to make their distances to the hole non-decreasing:}\\
 This is done as in the previous step.
 \item\textbf{Precompute for any candidate node with respect to the hole:}\\
-
 In query time we want to process each fragment after its hole has already been processed.
 We call a set of consecutive leaves of the caterpillar, that contains the closest leaf to the hole, a \emph{suffix} of the caterpillar. Similarly we can define the caterpillar's \emph{prefix}.
 Assuming we know what is the closest chosen node in the fragment's hole, we can eliminate an entire suffix of the caterpillar (because of the monotonicity of the distances of candidate nodes from the hole). We can compute in preprocessing, for any possible eliminated suffix, which nodes in the fragment should be chosen, and also which nodes are the candidate node and certain node we need to pass to the next fragment.
