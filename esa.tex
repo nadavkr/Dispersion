@@ -140,7 +140,7 @@ generating an implicit representation of the monotone matrices capturing the pai
 and then applying Frederickson's parametric search. The (few) fragments that do not satisfy property (3) are handled naively in $O(b)$ time during query time. 
 The fragments that do satisfy property (3) are further preprocessed. We look at the path from the hole to the root of the
 fragment and run the linear-time feasibility test for all subtrees hanging off from it. This can be done without knowing the exact value of $\lambda$,
-as for any two nodes of the fragment we know if their distance is smaller than $\lambda_{1}$ or larger than $\lambda_{2}$. Then, we can conceptually
+as for any two nodes of the fragment we know if their distance is smaller than $\lambda_{1}$ or larger or equal to $\lambda_{2}$. Then, we can conceptually
 prune the fragment and think of it as a caterpillar. The spine of the caterpillar is the hole-to-root path and each spine node has two leaf children: a \emph{certain} node (that is guaranteed to be included in an optimal solution for any $\lambda$, and a \emph{candidate} node (whose inclusion in an optimal solution depends on $\lambda$). Finally, we perform additional pruning on the leaves so that their distances from both the hole and
 the root are monotonically increasing. This structure enables us to precompute for each candidate node, assuming this node is the bottom-most node
 of the fragment included in the solution, what are all the other nodes in the solution. Upon query, we can then jump over the entire fragment  in $O(\log b)$ time by binary searching for this bottom-most node.
@@ -221,14 +221,15 @@ This is done with the parametric search method by Frederickson as follows. We ma
 $\lambda^{*}$ that we are searching for in the optimization problem is surely inside the interval, that is, $\lambda_{1}$ is feasibly
 while $\lambda_{2}$ is not. In the beginning, the interval is simply $[0,\infty)$. Then, we use $O(\log\log n)$ calls to the
 linear-time feasibility test to decrease the interval, so that most of the fragments have the property that any pairwise distance
-(and also any pairwise distance multiplied by 2) inside is either smaller than $\lambda_{1}$ or larger than $\lambda_{2}$.
+(and also any pairwise distance multiplied by 2) inside is either smaller than $\lambda_{1}$ or larger or equal to $\lambda_{2}$.
 A method of choosing which tests to perform to achieve this is the gist of Frederickson's method.
 
 For each fragment, we construct an implicit representation of $O(b)$ matrices of total side length $O(b\log b)$, that are row- and column-sorted,
 and any pairwise distance inside is an entry is some matrix. This is done using the standard centroid decomposition as described
-in Appendix \ref{appendix constructing sorted matrices using centroid decomp.}. Intuitively, by carefully choosing an entry in one of
+in Appendix \ref{appendix constructing sorted matrices using centroid decomp.} in $O(n/b\cdot b\log b)=O(n\log b)$ total time.
+Then, intuitively, by carefully choosing an entry in one of
 these matrices and using the linear-time feasibility test, we can actually eliminate a large piece of the matrix, because the
-matrices are row- and column-sorted. We use the following theorem:
+matrices are row- and column-sorted. More precisely, we use the following theorem:
 
 \begin{theorem}[\cite{Frederickson1991}]\label{Frederickson's theorem}
 Let  ${M_1, M_2, . . . , M_N}$ be a collection of sorted matrices in which matrix $M_j$ is of dimension $m_j \times n_j$, $m_j \leq n_j$, and $\sum_{j=1}^{N} m_j = m$.
@@ -236,7 +237,7 @@ Let p be nonnegative. The number of feasibility tests needed to discard all but 
 \end{theorem}
 In our case, $m=b \log b \cdot \frac{n}{b} = n \log b$ and we set $p$ to be $n/b^2$. The theorem implies that we can use $O(\log b)$ feasibility tests and discard all but $n/b^2$ elements of the matrices.
 We call fragments with the property that any pairwise distance (and any pairwise distance multiplied by 2) inside is either smaller than
-$\lambda_{1}$ or larger than $\lambda_{2}$ \text{inactive}, and all other fragments \textit{active}.
+$\lambda_{1}$ or larger or equal to $\lambda_{2}$ \text{inactive}, and all other fragments \textit{active}.
 By the choice of parameters, we have at most $n/b^{2}$ active fragments (out of all $n/b$) and we also pay $O(n \log b)$ exclusive of the feasibility tests.
 For an inactive fragment, we can now check if the distance between two nodes inside is at least $\lambda$ or $\lambda/2$ by first calculating
 the distance in $O(1)$ time (using lowest common ancestor queries~\cite{Bender2000}) and comparing it to $\lambda_{1}$.
@@ -280,10 +281,11 @@ remaining leaves from the root are non-decreasing.
 \textbf{Prune leaves to make their distances to the hole non-decreasing:}\\
 This is done as in the previous step.
 \item\textbf{Precompute for any candidate node with respect to the hole:}\\
+
 In query time we want to process each fragment after its hole has already been processed.
 We call a set of consecutive leaves of the caterpillar, that contains the closest leaf to the hole, a \emph{suffix} of the caterpillar. Similarly we can define the caterpillar's \emph{prefix}.
 Assuming we know what is the closest chosen node in the fragment's hole, we can eliminate an entire suffix of the caterpillar (because of the monotonicity of the distances of candidate nodes from the hole). We can compute in preprocessing, for any possible eliminated suffix, which nodes in the fragment should be chosen, and also which nodes are the candidate node and certain node we need to pass to the next fragment.
-In order to precompute this, scan the caterpillar from top to bottom. For every possible prefix of the caterpillar we would like to store the numbers of nodes chosen, the certain node and the candidate node, assuming all nodes that are not in the prefix are eliminated as they are too close to the hole. Consider the bottom node of the current prefix. If the distance of this node to the fragment's root is less than $\frac{\lambda}{2}$\footnote{We do not actually know $\lambda$ in preprocessing, but due to the previous steps, such a query of a node inside the fragment would produce the same result for any possible $\lambda$.}, store it as the candidate node, zero as the number of chosen nodes, and NULL as the certain node (if this fragment has a hole, we will consider its candidate and certain node in query time). Else (the node's distance to the root is greater or equal to $\frac{\lambda}{2}$), binary search to find the closest node above it, that is at distance of at least $\lambda$. If such a node exists, add 1 to the number of chosen nodes stored in the node we found, and copy the candidate node and certain node stored there (both of which could be the node itself). If such a node does not exist, the bottom node is the certain node, we store NULL as the candidate node, and the number of chosen nodes is one. This would take $O(b \log b)$ time. We can improve this by not binary searching for the first node far enough, but instead saving it for each prefix, and then only going down from the previous node found. This would only take $O(b)$ time.
+In order to precompute this, scan the caterpillar from top to bottom. For every possible prefix of the caterpillar we would like to store the numbers of nodes chosen, the certain node and the candidate node, assuming all nodes that are not in the prefix are eliminated as they are too close to the hole. Consider the bottom node of the current prefix. If the distance of this node to the fragment's root is less than $\frac{\lambda}{2}$\footnote{We do not actually know $\lambda$ in preprocessing, but due to the previous steps, such a query of a node inside the fragment would produce the same result for any possible $\lambda$.}, store it as the candidate node, zero as the number of chosen nodes, and NULL as the certain node (if this fragment has a hole, we will consider its candidate and certain node in query time). Else (the node's distance to the root is larger or equal to $\frac{\lambda}{2}$), binary search to find the closest node above it, that is at distance of at least $\lambda$. If such a node exists, add 1 to the number of chosen nodes stored in the node we found, and copy the candidate node and certain node stored there (both of which could be the node itself). If such a node does not exist, the bottom node is the certain node, we store NULL as the candidate node, and the number of chosen nodes is one. This would take $O(b \log b)$ time. We can improve this by not binary searching for the first node far enough, but instead saving it for each prefix, and then only going down from the previous node found. This would only take $O(b)$ time.
 \end{enumerate}
 
 \subsection{Feasibility test}
@@ -358,12 +360,12 @@ problem with $O(\log n)$ calls to the feasibility tests, so in $O(n\log^{2}n)$ t
 \subsection{An \texorpdfstring{\boldmath$O(n \log n)$}{O(nlogn)} algorithm for the weighted feasibility test}\label{O(nlogn) weighted f.t.}
 Similarly to the unweighted case, we would like to compute for each node of the tree, the subset of nodes $P$ in its subtree  s.t. $f(P) \geq \lambda$ and $W(P)$ is maximized. We compute this by going over the nodes of the tree bottom-up. Previously, the situation was simpler, as for any subtree we had just one candidate node (i.e., a node that may or may not be in the optimal solution for the entire input tree). This was true because nodes had uniform weights. Now however, there could be many candidates in a subtree, as the certain nodes are the ones that are at distance at least $\lambda$ from the root (and not $\frac{\lambda}{2}$ as in the unweighted case).
 
-Out of all the already chosen nodes in the subtree rooted at $v$, let $h$ be the node for which $d(h,v)$ is minimized. We call $h$ the {\em closest chosen node} in $v$'s subtree. In our weighted feasibility test, $v$ will store an optimal solution $P$ for any possible value of $d(h,v)$ (up to $\lambda$, since if the closest chosen node is farther, it does not affect nodes outside the subtree). That is, a subset of nodes $P$ in $v$'s subtree of maximum weight $W(P)$ s.t. the closest chosen node is at distance {\em greater or equal} to $d(h,v)$ from $v$, and $d(x_1,x_2) \geq \lambda$ for every  $x_1,x_2\in P$. 
+Out of all the already chosen nodes in the subtree rooted at $v$, let $h$ be the node for which $d(h,v)$ is minimized. We call $h$ the {\em closest chosen node} in $v$'s subtree. In our weighted feasibility test, $v$ will store an optimal solution $P$ for any possible value of $d(h,v)$ (up to $\lambda$, since if the closest chosen node is farther, it does not affect nodes outside the subtree). That is, a subset of nodes $P$ in $v$'s subtree of maximum weight $W(P)$ s.t. the closest chosen node is at distance {\em larger or equal} to $d(h,v)$ from $v$, and $d(x_1,x_2) \geq \lambda$ for every  $x_1,x_2\in P$. 
 The values $W(P)$ can be viewed as a monotone polyline, since the weight of $P$ only decreases as the distance of the closest chosen node increases (from zero to $\lambda$). The weight of $P$ can only change at certain points called the {\em breakpoints} of the polyline. Each point of the polyline is a key-value pair, where the key is $d(h,v)$ and the value is $W(P)$. We store with each breakpoint the value of the polyline between it and the next breakpoint. I.e. for some pair of consecutive breakpoints with keys $a$ and $a+b$, we store in the first breakpoint the value of the polyline in the interval $[a,a+b)$. As a special case, the first breakpoint stores the value of the polyline in the interval $(0,a)$ (where $a$ is the key of the second breakpoint), and we store the value for key zero separately. We only store the breakpoints of a polyline in order to represent it.
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[scale=0.6]{polyline}
+\includegraphics[scale=0.55]{polyline}
 \end{center}
 \caption{The polyline represents the weight of the optimal solution $P$ as a function of the distance of the closest chosen node in the subtree. %$v$ is the root of the subtree, and $h$ is the chosen node closest to $v$ in its subtree. 
 The weight of $P$ only decreases at certain points called breakpoints (in bold). Each breakpoint stores the value in the interval between itself and the next breakpoint.
@@ -568,7 +570,7 @@ We scan each of these chains bottom-up and greedily cut them into fragments of s
 Denoting the size of the $i$-th chain by $b_{i}$, and the number of chains by $k$, the number of fragments created in this phase is
 bounded by $$\sum_{i=1}^{k} \left\lceil \frac{b_i}{b} \right\rceil \leq n/b+k=O(n/b).$$
 In total we have created $O(n/b)$ fragments, and each of them is of size at most $b$.
-The whole process can be implemented by scanning the tree twice bottom-up in $O(n)$ time.
+The whole construction can be implemented by scanning the tree twice bottom-up in $O(n)$ time.
 \end{proof}
 
 
@@ -614,25 +616,46 @@ This concludes the induction and yields our $O(n \log n)$ weighted feasibility t
 \end{proof}
 
 \section{Constructing sorted matrices with all pairwise distances in all fragments}\label{appendix constructing sorted matrices using centroid decomp.}
-\begin{definition}[Centroid Decomposition]
-A node $v\in T$ is a centroid if every connected component of $T\setminus\{v\}$ consists of at most $\frac{|T|}{2}$
-nodes. The centroid decomposition of $T$ is defined recursively by first choosing a centroid $v\in T$
-and then recursing on every connected component of $T\setminus\{v\}$, which we call \emph{pieces}.
-\end{definition}
 
-\begin{figure}
+Our goal is to show that, given an input tree $T$ on $b$ nodes, we can construct in $O(b\log b)$ time an implicit representation of $O(b)$
+matrices of total side length $O(b\log b)$, that are row- and column-sorted, and any pairwise between two nodes of the tree is an entry in
+some matrix. By implicit representation we mean that we should be able to retrieve any entry in $O(1)$ time on request.
+
+\begin{figure}[ht]
 \begin{center}
 \includegraphics[scale=1]{centroid}
 \end{center}
-\caption{A single step in the centroid decomposition. Removing $v$ splits the tree into three pieces, s.t. none of them has more than $\frac{n}{2}$ nodes. The white piece is problematic, since the paths from its nodes to $v$ do not pass through the inner centroid $v'$.}
+\caption{A single step in the centroid decomposition. Removing $v$ splits $T$ into three pieces, s.t. none of them has more than $\frac{|T|}{2}$ nodes. The white piece is problematic, since the paths from its nodes to $v$ do not pass through the inner centroid $v'$.}
 \end{figure}
 
-Apply the centroid decomposition on each fragment. This take linear time. Since we assume our input tree is binary, the centroid at each level of the recursion will split the tree into three pieces. Now, run the following recursive routine: at each level of the recursion, we are given the three pieces of the decomposition, and for each of them a sorted list of the distances to their inner centroid. We would like to compute a sorted list of distances of the nodes in all three pieces, to the current centroid. This would give us the ability to compute, in constant time, the distance between any two nodes that are in different pieces (since the path between them goes through the centroid). Let us look at one of the three pieces we have already processed. It contains three pieces of its own. For two of these pieces, it holds that the path from every node inside them to the outer centroid passes through the inner centroid. We call the third piece, for which this does not hold a \textit{problematic} piece. For the two pieces that are not problematic, we can add to all the entries of the lists we have, the distance from the inner centroid to the outer centroid, and then merge the two sorted lists. This is all done in linear time.
+To construct the matrices we apply the standard centroid decomposition. A node $v\in T$ is a centroid if every connected component of
+$T\setminus\{v\}$ consists of at most $\frac{|T|}{2}$ nodes. The centroid decomposition of $T$ is defined recursively by first choosing a centroid
+$v\in T$ and then recursing on every connected component of $T\setminus\{v\}$, which we call \emph{pieces}.
+Overall, this process takes $O(b\log b)$ time. Since we assume that the input tree is binary, the centroid in every recursive call splits the tree
+into three pieces. Now, we run the following bottom-up computation: assuming that we are given the three pieces, and for each of
+them a sorted list of the distances to their centroid, we would like to compute a sorted list of distances of the nodes in all three pieces
+to the centroid used to separate them. The difficulty is that we would like to produce this sorted list in linear time.
 
-Our only problem now is the piece where the paths to the outer centroid do not go through the inner one. But notice that if we go one step deeper in the recursion we can see that inside the problematic piece there are two pieces that are not problematic, as the paths from all their nodes to the outer centroid pass through their inner centroid. We can do the same kind of merging for their two list, and then look deeper inside the remaining problematic piece, and so on. This recursive routine will also take linear time. Altogether we have $O(\log b)$ levels of recursion, and spend linear time on each one, so we get a running time of $O(b \log b)$ per fragment. For now, we set $b$ to $\log ^2 n$ and get a running time of $O(\frac{n}{b} \cdot b\log b) = O(n \log \log n)$ for all fragments.
+Consider one of the three already processed pieces obtained by removing the outer centroid. It contains three smaller pieces of its own,
+that have been obtained by removing the inner centroid.
+For two of these smaller pieces, it holds that the path from every node inside them to the outer centroid passes through the inner centroid.
+We call the third piece, for which this does not hold, a \textit{problematic} piece. For the two pieces that are not problematic, we can 
+increase all entries of their lists by the distance from the inner centroid to the outer centroid, and then merge two sorted lists in linear time.
+Now consider the problematic piece, where paths to the outer centroid do not go through the inner one. Notice that if we go one step deeper
+in the recursion, the problematic piece consists of two pieces that are not problematic, as the paths from all their nodes to the outer centroid
+pass through their inner centroid, and the remaining even smaller problematic piece. For the two non-problematic pieces we can again
+increase all entries of their lists and then merge two sorted lists in linear time, and repeat the reasoning on the problematic piece.
+If the initial problematic piece was of size $s$, after $O(\log s)$ iterations we obtain that a sorted list of distances to the centroid can be
+obtained by merging sorted lists of length $s,s/2,s/4,\ldots$, which can be done in $O(s)$ time. At every level of recursion, 
+the total size of all the pieces is at most $b$, and there are $O(\log b)$ levels of recursion, so the total time spend on constructing
+the sorted lists is $O(b\log b)$.
 
-Now we have for level $i$ of the recursion $3^i$ centroids (per fragment), and for each of them a sorted list of the distances to all nodes in the appropriate pieces. We can find any pairwise distance in a piece by adding two entries of this list. Since the lists are sorted, we can look at the situation as if we have $3^i$ matrices and their total side length is $n$ (over all fragments)\footnote{We cannot actually afford to explicitly store these matrices, but that is not needed.}. The matrices from all levels of the recursion, contain all the pairwise distances inside all the fragments. Each matrix is row and column sorted. Note that we also have some entries in the matrices that do not actually represent pairwise distances in the tree, because some entries in the matrix represent the length of a path between two nodes that passes through the centroid of the piece, but the shortest path between these two nodes does not pass through the centroid. This does not matter, since it just means we will do some unnecessary eliminations.
-
+Finally, for every piece we define a row- and column-sorted matrix. If the sorted list of all distances of the nodes in the piece to the
+centroid is $L[1..s]$, the entries of the matrix are $M[i,j]=L[i]+L[j]$. To represent $M$, we only have to store $L$, and then are able to
+retrieve any $M[i,j]$ in $O(1)$ time. Note that some entries of $M$ do not represent distances between two nodes, but this is irrelevant.
+To bound the number of matrices, observe that the total number of pieces is $b$, because after constructing a piece we remove the centroid.
+To bound the total side length, observe that the side length of $M$ is bounded by the size of the corresponding piece, and the total size
+of all pieces at the same level of recursion is at most $b$, so indeed the total side length is $O(b\log b)$.
 
 \section{Full description of the linear algorithm for the dispersion optimization problem}\label{appendix linear algorithm for the dispersion optimization problem}
 
