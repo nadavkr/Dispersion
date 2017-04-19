@@ -152,7 +152,7 @@ An old result of Brown and Tarjan~\cite{Brown1980} is that, in exactly such time
 Mehlhorn~\cite{huddlestonM82} to any sequence of operations that exhibits a certain locality of reference. However, in our specific
 application we need various non-standard batch operations on the lists, and hence applying these results would require effort.
 Instead, we present a simpler data structure for merging polylines that efficiently supports the required batch operations and works with %essentially 
-any balanced search tree with split and join capabilities. Our data structure both simplifies and extends that of Brown and Tarjan~\cite{Brown1980}, and we believe it to be of independent interest. 
+any balanced search tree with split and join capabilities. Our data structure both simplifies and extends that of Brown and Tarjan~\cite{Brown1980}, and we believe it to be of independent interest. All missing proofs can be found in Appendix \ref{appendix missing proofs}.
 
 
 \section{A Linear Time Feasibility Test}
@@ -185,7 +185,7 @@ The above feasibility test works in linear time and finds $P$ such that $f(P)\ge
 \label{sublinear f.t.}
 
 To accelerate the linear-time feasibility test described in Section~\ref{linear F.T.}, we will partition the tree into $O(n/b)$ fragments of size at most
-$b$ each. Each fragment is then preprocessed so that in query time we can handle it in sublinear $O(\log b)$ time.  The overall preprocessing time
+$b$ each. We perform preoprocessing so that in query time we can handle most of the fragments in sublinear $O(\log b)$ time.  The overall preprocessing time
 is $O(\frac{n}{b}\cdot b\log b)=O(n\log b)$ plus $O(\log b)$ calls to the linear-time feasibility test.
 Then, we show how to solve the unweighted dispersion problem with $O(\log^{2}n)$ calls to the sublinear
 feasibility test and $O(n)$ time exclusive of the feasibility tests, so that by setting $b=\log^{2}n$ we obtain an $O(n\log\log n)$ time algorithm.
@@ -196,7 +196,7 @@ the fragment).  We call the path from $u$ to $v$ the fragment's \textit{spine}, 
 fragment has only one border node, i.e., the fragment is a subtree of the input tree, we say that there is no hole.
 A partition of a tree into $O(n/b)$ such fragments is called a \emph{good partition}.
 Note that we can assume that the input tree is binary: given a non-binary tree, we can replace every degree $d\geq 3$ node with a binary tree on
-$d$ leaves. The edges of the binary tree are all of length zero and its artificial inner nodes cannot be taken.
+$d$ leaves. The edges of the binary tree are all of length zero, so at most one node in the tree can be taken.
 
 \begin{restatable}{lemmarestatable}{basicpartitioninglemma}
 \label{basic partitioning lemma}
@@ -212,23 +212,22 @@ For any binary tree on $n$ nodes and a parameter $b$, a good partition of the tr
  
 \subsection{Preprocessing fragments} \label{Pre-Processing Fragments}
 To solve the optimization problem, we will maintain an interval $[\lambda_1,\lambda_2)$ such that
-$\lambda^{*}$ that we are searching for in the optimization problem is surely inside the interval, that is, $\lambda_{1}$ is feasible
+the value we are searching for in the optimization problem, $\lambda^{*}$, is inside the interval. That is, $\lambda_{1}$ is feasible
 while $\lambda_{2}$ is not. In the beginning, the interval is simply $[0,\infty)$. In the preprocessing stage,
 we would like to to sufficiently decrease the initial interval, so that for any $\lambda\in [\lambda_{1},\lambda_{2})$ and any two
 nodes $u_{1}$ and $u_{2}$ in the same fragment either $d(u_{1},u_{2})\leq \lambda_{1}$ or $d(u_{1},u_{2})\geq\lambda_{2}$
-and similarly $d(u_{1},u_{2})\leq 2\lambda_{1}$ or $d(u_{1},u_{2})\geq 2\lambda_{2}$
+and similarly $d(u_{1},u_{2})\leq \frac{\lambda_{1}}{2}$ or $d(u_{1},u_{2})\geq \frac{\lambda_{2}}{2}$
 (and $\lambda^{*}\in [\lambda_{1},\lambda_{2})$ still holds). Intuitively, this will then allow us to preprocess the fragment,
 so that for any possible $\lambda$ specified in query time we can process it in sublinear time.
 We will achieve this goal for {\em most} of the fragments using using $O(\log b)$ calls to the linear-time feasibility test.
 A method of choosing which tests to perform to achieve this is the gist of Frederickson's method.
 
 For each fragment, we construct an implicit representation of $O(b)$ sorted matrices of total side length $O(b\log b)$
-(where a matrix is sorted if it is both row- and column-sorted),
-and any pairwise distance (and any pairwise distance multiplied by 2) inside is an entry in some matrix using the standard centroid 
-decomposition in $O(n/b\cdot b\log b)=O(n\log b)$ total time. Then, we can apply a theorem Frederickson on the obtained set of matrices.
+(where a matrix is sorted if it is both row- and column-sorted), s.t. any pairwise distance (and any pairwise distance multiplied by 2) inside the fragment is an entry in some matrix. This is done using the standard centroid 
+decomposition, in $O(n/b\cdot b\log b)=O(n\log b)$ total time. Then, we can apply a theorem Frederickson on the obtained set of matrices.
 
 \begin{restatable}{lemmarestatable}{centroidmatrix}
-Given a tree $T$ on $b$ nodes, we can construct in $O(b\log b)$ an implicit representation of $O(b)$ sorted matrices of total
+Given a tree $T$ on $b$ nodes, we can construct in $O(b\log b)$ time an implicit representation of $O(b)$ sorted matrices of total
 side length $O(b\log b)$ such that, for any $u,v\in T$, $d(u,v)$ is an entry in some matrix.
 \end{restatable}
 
@@ -237,26 +236,23 @@ Let  ${M_1, M_2, . . . , M_N}$ be a collection of sorted matrices in which matri
 Let p be nonnegative. The number of feasibility tests needed to discard all but at most $p$ of the elements is $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace)$, and the total running time exclusive of the feasibility tests is $O(\sum_{j=1}^{N} m_j \cdot \log (2n_j/m_j))$.
 \end{theorem}
 In our case, $m=b \log b \cdot \frac{n}{b} = n \log b$ and we set $p$ to be $n/b^2$. The theorem implies that we can use $O(\log b)$ feasibility tests and discard all but $n/b^2$ elements of the matrices.
-We say that a fragment is {\em inactive} if any pairwise distance (and any pairwise distance multiplied by 2) inside is either smaller than
+We say that a fragment is {\em inactive} if any pairwise distance (and any pairwise distance multiplied by 2) inside is either smaller or equal to
 $\lambda_{1}$ or larger or equal to $\lambda_{2}$. A fragment that is not inactive is called {\em active}.
-By the choice of parameters, we have at most $n/b^{2}$ active fragments (out of all $n/b$) and we also pay $O(n \log b)$ exclusive of the feasibility tests.
-For an inactive fragment, we can now check if the distance between two nodes inside is at least $\lambda$ or $\lambda/2$ by
-comparing it to $\lambda_{1}$.
-This allows us to preprocess each inactive fragment in $O(b)$ time as follows:
+By the choice of parameters, we have at most $n/b^{2}$ active fragments and we also pay $O(n \log b)$ exclusive of the feasibility tests.
+For any two nodes in an inactive fragment, we can compare their distance to $\lambda$ and $\lambda/2$, for any possible $\lambda$ (i.e. any $\lambda$ s.t.  $\lambda \in (\lambda_1,\lambda_2)$). This allows us to preprocess each inactive fragment in $O(b)$ time as follows:
 
 \begin{noindlist}
 \item\textbf{Reduce the fragment to a caterpillar:}
-a fragment consists of the spine and the subtrees hanging off the spine. Because for any two nodes inside the fragment we can compare
-their distance to $\lambda$ and $\lambda/2$, we can run our linear-time feasibility test on the subtrees hanging off the spine to obtain
-the candidate and the certain node for each of them. The fragment is now reduced to a caterpillar with at most two leaves attached to each
-spine node: the candidate node and the certain node.
+a fragment consists of the spine and the subtrees hanging off the spine. Because we can compare any pairwise distance in the fragment to $\lambda$ and $\lambda/2$, we can run our linear-time feasibility test on the subtrees hanging off the spine, and obtain
+the candidate and the certain node for each of them. The fragment can now be reduced to a caterpillar with at most two leaves attached to each
+spine node: a candidate node and a certain node.
 \item\label{removing certain nodes}
 \textbf{Find candidate nodes that cannot be taken into the solution:}
-for every candidate node we find the nearest certain node. Then, we compare their distance to $\lambda$ and remove the
+for each candidate node we find the nearest certain node. Then, we compare their distance to $\lambda$ and remove the
 candidate node if it cannot be taken. To find the nearest certain node, we first scan all nodes bottom-up (according to the natural order
 on the spine nodes they are attached to) and compute for each of them the nearest certain node below it. Then, we repeat the scan
 in the other direction to compute the nearest certain node above. This gives us, for every candidate node, the nearest certain node above
-and below. We delete all candidate nodes for which one of these distances is smaller than $\lambda_{1}$.
+and below. We delete all candidate nodes for which one of these distances is smaller or equal to $\lambda_{1}$.
 We store the certain node nearest to the root, the certain node nearest to the hole and the total number of certain nodes,
 and from now on ignore certain nodes and consider only the remaining candidate nodes.
 \item\label{making distances from the root monotone}
@@ -280,26 +276,25 @@ This takes linear time in the number of candidate nodes and ensures that the dis
 remaining leaves from the root are non-decreasing.
 \item\label{making distances from the hole monotone}
 \textbf{Prune leaves to make their distances to the hole non-increasing:}
-this is done as in the previous step, except that we scan in the other direction.
+this is done as in the previous step, except we scan in the other direction.
 \item\label{precompute for any candidate node}
 \textbf{Precompute for any candidate node with respect to the hole:}
 we call $u_{1},u_{2},\ldots,u_{i}$ a {\em prefix} of the caterpillar and, similarly, $u_{i+1},u_{i+2}, \ldots,u_{s}$ a {\em suffix}.
 For every possible prefix, we would like to precompute the result of running the linear-time feasibility
 test on that prefix. In Section~\ref{sec:feasibility test} we will show that, in fact, this is enough to efficiently
-simulate running the linear-time feasibility test on the whole subtree rooted at $r$ if we know the candidate
+simulate running the feasibility test on the whole subtree rooted at $r$ if we know the candidate
 and the certain node w.r.t. the hole. Consider running the feasibility test on $u_{1},u_{2},\ldots,u_{i}$.
 Recall that its goal is to choose as many nodes as possible, and in case of a tie to maximize the distance of the
 nearest chosen node to $r$. Due to distances of the leaves to $r$ being non-decreasing, it is clear that
 $u_{i}$ should be chosen. Then, consider the largest $i'<i$ such that $d(u_{i'},u_{i})\geq \lambda$ (recall that
-such a test is actually done by comparing to $\lambda_{1}$). Due to distances of the leaves to the hole
+such a test is actually done by comparing to $\lambda_{2}$). Due to distances of the leaves to the hole
 being non-decreasing, nodes $u_{i'+1},u_{i'+2},\ldots,u_{i-1}$ cannot be chosen and furthermore $d(u_{j},u_{i})\geq \lambda$
 for any $j=1,2,\ldots,i'$. Therefore, to continue the simulation we should repeat the reasoning for $u_{1},u_{2},\ldots,u_{i'}$.
-This suggest the following implementation: scan the caterpillar from top to bottom and store, for every prefix $u_{1},u_{2},\ldots,u_{i}$,
+This suggests the following implementation: scan the caterpillar from top to bottom and store, for every prefix $u_{1},u_{2},\ldots,u_{i}$,
 the number of chosen nodes, the certain node and the candidate node. While scanning we maintain $i'$ in amortised constant time.
-After increasing $i$, we only have to keep increasing $i'$ as long as $d(u_{i},u_{i'})<\lambda$.
-To store the information for the current prefix, we copy the already computed information for $u_{1},u_{2},\ldots,u_{i'}$
-and increase the number of chosen nodes by one. Then, if the candidate node is set to NULL and $d(r,u_{i})<\lambda/2$
-we set the candidate node to $u_{i}$, and else if the certain node is set to NULL we set it to $u_{i}$.
+After increasing $i$, we only have to keep increasing $i'$ as long as $d(u_{i},u_{i'}) \ge \lambda$.
+To store the information for the current prefix, copy the computed information for $u_{1},u_{2},\ldots,u_{i'}$
+and increase the number of chosen nodes by one. Then, if the certain node is set to NULL, we set it to be $u_{i}$. If there is no $u_{i'}$, and $u_i$ is the top-most chosen candidate, we need to set it to be the candidate (if $\d(r,u_i) < \frac{\lambda}{2}$) or the certain node otherwise.
 \end{noindlist}
 
 \subsection{Feasibility test}
@@ -534,7 +529,7 @@ The above implementation implies an $O(n \log n)$ weighted feasibility test.
 \newpage
 \appendix
 
-\section{Missing proofs}
+\section{Missing proofs}\label{appendix missing proofs}
 
 \lineartimecorrectness*
 
