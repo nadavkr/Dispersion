@@ -481,7 +481,7 @@ To conclude, the final polyline $p$ is obtained by concatenating the value compu
 \subsection{The polyline data structure} We now specify the data structure for storing the polylines. The required interface is:
 \begin{enumerate}
 \item \label{op1} Split the polyline at some key.
-\item \label{op2} Merge two polylines (s.t. all the keys in one polyline are smaller than all keys in the other).
+\item \label{op2} Merge two polylines (s.t. all  keys in one polyline are smaller than all keys in the other).
 \item \label{op3} Retrieve the value of the polyline for a certain key $d(h,v)$.
 \item \label{op4}Return a sorted list of the breakpoints of the polyline
 \item \label{op5} Batched interval increase -- Given a list of disjoint intervals of the polyline, and a number for each interval, increase the values of the polyline in each interval by the appropriate number. Each interval is given by the keys of its endpoints.
