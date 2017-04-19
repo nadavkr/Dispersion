@@ -94,19 +94,18 @@ However, such equivalence does not apply to general trees, on which $k$-dispersi
 \medskip \noindent {\bf The dispersion problem.}
 Consider the unweighted $k$-dispersion problem. This optimization problem can be solved by repeatedly querying a {\em feasibility test} that solves the decision version of this problem. More formally, let $d(u,v)$ denote the distance between nodes $u$ and $v$, and for a subset of nodes $P$ let $f(P)=\min_{u,v\in P} \{d(u,v)\}$:
 
-
 \begin{itemize} 
-\item {\em The Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, and a  number $k$, find a subset $P$ of nodes of size $k$ such that $f(P)$ is maximized. 
+\item {\em The Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, and a number $k$, find a subset $P$ of nodes of size $k$ such that $f(P)$ is maximized. 
 
 \item  {\em The Dispersion Decision Problem (feasibility test).}  Given a tree with non-negative edge lengths, a number $k$, and a number $\lambda$, find a subset $P$ of nodes of size $k$ such that  $f(P)\geq\lambda$, or declare no such subset exists. 
 \end{itemize}
 
-Both \cite{Bhattacharya1991} and \cite{Bhattacharya1999} present efficient feasibility tests, and use a result by Fredrickson \cite{Frederickson1983} that allows them to binary search over the possible values of $\lambda$ (which are all pairwise distances in the tree). In other words, a feasibility test with a running time $\tau$  implies an $O(n \log n + \tau \cdot \log n)$ time algorithm for the dispersion optimization problems (in both the weighted and unweighted versions). In Section~\ref{linear F.T.} we present a simplified version of the linear time feasibility test for the unweighted case presented in \cite{Bhattacharya1991}.
-%, improving on an earlier $\Oh(kn+n\log n)$ solution for single-path trees given by Wang and Kuo~\cite{Wang1988}. 
-%We present a faster $\Oh(n\log^2 n)$ time algorithm. 
-%Using this feasibility test, the optimization problem can then be solved by parametric search: Since the answer is always
-%a distance between two nodes, we can construct an implicit representation of all possible $O(n^{2})$ distances and binary search over this representation. More precisely, the representation consists of $O(n)$ matrices that are each monotone in both row and columns. The total side length
-%of all the matrices is $O(n\log n)$, and we can provide constant-time access to any entry after $O(n\log n)$ preprocessing. Using $O(\log n)$ calls to such feasibility test we can solve the optimization problem in $O(n\log n)$ time.
+\cite{Bhattacharya1991} present an efficient feasibility test, and use a result by Fredrickson \cite{Frederickson1983} that allows them to binary search over the possible values of $\lambda$ (which are all pairwise distances in the tree). In other words, a feasibility test with a running time $\tau$ implies an $O(n \log n + \tau \cdot \log n)$ time algorithm for the dispersion optimization problem. We present a simplified version of their linear time
+feasibility test in Section~\ref{linear F.T.}.
+
+In the weighted $k$-dispersion problem, nodes have non-negative weights and instead of $k$ we are given $W$. The goal is then to find a subset
+$P$ of nodes of total weight at least $W$. \cite{Bhattacharya1999} present an efficient feasibility test for this generalization, and by the same
+reasoning above solve the weighted dispersion optmization problem.
  
 \medskip \noindent {\bf Our solution for the unweighted dispersion problem.}
 We are able to decrease the total time to $O(n)$ by
@@ -377,13 +376,13 @@ this is $O(n)$ plus $O(\log^{2}n)$ calls to the feasibility test. Setting $b=\lo
 %We show that a large fragment can be reduced to a concatenation of small caterpillars, each corresponding to a small fragment that we have already preprocessed. We then carefully tailor these small caterpillars while reusing the results of their preprocessing. We show that this tailoring amortizes to $O(n)$ over all decompositions. Due to space constraints, the full description of the algorithm is in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
 
 \section{The Weighted Dispersion Problem}\label{section:weighted}
-We now consider the weighted variant of the dispersion problem, in which the edges have lengths and the nodes have weights. Recall that $f(P)=\min_{u,v\in P} \{d(u,v)\}$. The weighted dispersion problems are defined as follows.
-\begin{itemize} 
-\item {\em The Weighted Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, non-negative node weights, and a number $W$, find a subset of nodes $P$ of weight at least $W$, such that  $f(P)$ is maximized. 
 
-\item {\em The Weighted Dispersion Decision Problem.} Given a tree with non-negative edge lengths, non-negative node weights, a number $W$, and a number $\lambda$, find a subset of nodes  $P$ of weight at least $W$, such that $f(P)\geq\lambda$, or declare no such subset exists. 
-\end{itemize}
-
+%We now consider the weighted variant of the dispersion problem, in which the edges have lengths and the nodes have weights. Recall that $f(P)=\min_{u,v\in P} \{d(u,v)\}$. The weighted dispersion problems are defined as follows.
+%\begin{itemize} 
+%\item {\em The Weighted Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, non-negative node weights, and a number $W$, find a subset of nodes $P$ of weight at least $W$, such that  $f(P)$ is maximized. 
+%
+%\item {\em The Weighted Dispersion Decision Problem.} Given a tree with non-negative edge lengths, non-negative node weights, a number $W$, and a number $\lambda$, find a subset of nodes  $P$ of weight at least $W$, such that $f(P)\geq\lambda$, or declare no such subset exists. 
+%\end{itemize}
 
 In this section we present an $O(n\log n)$ time algorithm for the weighted decision problem. A matching lower bound follows by a reduction from the set disjointness problem as explained in Appendix \ref{appendix weighted f.t. lower bound}.
 Using Frederickson's algorithm for finding the $k$-th longest path \cite{Frederickson1983} we can binary search over the possible values of $\lambda$ and solve the optimization problem with $O(\log n)$ calls to the $O(n \log n)$ time feasibility test, and $O(n\log^{2}n)$ time overall.
