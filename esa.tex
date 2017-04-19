@@ -1044,7 +1044,6 @@ and additionally sweep through $O(x)$ roots, so the cost is $O(x \log (\frac{2y}
 The second use of this operation was to find the intersection points of two polylines. In this case it is easy to see that the intervals $(k_i',k_i)$ are in fact disjoint, since we query with the keys of the breakpoints of one of the polylines only when there must be an intersection point between this breakpoint and the previous one, and so we do not need any pruning.
 
 
-<<<<<<< HEAD
 \subsection{\bf Operation~\ref{op7} -- batched interval insertions.}
 Again, we split the tree into small trees with $O(\frac{y}{x})$ leaves. Additionally, we split the small trees s.t. every interval
 that should be inserted falls between two small trees.
@@ -1058,9 +1057,6 @@ up to a constant factor, by essentially the same calculation as in Lemma \ref{ru
 \subsection{\bf Operation~\ref{op8} -- batched interval deletions.}
 Once again we split our tree into small trees. We then delete the relevant intervals from each of the small trees. Each interval is either contained in a single small tree (and is then deleted by performing one or two split operations and at most one join operation) or it spans several small trees (in which case we might also need to delete some trees entirely). This takes $O(x \log(\frac{2y}{x}))$ time in total.
 
-
-\section{Additional figures}
-=======
 \section{Figures}
 
 \begin{figure}[ht]
@@ -1068,7 +1064,6 @@ Once again we split our tree into small trees. We then delete the relevant inter
 $u$ is the root, $v$ is the hole, and the path from $u$ to $v$ is the spine of the fragment.}}
 {\includegraphics[scale=0.7]{fragment}}
 \end{figure}
->>>>>>> 733ccb7203e4a082b5ffd7814d185bcb3a97f588
 
 \begin{figure}[ht]
 \begin{center}
