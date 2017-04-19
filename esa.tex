@@ -175,7 +175,8 @@ solution $P_{i}$ for the feasibility test on $T_{r_{i}}$, together with the cand
 \item Check if it is possible to add $r$ to $P$ by looking at the closest vertex to it we have already put in $P$, and if so take $r$.
 \end{enumerate}
 Iterating over the input tree bottom-up as described results in a valid solution $P$ for the whole tree. To solve the dispersion decision problem,
-we check if $|P|\geq k$. We can do linear time preprocessing and store the distance of every node to the root of the whole tree, so that using lowest common ancestor queries~\cite{Bender2000}, we can compute any pairwise distance in the tree, and specifically the distance of a candidate node to the subtree's root. Now we can perform each step in $O(\ell)$ time, and so the running time of the algorithm is $O(n)$. A proof of correctness of this algorithm can be found in Appendix~\ref{appendix proof of correctness for linear f.t.}.
+we check if $|P|\geq k$. We can do linear time preprocessing and store the distance of every node to the root of the whole tree, so that using lowest common ancestor queries~\cite{Bender2000}, we can compute any pairwise distance in the tree, and specifically the distance of a candidate node to the subtree's root. Now we can perform each step in $O(\ell)$ time, and so the running time of the algorithm is $O(n)$. 
+The proof of correctness can be found in Appendix~\ref{appendix proof of correctness for linear f.t.}.
 
 \section{An \texorpdfstring{\boldmath$O(n\log\log n)$}{O(nloglogn)} Time Algorithm for the Dispersion Problem}
 \label{sublinear f.t.}
@@ -191,11 +192,10 @@ descendant of $u$, and the fragment consists of the subtree of $u$ without the s
 the fragment).  We call the path from $u$ to $v$ the fragment's \textit{spine}, and $v$'s subtree its \textit{hole}. If the
 fragment has only one border node, i.e., the fragment is a subtree of the input tree, we say that there is no hole.
 A partition of a tree into $O(n/b)$ such fragments is called a \emph{good partition}.
-The proof of the following lemma can be found in Appendix \ref{appendix proof of basic partitioning lemma}.
 Note that we can assume that the input tree is binary: given a non-binary tree, we can replace every degree $d\geq 3$ node with a binary tree on
 $d$ leaves. The edges of the binary tree are all of length zero and its artificial inner nodes cannot be taken.
 
-\begin{restatable}{lemmarestatable}{basicpartitioninglemma}
+\begin{restatable}{lemmarestatable}{basicpartitioninglemma}[see Appendix \ref{appendix proof of basic partitioning lemma}]
 \label{basic partitioning lemma}
 For any binary tree on $n$ nodes and a parameter $b$, a good partition of the tree can be found in $O(n)$ time.
 \end{restatable}
@@ -382,7 +382,7 @@ We now consider the weighted variant of the dispersion problem, in which the edg
 \end{itemize}
 
 
-In this section we present an $O(n\log n)$ time algorithm for the weighted decision problem. A matching lower bound follows by a reduction from the set disjointness problem (see Appendix \ref{appendix weighted f.t. lower bound}).
+In this section we present an $O(n\log n)$ time algorithm for the weighted decision problem. A matching lower bound follows by a reduction from the set disjointness problem as explained in Appendix \ref{appendix weighted f.t. lower bound}.
 Using Frederickson's algorithm for finding the $k$-th longest path \cite{Frederickson1983} we can binary search over the possible values of $\lambda$ and solve the optimization problem with $O(\log n)$ calls to the $O(n \log n)$ time feasibility test, and $O(n\log^{2}n)$ time overall.
 
 Similarly to the unweighted case, we would like to compute for each node of the tree, the subset of nodes $P$ in its subtree  s.t. $f(P) \geq \lambda$ and $W(P)$ is maximized. We compute this by going over the nodes of the tree bottom-up. Previously, the situation was simpler, as for any subtree we had just one candidate node (i.e., a node that may or may not be in the optimal solution for the entire input tree). This was true because nodes had uniform weights. Now however, there could be many candidates in a subtree, as the certain nodes are the ones that are at distance at least $\lambda$ from the root (and not $\frac{\lambda}{2}$ as in the unweighted case).
@@ -504,11 +504,10 @@ Since the intervals are disjoint and we do at most two interval increases on sma
 
 Before the operation terminates, we need to join the small trees to form one large tree. This is symmetric to splitting and analyzed with the same
 calculation.
-\begin{restatable}{lemmarestatable}{runningtimetoobtainsmalltreeslemma}
+\begin{restatable}{lemmarestatable}{runningtimetoobtainsmalltreeslemma}[see Appendix \ref{appendix proof of running time to obtain small trees lemma}]
 \label{running time to obtain small trees lemma}
 The time to obtain the small trees is $O(x \log (\frac{2y}{x}))$.
 \end{restatable}
-The calculation proving this lemma is in Appendix \ref{appendix proof of running time to obtain small trees lemma}.
 
 The cost of all joins required to patch the small trees together can be bounded by the same calculation as the cost of the splits made to obtain them, and so the operation takes $O(x \log (\frac{2y}{x}))$ time in total.
 
@@ -517,11 +516,10 @@ There is an additional technical difficulty in Operation~\ref{op6}, as the inter
 Therefore, we need to consider how we use this operation more carefully and argue that the intervals can be made
 disjoint with some extra work. The full description of Operation 6-8 is in Appendix \ref{appendix batched operations}.
 
-\begin{restatable}{theoremrestatable}{nlognweighted}
+\begin{restatable}{theoremrestatable}{nlognweighted}[see Appendix \ref{appendix proof of nlogn theorem}]
 \label{nlogn weighted f.t. theorem}
 The above implementation implies an $O(n \log n)$ weighted feasibility test.
 \end{restatable}
-The proof of the theorem can be found in Appendix \ref{appendix proof of nlogn theorem}.
 
 \bibliography{dispersion}
 
