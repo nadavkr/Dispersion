@@ -230,15 +230,13 @@ linear-time feasibility test to further decrease the interval, so that most of t
 A method of choosing which tests to perform to achieve this is the gist of Frederickson's method.
 
 For each fragment, we construct an implicit representation of $O(b)$ matrices of total side length $O(b\log b)$, that are row- and column-sorted,
-and any pairwise distance (and any pairwise distance multiplied by 2) inside is an entry in some matrix. This is done using the standard centroid 
-decomposition in $O(n/b\cdot b\log b)=O(n\log b)$ total time. 
+and any pairwise distance (and any pairwise distance multiplied by 2) inside is an entry in some matrix using the standard centroid 
+decomposition in $O(n/b\cdot b\log b)=O(n\log b)$ total time. Then, we can apply a theorem Frederickson on the obtained set of matrices.
 
 \begin{restatable}{lemmarestatable}{centroidmatrix}
 Given a tree $T$ on $b$ nodes, we can construct in $O(b\log b)$ an implicit representation of $O(b)$ sorted matrices of total
 side length $O(b\log b)$ such that, for any $u,v\in T$, $d(u,v)$ is an entry in some matrix.
 \end{restatable}
-
-Then, we apply a theorem of Frederickson on the obtained set of matrices.
 
 \begin{theorem}[\cite{Frederickson1991}]\label{Frederickson's theorem}
 Let  ${M_1, M_2, . . . , M_N}$ be a collection of sorted matrices in which matrix $M_j$ is of dimension $m_j \times n_j$, $m_j \leq n_j$, and $\sum_{j=1}^{N} m_j = m$.
