@@ -133,7 +133,9 @@ The first step of the preprocessing computes values $\lambda_1$ and  $\lambda_2$
 The fragments that do satisfy property (3) are further preprocessed. We look at the path from the hole to the root of the
 fragment and run the linear-time feasibility test for all subtrees hanging off from it. This can be done without knowing the exact value of $\lambda$,
 as for any two nodes of the fragment we know if their distance is smaller than $\lambda_{1}$ or larger or equal to $\lambda_{2}$. Then, we can conceptually
-prune the fragment and think of it as a caterpillar. The spine of the caterpillar is the hole-to-root path and each spine node has two leaf children: a \emph{certain} node (that is guaranteed to be included in an optimal solution for any $\lambda$, and a \emph{candidate} node (whose inclusion in an optimal solution depends on $\lambda$). Finally, we show that  additional pruning can be performed on the caterpillar's leaves so that their distances from both the hole and the root are monotonically increasing. This structure enables us to precompute for each candidate node, assuming this node is the bottom-most node
+prune the fragment and think of it as a caterpillar connecting the root and the hole.
+%The spine of the caterpillar is the hole-to-root path and each spine node has two leaf children: a \emph{certain} node (that is guaranteed to be included %in an optimal solution for any $\lambda$, and a \emph{candidate} node (whose inclusion in an optimal solution depends on $\lambda$). 
+With some additional pruning, we can make sure that the distances of its leaves from both the hole and the root are monotonically increasing. This structure enables us to precompute for each candidate node, assuming this node is the bottom-most node
 of the fragment included in the solution, what are all the other nodes in the solution. Upon query, we can then jump over the entire fragment  in $O(\log b)$ time by binary searching for this bottom-most node.
 
 The above feasibility test is presented in~Section~\ref{sublinear f.t.}, with an overall preprocessing time of $O(n\log\log n)$.
@@ -141,7 +143,7 @@ The test is then translated into a solution for the optimization problem. This i
 $[\lambda_{1},\lambda_{2})$ and applying Frederickson's parametric search, but now we apply the heavy path decomposition to construct
 the monotone matrices, so that the feasibility test needs to be applied only $O(\log^{2}n)$ times in total.
 To accelerate the $O(n\log\log n)$ time algorithm, we construct a hierarchy of feasibility tests by partitioning the input tree
-into larger and larger fragments. In each iteration we construct a feasibility test with better running time, until finally, after $\log ^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time, which we use to solve the dispersion optimization problem in $O(n)$. The full description of the algorithm is in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
+into larger and larger fragments. In each iteration we construct a feasibility test with better running time, until finally, after $\log ^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time, which we use to solve the dispersion optimization problem in $O(n)$. The  algorithm is described in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
 
 
 \medskip \noindent {\bf Our solution for the weighted dispersion problem.}
