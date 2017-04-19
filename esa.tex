@@ -93,7 +93,7 @@ A related problem, also suggested in the early 80's  \cite{Becker1982,Perl1981},
 %
 Finally, and the focus of this paper, is the  {\em $k$-dispersion} problem, where we wish to designate $k$ nodes as facilities so as to maximize the distances among the facilities.  In other words, we wish to select $k$ nodes that are as spread-apart as possible. This can be seen as a generalization of the classical maximum independent set problem (that can be solved by binary searching for the largest value of $k$ for which the minimum distance is at least 2).  
 %
-It turns out that the $k$-dispersion and the $k$-partitioning problems are actually equivalent in the one-dimensional case (i.e. when the tree is a path),
+It turns out that the $k$-dispersion and the $k$-partitioning problems are actually equivalent in the one-dimensional case (i.e., when the tree is a path),
 by simply creating a new path with edges and nodes corresponding to nodes and edges, respectively, of the original path.
 However, such equivalence does not apply to general trees, on which $k$-dispersion seems more difficult than $k$-partitioning. In particular, until the present work, no linear time solution for $k$-dispersion was known. The fastest solution was the $O(n \log n)$ solution given in the late 90's by Bhattacharya and Houle \cite{Bhattacharya1991}, who also considered the weighted version (where nodes have weights and the goal is to select nodes with total weight at least $k$)  for which they gave an $\Oh(n\log^4 n)$ time solution \cite{Bhattacharya1999}.
 
@@ -313,10 +313,10 @@ we set the candidate node to $u_{i}$, and else if the certain node is set to NUL
 
 The sublinear feasibility test processes the tree bottom-up. For every fragment with root $r$, we would like to simulate running the
 linear-time feasibility test on the subtree rooted at $r$ to compute: the number of chosen nodes, the candidate node, and the certain
-node. We assume that we already have such information for the fragment rooted at the hole of the current fragment, if any.
-If the current fragment is active, we process it naively in $O(b)$ time (note that now we are given $\lambda$, and hence are
-able to run the linear-time feasibility test). If the current fragment is inactive, we would like to process it in $O(\log b)$ time.
-This can be seen as attaching the hole as another spine node to the corresponding caterpillar, and then executing steps
+node. We assume that we already have such information for the fragment rooted at the hole of the current fragment.
+If the current fragment is active, we process it naively in $O(b)$ time (note that now we know $\lambda$, and so are
+able to run the linear-time feasibility test). Otherwise, we will process the current fragment in $O(\log b)$ time.
+This can be seen as, roughly speaking, attaching the hole as another spine node to the corresponding caterpillar and executing steps
 (\ref{removing certain nodes})-(\ref{precompute for any candidate node}).
 
 We start by considering the case where there is no candidate node w.r.t. the hole. Let $v$ be the certain node w.r.t. the hole.
@@ -500,20 +500,18 @@ To conclude, the final polyline $p$ is obtained by concatenating the value compu
 \item \label{op7} Batched interval insertions -- Given a list of pairs of consecutive breakpoints in the polyline, insert between each pair a list of breakpoints.
 \item \label{op8} Batched interval deletions -- Given a list of disjoint intervals of the polyline, delete all the breakpoints inside the intervals.
 \end{enumerate}
-
 We now describe the data structure we use for polylines, which will allow us to implement the above interface efficiently. We represent a polyline by storing its breakpoints in an augmented 2-3 tree, where the data is stored in the leaves. Each node of the tree stores a key-value pair, and we maintain the following property: the key of each breakpoint is the sum of the keys of the corresponding leaf and of all its ancestors, and similarly for the values. In addition, we store in each node the maximal sum of keys and values on a path from that node to a leaf in its subtree. We also store in each node the number of leaves in its subtree. We next describe the implementation of each operation.
 
- Operations~\ref{op1} and~\ref{op2} can use standard split and join procedures for 2-3 trees in logarithmic time. 
- Operation~\ref{op3} can be done by running a predecessor query and returning the value at the returned breakpoint in logarithmic time.
- Operation~\ref{op4} is done by an inorder traversal of the tree. 
-Operations~\ref{op1}-\ref{op3} are performed only a constant number of times per step, and so their total cost is logarithmic (i.e. $O(\log x + \log y)$). Operation~\ref{op4} is also performed a constant number of times to iterate over the breakpoints of $p_{1}$ (in $O(x)$ time). The next four operations are more costly, since each of them is comprised of a batch of $O(x)$ operations on a tree of size $O(y)$. The input to all these four batched operations is assumed to be given in sorted order (by keys).
-
+Operations~\ref{op1} and~\ref{op2} use standard split and join procedures for 2-3 trees in logarithmic time. 
+Operation~\ref{op3} runs a predecessor query and returning the value at the returned breakpoint in logarithmic time.
+Operation~\ref{op4} is done by an inorder traversal of the tree. 
+Operations~\ref{op1}-\ref{op3} are performed only a constant number of times per step, and so their total cost is logarithmic (i.e., $O(\log x + \log y)$). Operation~\ref{op4} is also performed a constant number of times to iterate over the breakpoints of $p_{1}$ (in $O(x)$ time). The next four operations are more costly, since they consists a batch of $O(x)$ operations given in sorted order (by keys).
 
 \medskip \noindent {\bf Operation~\ref{op5} -- batched interval increase.}
 Consider the following implementation for Operation \ref{op5}. We iterate over the intervals, and for each of them, we find its left endpoint, and traverse the path from the left endpoint, through the LCA, to the right endpoint.
 The traversal is guided by the maximal key stored in the current node (that are used to find the maximal key of a breakpoint stored in its subtree
 by adding the sum of all keys from the root to the current node, which is maintained in constant time after moving to a child or the parent).
-While traversing the path from the left endpoint to the LCA (from the LCA to the right endpoint), we increase the value of every node hanging to the right (left) of this path. We also update the maximal value field in each node we reach (including the nodes on the path from the LCA to the root). Notice that if one of the endpoints of the interval is not in the structure, we need to insert it. We might also need to delete a breakpoint if it is a starting point of some interval and its new value is now equal to the value of its predecessor. This implementation would take time which is linear in the number of traversed nodes, plus the cost of insertions and deletions (whose number is linear in the number of intervals). Because the depth of a 2-3 tree of size $O(y)$ is $O(\log y)$, this comes up to $O(x \log y$). Such time complexity for each step would induce a running time of $O(n \log ^2 n)$ for the entire feasibilty test. 
+While traversing the path from the left endpoint to the LCA (from the LCA to the right endpoint), we increase the value of every node hanging to the right (left) of this path. We also update the maximal value field in each node we reach (including the nodes on the path from the LCA to the root). Notice that if one of the endpoints of the interval is not in the structure, we need to insert it. We might also need to delete a breakpoint if it is a starting point of some interval and its new value is now equal to the value of its predecessor. This implementation would take time which is linear in the number of traversed nodes, plus the cost of insertions and deletions (whose number is linear in the number of intervals). Because the depth of a 2-3 tree of size $O(y)$ is $O(\log y)$, this comes up to $O(x \log y$). Such time complexity for each step would imply $O(n\log^{2}n)$ total time for the feasibility test.
 
 We improve the running time by performing the operations on smaller trees. The operation therefore begins by splitting the tree into $O(x)$ smaller trees, each with $O(\frac{y}{x})$ leaves. This is done by recursively splitting the tree, first into two trees with $O(\frac{y}{2})$ leaves, then we split each of these trees into two trees with $O(\frac{y}{4})$ leaves, and so on, until we have trees of size $O(\frac{y}{x})$. We then increase the values in the relevant intervals using the small trees. For this, we scan the roots of the small trees, searching for the left endpoint of the first interval (by using the maximal key stored in the root of each tree). Once we have found the left endpoint of the interval, we check if the right endpoint of the interval is in the same tree or not (again, using the maximal key). In the first case, the interval is contained in a single tree, and can be increased in this tree in time $O(\log(\frac{2y}{x}))$ using the procedure we have previously described. In the second case, the interval spans several trees, and so we need to do an interval increase in the two trees containing the endpoints of the interval, and additionally increase the value stored in the root of every tree that is entirely contained in the interval. We then continue to the next interval, and proceed in the same manner. 
 %
@@ -528,8 +526,7 @@ The time to obtain the small trees is $O(x \log (\frac{2y}{x}))$.
 \end{restatable}
 
 The cost of all joins required to patch the small trees together can be bounded by the same calculation as the cost of the splits made to obtain them, and so the operation takes $O(x \log (\frac{2y}{x}))$ time in total.
-
-The rest of the batched operations are implemented similarly, using the same trick of splitting the tree and working on small trees. 
+The rest of the batched operations are implemented similarly, using the same trick of splitting the tree and working with the small trees. 
 There is an additional technical difficulty in Operation~\ref{op6}, as the intervals $(k_{i'},k_{i})$ might not be disjoint in our algorithm.
 Therefore, we need to consider how we use this operation more carefully and argue that the intervals can be made
 disjoint with some extra work. The full description of Operation 6-8 is in Appendix \ref{appendix batched operations}.
@@ -684,7 +681,7 @@ test from the previous step, we now find a good partition of the tree with $O(n/
 where $B=2^b$. We perform a heavy path decomposition on each fragment, and process the heavy
 path trees of all fragments bottom up and in parallel. The paths at lower levels have been processed so that each of them is
 reduced to a candidate and a certain node, and so each current path is a caterpillar, that we will now reduce to at most two nodes using Frederickson's method. As we have seen in Section \ref{sublinear f.t.}, after some processing, we can create a matrix 
-with linear number of rows and columns that contains all pairwise distances in such a caterpillar. As before, this is done by pruning the caterpillars so that the distances of leaves from the root and the hole are monotone, thus achieving a matrix that is row and column sorted. For any level of the heavy path decomposition the maximum side length of a matrix is $B^{3}$ (i.e. the parameter $n_j$ in Theorem \ref{Frederickson's theorem} is equal to $B^3$) and of total size of all matrices in the level is at most $n$ ($m=n$).
+with linear number of rows and columns that contains all pairwise distances in such a caterpillar. As before, this is done by pruning the caterpillars so that the distances of leaves from the root and the hole are monotone, thus achieving a matrix that is row and column sorted. For any level of the heavy path decomposition the maximum side length of a matrix is $B^{3}$ (i.e., the parameter $n_j$ in Theorem \ref{Frederickson's theorem} is equal to $B^3$) and of total size of all matrices in the level is at most $n$ ($m=n$).
 We use Frederickson's search (Theorem~\ref{Frederickson's theorem}) with the parameter $p$ set to $\frac{n}{B^7}$. We thus need to use the
 test $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (B^{3}), \log(\frac{n}{n/B^{7}} \rbrace) = O(\log B)$ times, and additionally spend linear time exclusive of the feasibility tests. This allows us to eliminate all pairwise distances in the caterpillars of the heavy paths at the current level for most of the fragments. We proceed to compute the candidate and certain node of each path as we did before, and continue with the next level
 of the heavy path decompositions, until we are left with only the top heavy path of each fragment.
@@ -705,7 +702,7 @@ $\log ^*n$ iterations, this time with only one fragment of size $n$, and setting
 
 In the rest of the section we describe how to improve the running time to $O(n)$, giving an optimal solution for the dispersion optimization problem.
 
-Consider a large fragment. It is composed of small fragments. Notice that some of these small fragments are active fragments, i.e. have not been reduced to caterpillars in the previous iteration, but most are inactive fragments, which have
+Consider a large fragment. It is composed of small fragments. Notice that some of these small fragments are active fragments, i.e., have not been reduced to caterpillars in the previous iteration, but most are inactive fragments, which have
 been reduced to caterpillars. The large fragment contains some small fragments whose roots and holes are spine nodes of the large fragment,
 and other fragments that form subtrees hanging off of the large fragment's spine (each hanging subtree may
 contain several small fragments), see Figure \ref{figure of small fragments inside a large fragment}.
@@ -820,7 +817,7 @@ non-decreasing. We repeat the symmetric process from top to bottom to ensure tha
 from the hole are non-decreasing. The whole procedure takes linear time in the number of eliminated
 candidate nodes plus the number of small fragments, which sums up to $O(n)$ overall.
 
-Now we need to eliminate all internal ``collisions'' inside the large caterpillar (i.e. remove candidate nodes that
+Now we need to eliminate all internal ``collisions'' inside the large caterpillar (i.e., remove candidate nodes that
 are too close to certain nodes). These collisions can occur between a candidate node of one small caterpillar
 and a certain node of another small caterpillar. Each certain node eliminates a range of consecutive
 candidates nodes below and above its small caterpillar. Therefore, we only need to consider the 
@@ -887,7 +884,7 @@ the certain node, and otherwise the last visited node is the candidate node and 
 such that $u$ might be accessed in query time. Recall that in query time we specify
 a node $v$ attached to the hole of the fragment and binary search for the first node $u$ that
 is at distance at least $\lambda^{*}$ from $v$. Therefore, we only need to maintain the information
-for a suffix consisting of nodes that are not too far from the hole (i.e. at distance at most $\lambda^{*}$). However, it is not
+for a suffix consisting of nodes that are not too far from the hole (i.e., at distance at most $\lambda^{*}$). However, it is not
  trivial to update such information after merging multiple small caterpillars into
 one. This is because we might remove some nodes (a prefix and a suffix)
 from every small caterpillar before the merge. To overcome this, we divide every caterpillar into
