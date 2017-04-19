@@ -707,14 +707,13 @@ been reduced to caterpillars. The large fragment contains some small fragments w
 and other fragments that form subtrees hanging off of the large fragment's spine (each hanging subtree may
 contain several small fragments), see Figure \ref{figure of small fragments inside a large fragment}.
 
-%\begin{figure}[h]
-%\begin{center}
-%\includegraphics[scale=1]{refinement}
-%\end{center}
-%\caption{A large fragment containing a number of smaller fragments. The small fragments on the spine are gray, and the subtrees hanging off of the spine are black (each of them may contain many small fragments). %We start by reducing the hanging subtrees to just two nodes, then handle the small active fragments on the spine, and finally reduce the entire large fragment to one caterpillar and process it. 
-%\label{figure of small fragments inside a large fragment}}
-%\end{figure}
-
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=1]{refinement}
+\end{center}
+\caption{A large fragment containing a number of smaller fragments. The small fragments on the spine are gray, and the subtrees hanging off of the spine are black (each of them may contain many small fragments). %We start by reducing the hanging subtrees to just two nodes, then handle the small active fragments on the spine, and finally reduce the entire large fragment to one caterpillar and process it. 
+\label{figure of small fragments inside a large fragment}}
+\end{figure}
 
 \noindent The partitioning used in the algorithm is presented in Subsection \ref{section:partioioning}. In Subsection~\ref{section:lemma1} we show how to reduce the hanging subtrees to at most two nodes, one candidate and one certain. Then, in Subsection~\ref{section:lemma2} we reduce the small active fragments on the spine to caterpillars. This turns the entire fragment into a large caterpillar. In Subsection~\ref{section:lemma3} we prune this large caterpillar so that it becomes monotone and without collisions. Finally, in Subsection~\ref{section:lemma4} we preprocess the resulting large caterpillar for eliminated suffix queries. 
 
@@ -1129,22 +1128,13 @@ The weight of $P$ only decreases at certain points called breakpoints (in bold).
 \label{figure of constructing the second half of the polyline}}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \begin{center}
 \includegraphics[scale=0.6]{polyline_first_half_construction_case2}
 \end{center}
 \caption{Case II of constructing the first half of the polyline. The first half of $p_2$ is in blue. The vertical black dashed lines are the breakpoints of $p_1$. We increase the values of $p_{2}$ and obtain the red polyline, which is not monotone. To make it monotone, we delete all the breakpoints below the green intervals, which are found with value predecessor queries (the results of these queries are the bold points).\label{figure of the second case in the construction of the first half of the polyline}
 }
 \end{figure}
-
-\begin{figure}[h]
-\begin{center}
-\includegraphics[scale=1]{refinement}
-\end{center}
-\caption{A large fragment containing a number of smaller fragments. The small fragments on the spine are gray, and the subtrees hanging off of the spine are black (each of them may contain many small fragments). %We start by reducing the hanging subtrees to just two nodes, then handle the small active fragments on the spine, and finally reduce the entire large fragment to one caterpillar and process it. 
-\label{figure of small fragments inside a large fragment}}
-\end{figure}
-
 
 \end{document}
 
