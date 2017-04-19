@@ -400,7 +400,8 @@ The values $W(P)$ can be viewed as a monotone polyline, since the weight of $P$ 
 %\end{figure}
 
 
-The algorithm computes such a polyline for the subtrees rooted at all the nodes of the tree. As we have mentioned, this computation is done bottom-up, and so in each step of the algorithm we compute the polyline for a subtree rooted at some node $v$, assuming that we have already computed the polylines for the subtrees rooted at $v$'s children. We will show how to achieve this step in time $O(x \log (\frac{2y}{x}))$, where $x$ is the number of breakpoints in the polyline with fewer breakpoints, and $y$ the number of breakpoints in the other polyline\footnote{For the same reasoning as in the unweighted case, we assume w.l.o.g. that the input tree is binary.}. This sums up to $O(n \log n)$ overall.
+The algorithm computes such a polyline for the subtrees rooted at all the nodes of the tree. As we have mentioned, this computation is done bottom-up, and so in each step of the algorithm we compute the polyline for a subtree rooted at some node $v$, assuming that we have already computed the polylines for the subtrees rooted at $v$'s children. W.l.o.g. we assume that the input tree is binary, and show how to
+achieve this step in time $O(x \log (\frac{2y}{x}))$, where $x$ is the number of breakpoints in the polyline with fewer breakpoints, and $y$ the number of breakpoints in the other polyline.
 
 
 When constructing a polyline, we need to consider several cases, as the closest chosen node $h$ in the subtree of $v$ could be $v$ itself, or it could be in the subtree of one of $v$'s children. This means that for any key $d(h,v)$ in the polyline, the value for that key can represent a solution $P$ in which $h$ is in the subtree rooted $v$'s left child, or in the subtree rooted $v$'s right child, or it could be $v$ itself.
@@ -477,12 +478,12 @@ To conclude, the final polyline $p$ is obtained by concatenating the value compu
 \item \label{op3} Retrieve the value of the polyline for a certain key $d(h,v)$.
 \item \label{op4}Return a sorted list of the breakpoints of the polyline
 \item \label{op5} Batched interval increase -- Given a list of disjoint intervals of the polyline, and a number for each interval, increase the values of the polyline in each interval by the appropriate number. Each interval is given by the keys of its endpoints.
-\item \label{op6} Batched value predecessor -- Given a list of key-value pairs, $(k_i,v_i)$, find for each $k_i$, the maximal key $k_{i}'$, s.t. $k_{i}' < k_i$ and the value of the polyline at $k_{i}'$ is at least $v_i$.
+\item \label{op6} Batched value predecessor -- Given a list of key-value pairs, $(k_i,v_i)$, find for each $k_i$, the maximal key $k_{i}'$, s.t. $k_{i}' < k_i$ and the value of the polyline at $k_{i}'$ is at least $v_i$, assuming that the intervals $(k_{i}',k_{i})$ are disjoint.
 \item \label{op7} Batched interval insertions -- Given a list of pairs of consecutive breakpoints in the polyline, insert between each pair a list of breakpoints.
 \item \label{op8} Batched interval deletions -- Given a list of disjoint intervals of the polyline, delete all the breakpoints inside the intervals.
 \end{enumerate}
 
-We now describe the data structure we use for polylines, which will allow us to implement the above interface efficiently. We represent a polyline by storing its breakpoints in an augmented 2-3 tree, where the data is stored in the leaves. Each node of the tree stores a key-value pair, and we maintain the following property: the key of each breakpoint is the sum of the keys of the corresponding leaf and of all its ancestors, and similarly for the values. In addition, we store in each node the maximal key and the maximal value of a breakpoint that corresponds to a leaf in its subtree. We also store in each node the number of leaves in its subtree. We next describe the implementation of each operation.
+We now describe the data structure we use for polylines, which will allow us to implement the above interface efficiently. We represent a polyline by storing its breakpoints in an augmented 2-3 tree, where the data is stored in the leaves. Each node of the tree stores a key-value pair, and we maintain the following property: the key of each breakpoint is the sum of the keys of the corresponding leaf and of all its ancestors, and similarly for the values. In addition, we store in each node the maximal sum of keys and values on a path from that node to a leaf in its subtree. We also store in each node the number of leaves in its subtree. We next describe the implementation of each operation.
 
  Operations~\ref{op1} and~\ref{op2} can use standard split and join procedures for 2-3 trees in logarithmic time. 
  Operation~\ref{op3} can be done by running a predecessor query and returning the value at the returned breakpoint in logarithmic time.
@@ -492,7 +493,8 @@ Operations~\ref{op1}-\ref{op3} are performed only a constant number of times per
 
 \medskip \noindent {\bf Operation~\ref{op5} -- batched interval increase.}
 Consider the following implementation for Operation \ref{op5}. We iterate over the intervals, and for each of them, we find its left endpoint, and traverse the path from the left endpoint, through the lowest common ancestor (LCA), to the right endpoint.
-The traversal is guided by the maximal keys stored at the nodes.\footnote{We need to maintain during the traversal the sum of all keys on the path from the root to the current node. This quantity can be easily maintained in constant time while moving to a child or the parent.}
+The traversal is guided by the maximal key stored in the current node (that are used to find the maximal key of a breakpoint stored in its subtree
+by adding the sum of all keys from the root to the current node, which is maintained in constant time after moving to a child or the parent).
 While traversing the path from the left endpoint to the LCA (from the LCA to the right endpoint), we increase the value of every node hanging to the right (left) of this path. We also update the maximal value field in each node we reach (including the nodes on the path from the LCA to the root). Notice that if one of the endpoints of the interval is not in the structure, we need to insert it. We might also need to delete a breakpoint if it is a starting point of some interval and its new value is now equal to the value of its predecessor. This implementation would take time which is linear in the number of traversed nodes, plus the cost of insertions and deletions (whose number is linear in the number of intervals). Because the depth of a 2-3 tree of size $O(y)$ is $O(\log y)$, this comes up to $O(x \log y$). Such time complexity for each step would induce a running time of $O(n \log ^2 n)$ for the entire feasibilty test. 
 
 We improve the running time by performing the operations on smaller trees. The operation therefore begins by splitting the tree into $O(x)$ smaller trees, each with $O(\frac{y}{x})$ leaves. This is done by recursively splitting the tree, first into two trees with $O(\frac{y}{2})$ leaves, then we split each of these trees into two trees with $O(\frac{y}{4})$ leaves, and so on, until we have trees of size $O(\frac{y}{x})$. We then increase the values in the relevant intervals using the small trees. For this, we scan the roots of the small trees, searching for the left endpoint of the first interval (by using the maximal key stored in the root of each tree). Once we have found the left endpoint of the interval, we check if the right endpoint of the interval is in the same tree or not (again, using the maximal key). In the first case, the interval is contained in a single tree, and can be increased in this tree in time $O(\log(\frac{y}{x}))$ using the procedure we have previously described. In the second case, the interval spans several trees, and so we need to do an interval increase in the two trees containing the endpoints of the interval, and additionally increase the value stored in the root of every tree that is entirely contained in the interval. We then continue to the next interval, and proceed in the same manner. 
@@ -500,8 +502,8 @@ We improve the running time by performing the operations on smaller trees. The o
 Since the intervals are disjoint and we do at most two interval increases on small trees per interval, the total time for the increases in the small trees is $O(x \cdot \log (\frac{y}{x}))$. Scanning the roots of the small trees adds $O(x)$ to the complexity, leading to 
  $O(x \cdot \log (\frac{y}{x}) + x) = O(x \log (\frac{2y}{x}))$ overall for processing the small trees.
 
-Before the operation terminates, we still need to merge the small trees back into one large tree. We do this using join operations, symmetrically to how we obtained the small trees by splitting. 
-
+Before the operation terminates, we need to join the small trees to form one large tree. This is symmetric to splitting and analyzed with the same
+calculation.
 \begin{restatable}{lemmarestatable}{runningtimetoobtainsmalltreeslemma}
 \label{running time to obtain small trees lemma}
 The time to obtain the small trees is $O(x \log (\frac{2y}{x}))$.
@@ -510,7 +512,10 @@ The calculation proving this lemma is in Appendix \ref{appendix proof of running
 
 The cost of all joins required to patch the small trees together can be bounded by the same calculation as the cost of the splits made to obtain them, and so the operation takes $O(x \log (\frac{2y}{x}))$ time in total.
 
-The rest of the batched operations are implemented similarly, using the same trick of splitting the tree and working on small trees. Operation \ref{op6} has an additional technical difficulty, since the intervals $(k_i',k_i)$ are not guaranteed to be disjoint. This means that scanning the roots of the small trees might take more than $O(x)$ time. We solve this problem by considering our use of this operation, and showing that we can prune the input s.t. the resulting intervals (i.e. $(k_i',k_i)$) are disjoint. The full description of Operation 6-8 is in Appendix \ref{appendix batched operations}.
+The rest of the batched operations are implemented similarly, using the same trick of splitting the tree and working on small trees. 
+There is an additional technical difficulty in Operation~\ref{op6}, as the intervals $(k_{i'},k_{i})$ might not be disjoint in our algorithm.
+Therefore, we need to consider how we use this operation more carefully and argue that the intervals can be made
+disjoint with some extra work. The full description of Operation 6-8 is in Appendix \ref{appendix batched operations}.
 
 \begin{restatable}{theoremrestatable}{nlognweighted}
 \label{nlogn weighted f.t. theorem}
@@ -607,18 +612,18 @@ S = & \ 2c\cdot x \log x + 2c\cdot y \log y + c\cdot x \log (\frac{2y}{x})\\
 This concludes the induction and yields our $O(n \log n)$ weighted feasibility test.
 \end{proof}
 
-\section{Constructing sorted matrices with all pairwise distances in all fragments}\label{appendix constructing sorted matrices using centroid decomp.}
+\section{Constructing sorted matrices with all pairwise distances inside a fragment}\label{appendix constructing sorted matrices using centroid decomp.}
 
 Our goal is to show that, given an input tree $T$ on $b$ nodes, we can construct in $O(b\log b)$ time an implicit representation of $O(b)$
 matrices of total side length $O(b\log b)$, that are row- and column-sorted, and any pairwise between two nodes of the tree is an entry in
 some matrix. By implicit representation we mean that we should be able to retrieve any entry in $O(1)$ time on request.
 
-%\begin{figure}[ht]
-%\begin{center}
-%\includegraphics[scale=1]{centroid}
-%\end{center}
-%\caption{A single step in the centroid decomposition. Removing $v$ splits $T$ into three pieces, s.t. none of them has more than $\frac{|T|}{2}$ nodes. The white piece is problematic, since the paths from its nodes to $v$ do not pass through the inner centroid $v'$.}
-%\end{figure}
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[scale=1]{centroid}
+\end{center}
+\caption{A single step in the centroid decomposition. Removing $v$ splits $T$ into three pieces, s.t. none of them has more than $\frac{|T|}{2}$ nodes. The white piece is problematic, since the paths from its nodes to $v$ do not pass through the inner centroid $v'$.}
+\end{figure}
 
 To construct the matrices we apply the standard centroid decomposition. A node $v\in T$ is a centroid if every connected component of
 $T\setminus\{v\}$ consists of at most $\frac{|T|}{2}$ nodes. The centroid decomposition of $T$ is defined recursively by first choosing a centroid
@@ -653,7 +658,7 @@ of all pieces at the same level of recursion is at most $b$, so indeed the total
 
 We first present an $O(n \log^* n)$ time algorithm that uses the procedures of the $O(n \log \log n)$ time algorithm iteratively, and then move to the more complex linear time algorithm.
 
-\subsection{A \texorpdfstring{\boldmath$O(n\log^{*}n)$}{O(nlog^*n)} time algorithm for the dispersion optimization problem} \label{sectionlog*}
+\subsection{An \texorpdfstring{\boldmath$O(n\log^{*}n)$}{O(nlog^*n)} time algorithm for the dispersion optimization problem} \label{sectionlog*}
 The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test (or test for short) to get a sublinear one. In order to get the complexity down to $O(n \log ^*n)$ we will use a similar process, iteratively, with growing fragments size, improving in each iteration the performance of our test.
 We start with $O(n/c^{3})$ fragments of size at most $c^3$ for some constant $c$.
 We pay $O(n)$ time for preprocessing and get an $O(\frac{n}{c^3} \cdot \log c)$ time test.
@@ -723,25 +728,14 @@ If $b_{\ell}$ denotes the value of the parameter $b$ in the $\ell$-th applicatio
 $$ O(\sum_{\ell} {n}/{b_{\ell}}) = O(\sum_{\ell} {n}/{2^{\ell}}) = O(n).$$
 Observe that the size of a (large) fragment in the $(\ell+1)$-th partition is at most $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$ which is at most $O((b_{\ell+1})^5)$ for a large enough $\ell$ (i.e., an $\ell$ s.t. $\alpha^{\ell+1}\leq 2^{2^{\ell+1}}$ and $b_{\ell+1}\geq 2^{2^{\ell+1}}$).  Denoting by $b=b_{\ell}$ and $B=b_{\ell+1}$  we get that every large fragment is of size $O(B^5)$ and is composed of (small) fragments of the $\ell$-th partition (each of size $O(b^5)$). 
 
-
-
-
-
-
-
-
 \subsection{Reducing a hanging subtree into two nodes}\label{section:lemma1}
 The first step in reducing a large fragment into a caterpillar is reducing the hanging subtrees of the large fragment into at most two nodes. The following lemma shows that this can be done in total $O(n)$ time for all fragments in all the $\log^* n$ partitions.
 
-
-
-
 \begin{lemma}\label{lemma1}
-	The hanging subtrees of the large fragments in all the partitions can be reduced to at most two nodes (one candidate and one certain) in total $O(n)$ time. 
+The hanging subtrees of the large fragments in all the partitions can be reduced to at most two nodes (one candidate and one certain) in total $O(n)$ time. 
 \end{lemma}
 \begin{proof}
-We 
-perform a heavy path decomposition on each hanging subtree. Since each such subtree is contained in a large fragment, its 
+We perform a heavy path decomposition on each hanging subtree. Since each such subtree is contained in a large fragment, its 
 size is bounded by $O(B^5)$, and so we have at most $O(\log B)$ levels in the heavy 
 path decompositions. On each level we run Frederickson's search (similarly to what we have presented before).
 We run this search in parallel, for all heavy paths from all these hanging subtrees in all large fragments.
@@ -763,7 +757,6 @@ $\frac{n}{B^9} \cdot O(B^5)$.
 %subtrees  by simply saying that each such hanging subtree is reduced to at most
 %two nodes, but we can easily afford to separately pay $O(\frac{n}{B^{4}})$ per iteration for this processing.
 \end{proof}
-
 
 \subsection{Reducing a small active fragment into a caterpillar}\label{section:lemma2}
 Having processed the hanging subtrees, we now deal with the active small fragments on the spine of the large fragment. 
@@ -1135,15 +1128,6 @@ The weight of $P$ only decreases at certain points called breakpoints (in bold).
 \caption{Case II of constructing the first half of the polyline. The first half of $p_2$ is in blue. The vertical black dashed lines are the breakpoints of $p_1$. We increase the values of $p_{2}$ and obtain the red polyline, which is not monotone. To make it monotone, we delete all the breakpoints below the green intervals, which are found with value predecessor queries (the results of these queries are the bold points).\label{figure of the second case in the construction of the first half of the polyline}
 }
 \end{figure}
-
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[scale=1]{centroid}
-\end{center}
-\caption{A single step in the centroid decomposition. Removing $v$ splits $T$ into three pieces, s.t. none of them has more than $\frac{|T|}{2}$ nodes. The white piece is problematic, since the paths from its nodes to $v$ do not pass through the inner centroid $v'$.}
-\end{figure}
-
 
 \begin{figure}[h]
 \begin{center}
