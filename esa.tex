@@ -7,6 +7,12 @@
 \usepackage{floatrow}
 \usepackage{amsthm,thmtools,thm-restate}
 
+\usepackage{lipsum}
+\newcounter{mycounter}  
+\newenvironment{noindlist}
+ {\begin{list}{\arabic{mycounter}.~~}{\usecounter{mycounter} \labelsep=0em \labelwidth=0em \leftmargin=0em \itemindent=0em}}
+ {\end{list}}
+
 \theoremstyle{plain}
 \newtheorem{lemmarestatable}[theorem]{Lemma}
 \newtheorem{theoremrestatable}[theorem]{Theorem}
@@ -236,47 +242,46 @@ For an inactive fragment, we can now check if the distance between two nodes ins
 comparing it to $\lambda_{1}$.
 This allows us to preprocess each inactive fragment in $O(b)$ time as follows:
 
-\begin{enumerate}
-\item\textbf{Reduce the fragment to a caterpillar:}\\
-A fragment consists of the spine and the subtrees hanging off the spine. Because for any two nodes inside the fragment we can compare
+\begin{noindlist}
+\item\textbf{Reduce the fragment to a caterpillar:}
+a fragment consists of the spine and the subtrees hanging off the spine. Because for any two nodes inside the fragment we can compare
 their distance to $\lambda$ and $\lambda/2$, we can run our linear-time feasibility test on the subtrees hanging off the spine to obtain
 the candidate and the certain node for each of them. The fragment is now reduced to a caterpillar with at most two leaves attached to each
 spine node: the candidate node and the certain node.
 \item\label{removing certain nodes}
-\textbf{Find candidate nodes that cannot be taken into the solution:}\\
-\label{removing impossible candidate nodes}
-For every candidate node we want to find the nearest certain node. Then, we can compare their distance to $\lambda$ and remove the
+\textbf{Find candidate nodes that cannot be taken into the solution:}
+for every candidate node we find the nearest certain node. Then, we compare their distance to $\lambda$ and remove the
 candidate node if it cannot be taken. To find the nearest certain node, we first scan all nodes bottom-up (according to the natural order
 on the spine nodes they are attached to) and compute for each of them the nearest certain node below it. Then, we repeat the scan
 in the other direction to compute the nearest certain node above. This gives us, for every candidate node, the nearest certain node above
 and below. We delete all candidate nodes for which one of these distances is smaller than $\lambda_{1}$.
 We store the certain node nearest to the root, the certain node nearest to the hole and the total number of certain nodes,
-and from now on ignore certain nodes and only deal with the remaining candidate nodes.
+and from now on ignore certain nodes and consider only the remaining candidate nodes.
 \item\label{making distances from the root monotone}
-\textbf{Prune leaves to make their distances to the root non-decreasing:}\\
-Let the $i$-th leaf, $u_{i}$, be connected with an edge of length $y_{i}$ to a spine node at distance $x_{i}$ from the root,
+\textbf{Prune leaves to make their distances to the root non-decreasing:}
+let the $i$-th leaf, $u_{i}$, be connected with an edge of length $y_{i}$ to a spine node at distance $x_{i}$ from the root,
 and order the leaves so that $x_{1}<x_{2}<\ldots<x_{s}$. See Figure~\ref{fig:pruning} in the appendix.
 Note that $y_{i}<\frac{\lambda_{1}}{2}$, as otherwise $u_{i}$ would be a certain node.
 Suppose that $u_{i-1}$ is farther from the root than $u_i$ (i.e.,
 $x_{i-1}+y_{i-1} > x_i+y_i$), then:
-$$d(u_{i},u_{i-1}) = x_i-x_{i-1}+y_i+y_{i-1} = x_{i} + y_{i} - x_{i-1} + y_{i-1} < 2y_{i-1} < \lambda_1.$$
+$d(u_{i},u_{i-1}) = x_i-x_{i-1}+y_i+y_{i-1} = x_{i} + y_{i} - x_{i-1} + y_{i-1} < 2y_{i-1} < \lambda_1.$
 Therefore an optimal solution cannot contain both $u_{i}$ and $u_{i-1}$. We claim that if the solution contains
 $u_{i}$ then it can be replaced with $u_{i-1}$. To prove this, it is enough to argue that
 $u_{i-1}$ is farther away from any node above it than $u_i$, and $u_i$ is closer to any node below it than $u_{i-1}$.
 Consider a node $u_{j}$ that is above $u_{i-1}$ (so $j<i-1$), then:
-$$d(u_j,u_{i-1}) - d(u_j,u_{i}) = y_{i-1}-(x_i-x_{i-1})-y_i = x_{i-1}+y_{i-1}-(x_i+y_i) > 0.$$
+$d(u_j,u_{i-1}) - d(u_j,u_{i}) = y_{i-1}-(x_i-x_{i-1})-y_i = x_{i-1}+y_{i-1}-(x_i+y_i) > 0.$
 Now consider a node $u_{j}$ that is below $u_{i}$ (so $j>i$), then:
-$$d(u_j,u_{i-1}) - d(u_j,u_{i}) = y_{i-1}+(x_i-x_{i-1})-y_i > 2(x_i-x_{i-1}) > 0.$$
+$d(u_j,u_{i-1}) - d(u_j,u_{i}) = y_{i-1}+(x_i-x_{i-1})-y_i > 2(x_i-x_{i-1}) > 0.$
 So in fact, we can remove the $i$-th leaf from the caterpillar if $x_{i-1}+y_{i-1} > x_i+y_i$.
 To check this condition efficiently, we scan the caterpillar from top to bottom while maintaining the most recently processed non-removed leaf.
-The whole scan takes linear time in the number of candidate nodes and ensures that the distances of the
+This takes linear time in the number of candidate nodes and ensures that the distances of the
 remaining leaves from the root are non-decreasing.
-
-\item \label{making distances from the hole monotone}
-\textbf{Prune leaves to make their distances to the hole non-increasing:}\\
-This is done as in the previous step, except that we scan in the other direction.
-\item\label{precompute for any candidate node}\textbf{Precompute for any candidate node with respect to the hole:}\\
-We call $u_{1},u_{2},\ldots,u_{i}$ a {\em prefix} of the caterpillar and, similarly, $u_{i+1},u_{i+2}, \ldots,u_{s}$ a {\em suffix}.
+\item\label{making distances from the hole monotone}
+\textbf{Prune leaves to make their distances to the hole non-increasing:}
+this is done as in the previous step, except that we scan in the other direction.
+\item\label{precompute for any candidate node}
+\textbf{Precompute for any candidate node with respect to the hole:}
+we call $u_{1},u_{2},\ldots,u_{i}$ a {\em prefix} of the caterpillar and, similarly, $u_{i+1},u_{i+2}, \ldots,u_{s}$ a {\em suffix}.
 For every possible prefix, we would like to precompute the result of running the linear-time feasibility
 test on that prefix. In Section~\ref{sec:feasibility test} we will show that, in fact, this is enough to efficiently
 simulate running the linear-time feasibility test on the whole subtree rooted at $r$ if we know the candidate
@@ -292,8 +297,8 @@ the number of chosen nodes, the certain node and the candidate node. While scann
 it is easy to see that after increasing $i$ we have to keep increasing $i'$ as long as $d(u_{i},u_{i'})<\lambda$.
 To store the information for the current prefix, we copy the already computed information for $u_{1},u_{2},\ldots,u_{i'}$
 and increase the number of chosen nodes by one. Then, if the candidate node is set to NULL and $d(r,u_{i})<\lambda/2$
-we set the candidate node to $u_{i}$, and else if the certain node is set to NULL we set the certain node to $u_{i}$.
-\end{enumerate}
+we set the candidate node to $u_{i}$, and else if the certain node is set to NULL we set it to $u_{i}$.
+\end{noindlist}
 
 \subsection{Feasibility test}
 \label{sec:feasibility test}
@@ -343,7 +348,7 @@ Let $n_{d}$ denote the total size of all heavy paths at depth $d$. For every suc
 every hanging off subtree by the certain and the candidate node (this is possible, because we have already determined the result of
 running the feasibility test on that subtree). To account for the possibility of including a node of the heavy path in the solution,
 we attach an artificial leaf connected with an zero-length edge to every such node.
-The caterpillar is then pruned similarly to steps (\ref{removing impossible candidate nodes})-(making distances from the hole monotone)
+The caterpillar is then pruned similarly to steps (\ref{removing certain nodes})-(making distances from the hole monotone)
 from Section~\ref{Pre-Processing Fragments}, except that after having found the nearest certain node for every candidate
 node we cannot simply compare their distance to $\lambda_{1}$. Instead, we create an $1\times 1$ matrix storing the relevant
 distance for every candidate node. Then, we apply Theorem~\ref{Frederickson's theorem} with $p=0$ to the obtained set of
