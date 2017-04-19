@@ -133,8 +133,8 @@ The above feasibility test is presented in~Section~\ref{sublinear f.t.}, with an
 The test is then translated into a solution for the optimization problem. This is done by, again, maintaining an interval
 $[\lambda_{1},\lambda_{2})$ and applying Frederickson's parametric search, but now we apply the heavy path decomposition to construct
 the monotone matrices, so that the feasibility test needs to be applied only $O(\log^{2}n)$ times in total.
-Finally, in Section~\ref{sectionLinear} we highlight the high-level ideas used to decrease the preprocessing time of the sublinear feasibility
-test to optimal $O(n)$.
+To accelerate the $O(n\log\log n)$ time algorithm, we construct a hierarchy of feasibility tests by partitioning the input tree
+into larger and larger fragments. In each iteration we construct a feasibility test with better running time, until finally, after $\log ^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time, which we use to solve the dispersion optimization problem in $O(n)$. The full description of the algorithm is in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
 
 
 \medskip \noindent {\bf Our solution for the weighted dispersion problem.}
@@ -357,21 +357,21 @@ at $\head(p)$, where $p$ is a heavy path at depth $d$.
 All in all, for every $d$ we spend $O(n_{d})$ time and execute $O(\log n)$ feasibility tests. Summing over all depths $d$,
 this is $O(n)$ plus $O(\log^{2}n)$ calls to the feasibility test. Setting $b=\log^{2}n$, the total time is thus $O(n+n\log\log n+\frac{n}{\log^{2}n}\cdot\log\log n\cdot \log^{2}n)=O(n\log\log n)$.
 
-\section{A Linear Time Algorithm for the Dispersion Problem}
-\label{sectionLinear}
-
-To accelerate the $O(n\log\log n)$ time algorithm, we construct a hierarchy of feasibility tests by partitioning the input tree
-into larger and larger fragments, starting from the linear-time implementation described in Section~\ref{linear F.T.}. 
-Given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with
-$O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
-After $\log ^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time
-which we use to solve the dispersion optimization problem in $O(n)$. 
-
-There are multiple technical difficulties that need to be overcome in order to keep the preprocessing time $O(\frac{n}{b})$.
-We must make each partition into fragments a refinement of the previous one, i.e. the fragments of the $(\ell+1)$-th partition (called large fragments)
-are composed of fragments of the $\ell$-th partition (called small fragments). We believe that this simple micro-macro variant is of independent interest. 
-Further, we cannot afford to touch every node of every fragment at every decomposition level. Therefore, we take a closer look at how a (large) fragment decomposes into smaller fragments. 
-We show that a large fragment can be reduced to a concatenation of small caterpillars, each corresponding to a small fragment that we have already preprocessed. We then carefully tailor these small caterpillars while reusing the results of their preprocessing. We show that this tailoring amortizes to $O(n)$ over all decompositions. Due to space constraints, the full description of the algorithm is in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
+%\section{A Linear Time Algorithm for the Dispersion Problem}
+%\label{sectionLinear}
+%
+%To accelerate the $O(n\log\log n)$ time algorithm, we construct a hierarchy of feasibility tests by partitioning the input tree
+%into larger and larger fragments, starting from the linear-time implementation described in Section~\ref{linear F.T.}. 
+%Given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with
+%$O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
+%After $\log ^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time
+%which we use to solve the dispersion optimization problem in $O(n)$. 
+%
+%There are multiple technical difficulties that need to be overcome in order to keep the preprocessing time $O(\frac{n}{b})$.
+%We must make each partition into fragments a refinement of the previous one, i.e. the fragments of the $(\ell+1)$-th partition (called large fragments)
+%are composed of fragments of the $\ell$-th partition (called small fragments). We believe that this simple micro-macro variant is of independent interest. 
+%Further, we cannot afford to touch every node of every fragment at every decomposition level. Therefore, we take a closer look at how a (large) fragment decomposes into smaller fragments. 
+%We show that a large fragment can be reduced to a concatenation of small caterpillars, each corresponding to a small fragment that we have already preprocessed. We then carefully tailor these small caterpillars while reusing the results of their preprocessing. We show that this tailoring amortizes to $O(n)$ over all decompositions. Due to space constraints, the full description of the algorithm is in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
 
 \section{The Weighted Dispersion Problem}\label{section:weighted}
 We now consider the weighted variant of the dispersion problem, in which the edges have lengths and the nodes have weights. Recall that $f(P)=\min_{u,v\in P} \{d(u,v)\}$. The weighted dispersion problems are defined as follows.
