@@ -695,7 +695,7 @@ We do this iteratively until we have an $O(\frac{n}{\log ^3n} \cdot \log \log n)
 solve the dispersion optimization problem in linear time (in the same manner as in each of the previous
 $\log ^*n$ iterations, this time with only one fragment of size $n$, and setting $p$ to zero).
 
-
+\subsection{Overview of the linear time algorithm}
 In the rest of the section we describe how to improve the running time to $O(n)$, giving an optimal solution for the dispersion optimization problem.
 
 Consider a large fragment. It is composed of small fragments. Notice that some of these small fragments are active fragments, i.e., have not been reduced to caterpillars in the previous iteration, but most are inactive fragments, which have
