@@ -155,7 +155,6 @@ any balanced search tree with split and join capabilities. Our data structure bo
 
 Due to space constraints, all  missing proofs are deferred to Appendix \ref{appendix missing proofs}.
 
-
 \section{A Linear Time Feasibility Test}
 \label{linear F.T.}
 
@@ -518,9 +517,10 @@ The time to obtain the small trees is $O(x \log (\frac{2y}{x}))$.
 
 The cost of all joins required to patch the small trees together can be bounded by the same calculation as the cost of the splits made to obtain them, and so the operation takes $O(x \log (\frac{2y}{x}))$ time in total.
 The rest of the batched operations are implemented similarly, using the same trick of splitting the tree and working with the small trees. 
-There is an additional technical difficulty in Operation~\ref{op6}, as the intervals $(k_{i'},k_{i})$ might not be disjoint in our algorithm.
-We do this operation more carefully and argue that the intervals can be made
-disjoint with some extra work. The full description of Operation 6-8 is in Appendix \ref{appendix batched operations}.
+There is an additional technical difficulty in Operation~\ref{op6}, as the intervals $(k_{i'},k_{i})$ might not be disjoint in our algorithm and
+hence we need some extra work to make them disjoint. 
+In Operation~\ref{op7}, some of the small trees might become much larger due to the insertions, and this also requires some extra work.
+The full description of Operation 6-8 is in Appendix \ref{appendix batched operations}.
 
 \begin{restatable}{theoremrestatable}{nlognweighted}
 \label{nlogn weighted f.t. theorem}
