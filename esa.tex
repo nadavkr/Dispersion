@@ -73,7 +73,7 @@ is larger than 1.
 We design an optimal $\Oh(n)$ time algorithm for the dispersion problem on trees consisting
 of $n$ nodes, thus improving the previous  $\Oh(n\log n)$ time solution from 1997. 
 
-We also consider the weighted case, where the goal is to choose a set of nodes of total weight at least $W$. We present an $\Oh(n\log^2n)$ algorithm improving the previous $\Oh(n\log^4 n)$ solution. Our solution builds on the decision version (where we know the minimum distance $\lambda$ between the chosen nodes) for which we present tight $\Theta(n\log n)$ upper and lower bounds. 
+We also consider the weighted case, where the goal is to choose a set of nodes of total weight at least $W$. We present an $\Oh(n\log^2n)$ algorithm improving the previous $\Oh(n\log^4 n)$ solution. Our solution builds on the search version (where we know the minimum distance $\lambda$ between the chosen nodes) for which we present tight $\Theta(n\log n)$ upper and lower bounds. 
 \end{abstract}
 
 \section{Introduction}
@@ -90,26 +90,26 @@ designated as facilities. The latter complexity can be further improved to $\Oh(
 %
 A related problem, also suggested in the early 80's  \cite{Becker1982,Perl1981}, is \emph{$k$-partitioning}. In this problem the nodes have weight and we wish to delete $k$ edges in the tree so as to maximize the weight of the lightest resulting subtree. This problem was also solved by Frederickson in $\Oh(n)$ time \cite{Frederickson1991} using his parametric search framework. 
 %
-Finally, and the focus of this paper, is the  {\em $k$-dispersion} problem, where we wish to designate $k$ nodes as facilities so as to maximize the distances among the facilities.  In other words, we wish to select $k$ nodes that are as spread-apart as possible. This can be seen as a generalization of the classical maximum independent set problem (that can be solved by binary searching for the largest value of $k$ for which the minimum distance is at least 2).  
-%
-It turns out that the $k$-dispersion and the $k$-partitioning problems are actually equivalent in the one-dimensional case (i.e., when the tree is a path). The reduction simply creates a new path whose edges correspond to nodes in the original path and whose nodes correspond to edges in the original path. However, such equivalence does not apply to general trees, on which $k$-dispersion seems more difficult than $k$-partitioning. In particular, until the present work, no linear time solution for $k$-dispersion was known. The fastest solution was the $O(n \log n)$ solution given in the late 90's by Bhattacharya and Houle \cite{Bhattacharya1991}, who also considered the weighted version (where nodes also have weights), for which they gave an $\Oh(n\log^4 n)$ time solution \cite{Bhattacharya1999}.
 
 \medskip \noindent {\bf The dispersion problem.}
-Consider the unweighted $k$-dispersion problem. This optimization problem can be solved by repeatedly querying a {\em feasibility test} that solves the decision version of this problem. More formally, let $d(u,v)$ denote the distance between nodes $u$ and $v$, and for a subset of nodes $P$ let $f(P)=\min_{u,v\in P} \{d(u,v)\}$:
-
+The focus of this paper is the  {\em $k$-dispersion} problem, where we wish to designate $k$ nodes as facilities so as to maximize the distances among the facilities. More formally, let $d(u,v)$ denote the distance between nodes $u$ and $v$, and for a subset of nodes $P$ let $f(P)=\min_{u,v\in P} \{d(u,v)\}$.
 \begin{itemize} 
-\item {\em The Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, and a number $k$, find a subset $P$ of nodes of size $k$ such that $f(P)$ is maximized. 
-
-\item  {\em The Dispersion Decision Problem (feasibility test).}  Given a tree with non-negative edge lengths, a number $k$, and a number $\lambda$, find a subset $P$ of nodes of size $k$ such that  $f(P)\geq\lambda$, or declare that no such subset exists. 
+\item {\em The Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, and a number $k$, find a subset $P$ of nodes of size $k$ such that $f(P)$ is maximized.
 \end{itemize}
-
-Bhattacharya and Houle~\cite{Bhattacharya1991} present a linear-time feasibility test, and use a result by Frederickson \cite{Frederickson1983} that enables binary searching over all possible values of $\lambda$ (i.e., all pairwise distances in the tree). In other words, a feasibility test with a running time $\tau$ implies an $O(n \log n + \tau \cdot \log n)$ time algorithm for the dispersion optimization problem. We present a simplified version of their linear time
-feasibility test in Section~\ref{linear F.T.}.
+In other words, we wish to select $k$ nodes that are as spread-apart as possible. The dispersion problem can be seen as a generalization of the classical maximum independent set problem (that can be solved by binary searching for the largest value of $k$ for which the minimum distance is at least 2).  
+%
+It turns out that the dispersion and the $k$-partitioning problems are actually equivalent in the one-dimensional case (i.e., when the tree is a path). The reduction simply creates a new path whose edges correspond to nodes in the original path and whose nodes correspond to edges in the original path. However, such equivalence does not apply to general trees, on which $k$-dispersion seems more difficult than $k$-partitioning. In particular, until the present work, no linear time solution for $k$-dispersion was known. 
+The optimization problem can be solved by repeatedly querying a {\em feasibility test} that solves the search problem. 
+\begin{itemize}
+\item  {\em The Dispersion Search Problem (feasibility test).}  Given a tree with non-negative edge lengths, a number $k$, and a number $\lambda$, find a subset $P$ of nodes of size $k$ such that  $f(P)\geq\lambda$, or declare that no such subset exists. 
+\end{itemize}
+Bhattacharya and Houle~\cite{Bhattacharya1991} present a linear-time feasibility test, and use a result by Frederickson \cite{Frederickson1983} that enables binary searching over all possible values of $\lambda$ (i.e., all pairwise distances in the tree). That is, a feasibility test with a running time $\tau$ implies an $O(n \log n + \tau \cdot \log n)$ time algorithm for the dispersion optimization problem. Thus the algorithm of Bhattacharya and Houle for the dispersion optimization problem runs in $O(n\log n)$ time. We present a linear time algorithm for the optimization problem. Our solution is based on a simplified linear-time feasibility test, which we turn into a sublinear-time feasibility test in a technically involved way closely inspired by Frederickson's approach.
 
 In the {\em weighted} dispersion problem, nodes have non-negative weights. Instead of $k$ we are given $W$, and the goal is then to find a subset
-$P$ of nodes of total weight at least $W$ s.t. $f(P)$ is maximized. \cite{Bhattacharya1999} present an efficient feasibility test for this generalization, that by the same reasoning above solves the weighted optimization problem with a logarithmic overhead.
+$P$ of nodes of total weight at least $W$ s.t. $f(P)$ is maximized. Bhattacharya and Houle\cite{Bhattacharya1999} also considered this generalization. They present an $O(n \log^3 n)$ feasibility test for this generalization, that by the same reasoning above solves the weighted optimization problem in $O(n \log^4 n)$ time. We give an $O(n \log n$)-time feasibility test, so our algorithm for the weighted optimization problem runs in $O(n \log^2 n)$ time. Our solution here uses novel ideas, and differs substantially from Frederickson's approach.
+
  
-\medskip \noindent {\bf Our solution for the unweighted dispersion problem.}
+\medskip \noindent {\bf Our technique for the unweighted dispersion problem.}
 We are able to decrease the total time to $O(n)$ by
 developing a feasibility test that requires {\em linear} time preprocessing and can then be queried in \emph{sublinear} time. This was Frederickson approach for $k$-partitioning and $k$-center, and it is plausible that his framework can be adapted to solve our problem as well.
 However, this has not been done to date. Our (slightly different) take on $k$-dispersion allows us to develop a  simpler and more structured algorithm, and hence might be of independent interest.
@@ -120,7 +120,7 @@ Our algorithm begins by partitioning the input tree $T$ into $O(n/b)$ {\em fragm
 We use this to simulate a bottom-up feasibility test by jumping over entire 
 fragments, i.e., knowing $\lambda$, we wish to extend in $O(\log b)$ time a solution for a subtree of $T$ rooted at the fragment's hole to a subtree of $T$ rooted at the fragment's root. This is achieved by an efficient preprocessing: 
 % 
-The first step of the preprocessing computes values $\lambda_1$ and  $\lambda_2$ such that (1) there is no solution to the decision problem on $T$ for any $\lambda \geq \lambda_2$, (2) there is a solution to the decision problem on $T$ for any $\lambda \le \lambda_1$, and (3) for {\em most} of the fragments, the distance between any two nodes is either smaller or equal to $\lambda_1$ or larger or equal to $\lambda_2$. This is achieved by applying Frederickson's parametric search on sorted matrices capturing the pairwise distances between nodes in the same fragment. The (few) fragments that do not satisfy property (3) are handled naively in $O(b)$ time during query time. 
+The first step of the preprocessing computes values $\lambda_1$ and  $\lambda_2$ such that (1) there is no solution to the search problem on $T$ for any $\lambda \geq \lambda_2$, (2) there is a solution to the search problem on $T$ for any $\lambda \le \lambda_1$, and (3) for {\em most} of the fragments, the distance between any two nodes is either smaller or equal to $\lambda_1$ or larger or equal to $\lambda_2$. This is achieved by applying Frederickson's parametric search on sorted matrices capturing the pairwise distances between nodes in the same fragment. The (few) fragments that do not satisfy property (3) are handled naively in $O(b)$ time during query time. 
 The fragments that do satisfy property (3) are further preprocessed. We look at the path from the hole to the root of the
 fragment and run the linear-time feasibility test for all subtrees hanging off from it. This can be done without knowing the exact value of $\lambda$, due to property (3). Then, we can conceptually
 prune the fragment and think of it as a caterpillar connecting the root and the hole.
@@ -136,9 +136,9 @@ To accelerate the $O(n\log\log n)$ time algorithm, we construct a hierarchy of f
 into larger and larger fragments. In each iteration we construct a feasibility test with better running time, until finally, after $\log ^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time, which we use to solve the dispersion optimization problem in linear  time. The details of the linear-time algorithm are rather technically difficult and are differed to Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
 
 
-\medskip \noindent {\bf Our solution for the weighted dispersion problem.}
-In Section~\ref{section:weighted} we consider the weighted version of the dispersion problem. Our main result is an $O(n\log n)$ feasibility test (for which we also give a simple tight $\Omega(n\log n)$ lower bound) implying an $\Oh(n\log^2n)$ time solution for the optimization problem. Our techniques here differ substantially from Frederickson's approach.
-
+\medskip \noindent {\bf Our technique for the weighted dispersion problem.}
+%In Section~\ref{section:weighted} we consider the weighted version of the dispersion problem. Our main result is an $O(n\log n)$ feasibility test (for which we also give a simple tight $\Omega(n\log n)$ lower bound) implying an $\Oh(n\log^2n)$ time solution for the optimization problem. 
+Our solution for the weighted case differ substantially from Frederickson's approach.
 In contrast to the unweighted case, where each subtree had only one candidate, in the weighted case each subtree can have a large number of candidates. 
   To overcome this, we represent the candidates of a subtree with a {\em monotonically decreasing polyline}:
 for every possible distance $d$, we store the maximum weight $W(P)$ of a subset of nodes $P$ such that the distance of every node of $P$ to the root of the subtree is at least $d$.
@@ -380,10 +380,10 @@ this is $O(n)$ plus $O(\log^{2}n)$ calls to the feasibility test. Setting $b=\lo
 %\begin{itemize} 
 %\item {\em The Weighted Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, non-negative node weights, and a number $W$, find a subset of nodes $P$ of weight at least $W$, such that  $f(P)$ is maximized. 
 %
-%\item {\em The Weighted Dispersion Decision Problem.} Given a tree with non-negative edge lengths, non-negative node weights, a number $W$, and a number $\lambda$, find a subset of nodes  $P$ of weight at least $W$, such that $f(P)\geq\lambda$, or declare no such subset exists. 
+%\item {\em The Weighted Dispersion search Problem.} Given a tree with non-negative edge lengths, non-negative node weights, a number $W$, and a number $\lambda$, find a subset of nodes  $P$ of weight at least $W$, such that $f(P)\geq\lambda$, or declare no such subset exists. 
 %\end{itemize}
 
-In this section we present an $O(n\log n)$ time algorithm for the weighted decision problem (a simple matching lower bound is shown in Appendix \ref{appendix weighted f.t. lower bound}).
+In this section we present an $O(n\log n)$ time algorithm for the weighted search problem (a matching lower bound is shown in Appendix \ref{appendix weighted f.t. lower bound}).
 As explained in the introduction, this then implies an $O(n\log^{2}n)$ time solution for the optimization problem.
 
 Similarly to the unweighted case, we compute for each node of the tree, the subset of nodes $P$ in its subtree  s.t. $f(P) \geq \lambda$ and the total  weight of  $P$ is maximized. We compute this by going over the nodes of the tree bottom-up. Previously, the situation was simpler, as for any subtree we had just one candidate node (i.e., a node that may or may not be in the optimal solution for the entire input tree). This was true because nodes had uniform weights. Now however, there could be many candidates in a subtree, as the certain nodes are only the ones that are at distance at least $\lambda$ from the root (and not $\frac{\lambda}{2}$ as in the unweighted case).
