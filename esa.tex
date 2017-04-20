@@ -275,7 +275,7 @@ remaining leaves from the root are non-decreasing.
 \textbf{Prune leaves to make their distances to the hole non-increasing:}
 this is done as in the previous step, except we scan in the other direction.
 \item\label{precompute for any candidate node}
-\textbf{Precompute for any candidate and certain node with respect to the hole:}
+\textbf{Preprocess for any candidate and certain node with respect to the hole:}
 we call $u_{1},u_{2},\ldots,u_{i}$ a {\em prefix} of the caterpillar and, similarly, $u_{i+1},u_{i+2}, \ldots,u_{s}$ a {\em suffix}.
 For every possible prefix, we would like to precompute the result of running the linear-time feasibility
 test on that prefix. In Section~\ref{sec:feasibility test} we will show that, in fact, this is enough to efficiently
@@ -537,24 +537,24 @@ node nearest to $r$, and any $d(u,v)$ can be computed in $O(1)$ time after stori
 whole tree and using lowest common ancestor queries~\cite{Bender2000}.
 
 To prove correctness, we will argue by induction that the following invariant holds: for every node $r$ of the tree, the algorithm
-produces $P$, a subset of the vertices of the subtree rooted at $r$, s.t. $f(P)\geq\lambda$ and $|P|$ is maximal and, if there are multiple
+produces $P$, a subset of the vertices of the subtree rooted at $r$, s.t. $f(P)\geq\lambda$, $|P|$ is maximal and, if there are multiple
 such valid subsets with maximal cardinality, $\min_{u\in P} d(r,u)$ is maximal. The proof is by induction.
 
 Consider a node $r$ of the tree and and assume that the invariant holds for all of its children $r_{1},r_{2},\ldots,r_{\ell}$.
 We want to show that the invariant also holds for $r$.
 Assume for contradiction that $P'$ is a subset of the vertices of $T_r$, s.t. $f(P')\geq\lambda$ and $|P'| > |P|$. Let us look at the two possible cases:
 \begin{enumerate}
-\item \textbf{\boldmath$P'$ has more certain nodes w.r.t \boldmath$r$ than \boldmath$P'$}: All certain nodes w.r.t $r$, are in subtrees rooted at children of $r$, and so there must be some child of $r$, $r_i$, s.t. $P'_{r_i}$ has more certain nodes w.r.t $r$ than $P_{r_i}$ (where $P'_{r_i}$ is $P'$ restricted to $T_{r_i}$). This can only be if $|P'_{r_i}| > |P_{r_i}|$, or if the closest node to $r_i$ in $P'_{r_i}$ is farther than the closest node in $P_{r_i}$, and so the invariant does not hold for $r_i$.
-\item \textbf{\boldmath$P'$ has the same number of certain nodes w.r.t \boldmath$r$ as \boldmath$P$, but \boldmath$P'$ has a candidate w.r.t \boldmath$r$  and \boldmath$P$ does not}: Denote the candidate node of $P'$ by $u$. We have two possible cases. First, if $u=r$, then there is some node $v \in P$ s.t. $d(u,v)<\lambda$. Assume that $v$ is in the subtree rooted at $r_i$. In this case, either $|P'_{r_i}| \geq |P_{r_i}|$ and the closest node to $r_i$ in $P'_{r_i}$ is farther than the closest node in $P_{r_i}$, and the invariant does not hold for $r_i$, or $|P'_{r_i}|<|P_{r_i}|$ and so there must be some $r_j$ s.t. $|P'_{r_j}|>|P_{r_j}|$, and the invariant does not hold for $r_j$. Second, if $u$ is in one of the subtrees rooted at children of $r$, since all certain nodes w.r.t $r$ are also in these subtrees, there must be one such subtree, $T_{r_m}$ s.t. $|P'_{r_m}| > |P_{r_m}|$, and so the invariant does not hold for it.
+\item \textbf{\boldmath$P'$ has more certain nodes w.r.t. \boldmath$r$ than \boldmath$P'$}: All certain nodes w.r.t. $r$ are in subtrees rooted at children of $r$, and so there must be some child $r_{i}$ of $r$ s.t. $P'_{r_i}$ has more certain nodes w.r.t. $r$ than $P_{r_i}$ (where $P'_{r_i}$ is $P'$ restricted to $T_{r_i}$). This can only be if $|P'_{r_i}| > |P_{r_i}|$, or if the closest node to $r_i$ in $P'_{r_i}$ is farther than the closest node in $P_{r_i}$, and so the invariant does not hold for $r_i$.
+\item \textbf{\boldmath$P'$ has the same number of certain nodes w.r.t. \boldmath$r$ as \boldmath$P$, but \boldmath$P'$ has a candidate node w.r.t. \boldmath$r$  and \boldmath$P$ does not}: Denote the candidate node of $P'$ by $u$. We have two possible cases. First, if $u=r$, then there is some node $v \in P$ s.t. $d(u,v)<\lambda$. Assume that $v$ is in the subtree rooted at $r_i$. In this case, either $|P'_{r_i}| \geq |P_{r_i}|$ and the closest node to $r_i$ in $P'_{r_i}$ is farther than the closest node in $P_{r_i}$, and the invariant does not hold for $r_i$, or $|P'_{r_i}|<|P_{r_i}|$ and so there must be some $r_j$ s.t. $|P'_{r_j}|>|P_{r_j}|$, and the invariant does not hold for $r_j$. Second, if $u$ is in one of the subtrees rooted at children of $r$, since all certain nodes w.r.t. $r$ are also in these subtrees, there must be one such subtree, $T_{r_m}$ s.t. $|P'_{r_m}| > |P_{r_m}|$, and so the invariant does not hold for it.
 \end{enumerate} 
-Thus we have proven that $P$ is of maximal cardinality. Now, assume for contradiction that $P'$ is a subset of the vertices of the subtree rooted at $r$, s.t. $f(P')\geq\lambda$ and $|P'| = |P|$, but the closest node to $r$ in $P$ (denoted by $u$) is closer to $r$ than the closest node to $r$ in $P'$. Assume that $u \neq r$ and denote by $T_{r_i}$ the subtree that $u$ is in. Thus, either $|P'_{r_i}| = |P_{r_i}|$, but the closest vertex to $r_i$ in $P'_{r_i}$ is farther away from $r_i$ than $u$, which means the invariant does not hold for $T_{r_i}$, or $|P'_{r_i}| < |P_{r_i}|$, and it makes up for it in some other subtree where the invariant does not hold. If $u=r$, then since $|P'| = |P|$, there must some child of $r$, $r_i$, s.t. $|P'_{r_i}| > |P_{r_i}|$, and so the invariant does not hold for $r_i$. We have proven that the invariant holds also for $r$ and, consequently, the algorithm indeed is correct.
+Thus we have proven that $P$ is of maximal cardinality. Now, assume for contradiction that $P'$ is a subset of the vertices of the subtree rooted at $r$, s.t. $f(P')\geq\lambda$ and $|P'| = |P|$, but the closest node to $r$ in $P$ (denoted by $u$) is closer to $r$ than the closest node to $r$ in $P'$. Assume that $u \neq r$ and denote by $T_{r_i}$ the subtree that $u$ is in. Thus, either $|P'_{r_i}| = |P_{r_i}|$, but the closest vertex to $r_i$ in $P'_{r_i}$ is farther away from $r_i$ than $u$, which means that the invariant does not hold for $T_{r_i}$, or $|P'_{r_i}| < |P_{r_i}|$, and it makes up for it in some other subtree where the invariant does not hold. If $u=r$, then since $|P'| = |P|$, there must some child $r_{i}$ of $r$ s.t. $|P'_{r_i}| > |P_{r_i}|$, and so the invariant does not hold for $r_i$. We have proven that the invariant holds also for $r$ and, consequently, the algorithm indeed is correct.
 \end{proof}
 \basicpartitioninglemma*
 
 \begin{proof}
 We prove the lemma by construction. Call a node \textit{large} if the size of its subtree is at least $b$
 and \textit{small} otherwise. Consider the tree $T_L$ induced by the large nodes of the original tree. 
-For each leaf $u\in T_{L}$, we make each of its children in the original tree a new fragment with no holes.
+For each leaf $u\in T_{L}$, we make the subtree rooted at each of its children in the original tree a new fragment with no holes.
 Each leaf of leaf of $T_{L}$ is the root of a subtree of size at least $b$ in the original tree, and these subtrees
 are all disjoint, so we have at most $n/b$ leaves in $T_{L}$. Each of them creates up to two fragments
 since the tree is binary, and each of these fragments is of size at most $b$ by definition.
@@ -594,21 +594,21 @@ to the centroid used to separate them. The difficulty is that we would like to p
 
 Consider one of the three already processed pieces obtained by removing the outer centroid. It contains three smaller pieces of its own,
 that have been obtained by removing the inner centroid.
-For two of these smaller pieces, it holds that the path from every node inside them to the outer centroid passes through the inner centroid.
+For two of these smaller pieces, it holds that the path from every node inside to the outer centroid passes through the inner centroid.
 We call the third piece, for which this does not hold, a \textit{problematic} piece. For the two pieces that are not problematic, we can 
 increase all entries of their lists by the distance from the inner centroid to the outer centroid, and then merge two sorted lists in linear time.
-Now consider the problematic piece, where paths to the outer centroid do not go through the inner one. Notice that if we go one step deeper
+Now consider the problematic piece, where paths to the outer centroid do not go through the inner centroid. Notice that if we go one step deeper
 in the recursion, the problematic piece consists of two pieces that are not problematic, as the paths from all their nodes to the outer centroid
-pass through their inner centroid, and the remaining even smaller problematic piece. For the two non-problematic pieces we can again
+pass through the inner centroid, and the remaining even smaller problematic piece. For the two non-problematic pieces we can again
 increase all entries of their lists and then merge two sorted lists in linear time, and repeat the reasoning on the problematic piece.
 If the initial problematic piece was of size $s$, after $O(\log s)$ iterations we obtain that a sorted list of distances to the centroid can be
 obtained by merging sorted lists of length $s,s/2,s/4,\ldots$, which can be done in $O(s)$ time. At every level of recursion, 
 the total size of all the pieces is at most $b$, and there are $O(\log b)$ levels of recursion, so the total time spend on constructing
 the sorted lists is $O(b\log b)$.
 
-Finally, for every piece we define a row- and column-sorted matrix. If the sorted list of all distances of the nodes in the piece to the
+Finally, for every piece we define a sorted matrix, that is, a matrix where every row is sorted and every column is sorted. If the sorted list of all distances of the nodes in the piece to the
 centroid is $L[1..s]$, the entries of the matrix are $M[i,j]=L[i]+L[j]$. To represent $M$, we only have to store $L$, and then are able to
-retrieve any $M[i,j]$ in $O(1)$ time. Note that some entries of $M$ do not represent distances between two nodes, but this is irrelevant.
+retrieve any $M[i,j]$ in $O(1)$ time. Note that some entries of $M$ do not really represent distances between two nodes, but this is irrelevant.
 To bound the number of matrices, observe that the total number of pieces is $b$, because after constructing a piece we remove the centroid.
 To bound the total side length, observe that the side length of $M$ is bounded by the size of the corresponding piece, and the total size
 of all pieces at the same level of recursion is at most $b$, so indeed the total side length is $O(b\log b)$.
@@ -629,13 +629,13 @@ We start with a tree that has $y$ leaves, select the middle leaf by traversing f
 
 \nlognweighted*
 
-\begin{proof}The running time of the algorithm is the sum of running times required for constructing the polylines of the subtrees rooted at each node of the tree.
+\begin{proof}The running time of the algorithm is the sum of the time required for constructing the polylines of the subtrees rooted at each node of the tree.
 %
-Notice that the number of breakpoints in the polyline of a subtree is at most the number of nodes in this subtree. This is because every breakpoint corresponds to some node that was in the solution becoming too close to the root to be still included.
+Notice that the number of breakpoints in the polyline of a subtree is at most the number of nodes in this subtree. This is because every breakpoint corresponds to some node that was taken in the solution becoming too close to the root to be still included.
 
 For any node that has one child (a degree one node), constructing its polyline is done with one query to the polyline of its child, and an increase of the keys of all but the first breakpoint (which can be done by increasing the key stored at the root, and decreasing the key stored at the first leaf). This takes $O(\log n)$ time and so the total time over all degree one nodes is $O(n \log n)$.
  
-The time spent for each node of degree two (a node with two children) is bounded by the running time of the batched operations, which is $c\cdot x \log (\frac{2y}{x})$ for some constant $c$. We prove that this sums up to at most $2c \cdot n \log n$ by induction on the size of the  tree: Consider some binary tree with $n$ nodes. Denote the time spent for nodes of degree two while running the weighted feasibility test on the tree by $S$. If the root is of degree one, then by the induction hypothesis $S \leq 2c\cdot (n-1)\log(n-1)\leq 2c\cdot n \log n$. If the root is of degree two, denote the size of its smaller subtree by $x$, and the size of the larger by $y$ (so it holds that $n=x+y+1$, and $x \leq y$). Then, we have that
+The time spent for each node a node that has two children (a of degree two node) is bounded by the running time of the batched operations, which is $c\cdot x \log (\frac{2y}{x})$ for some constant $c$. We prove that this sums up to at most $2c \cdot n \log n$ by induction on the size of the  tree: Consider some binary tree with $n$ nodes. Denote the time spent for nodes of degree two while running the weighted feasibility test on the tree by $S$. If the root is of degree one, then by the induction hypothesis $S \leq 2c\cdot (n-1)\log(n-1)\leq 2c\cdot n \log n$. If the root is of degree two, denote the size of its smaller subtree by $x$, and the size of the larger by $y$ (so it holds that $n=x+y+1$, and $x \leq y$). Then, we have that
 \begin{align*}
 S = & \ 2c\cdot x \log x + 2c\cdot y \log y + c\cdot x \log (\frac{2y}{x})\\
  %= & x\log x+y\log y+\frac{x}{2}+\frac{x}{2}\log y-\frac{x}{2}\log x \\
@@ -653,7 +653,7 @@ This concludes the induction and yields our $O(n \log n)$ weighted feasibility t
 We first present an $O(n \log^* n)$ time algorithm that uses the procedures of the $O(n \log \log n)$ time algorithm (from Section~\ref{sublinear f.t.}) iteratively, and then move to the more complex linear time algorithm.
 
 \subsection{An \texorpdfstring{\boldmath$O(n\log^{*}n)$}{O(nlog^*n)} time algorithm for the dispersion optimization problem} \label{sectionlog*}
-The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test (or test for short) to get a sublinear one. In order to get the complexity down to $O(n \log ^*n)$ we will use a similar process, iteratively, with growing fragments size, improving in each iteration the performance of our test.
+The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test (or test for short) to get a sublinear feasibility test. In order to get the complexity down to $O(n \log ^*n)$ we will use a similar process, iteratively, with growing fragments size, improving in each iteration the performance of our test.
 We start with $O(n/c^{3})$ fragments of size at most $c^3$ for some constant $c$.
 We pay $O(n)$ time for preprocessing and get an $O(\frac{n}{c^3} \cdot \log c)$ time test.
 We use this test to do the same preprocessing again, this time with $O(n/(2^{c})^{3})$ fragments of size at most $(2^c)^3$.
@@ -666,9 +666,9 @@ We now describe one iteration of this process. Assuming we have obtained an $O(\
 test from the previous step, we now find a good partition of the tree with $O(n/B^{3})$ fragments of size at most $B^3$, 
 where $B=2^b$. We perform a heavy path decomposition on each fragment, and process the heavy
 path trees of all fragments bottom up and in parallel. The paths at lower levels have been processed so that each of them is
-reduced to a candidate and a certain node, and so each current path is a caterpillar, that we will now reduce to at most two nodes using Frederickson's method. As we have seen in Section \ref{sublinear f.t.}, after some processing, we can create a matrix 
-with linear number of rows and columns that contains all pairwise distances in such a caterpillar. As before, this is done by pruning the caterpillars so that the distances of leaves from the root and the hole are monotone, thus achieving a matrix that is row and column sorted. For any level of the heavy path decomposition the maximum side length of a matrix is $B^{3}$ (i.e., the parameter $n_j$ in Theorem \ref{Frederickson's theorem} is equal to $B^3$) and of total size of all matrices in the level is at most $n$ ($m=n$).
-We use Frederickson's search (Theorem~\ref{Frederickson's theorem}) with the parameter $p$ set to $\frac{n}{B^7}$. We thus need to use the
+reduced to a candidate and a certain node, and so each current path is a caterpillar, that we will now reduce to at most two nodes using Frederickson's method. As we have seen in Section \ref{sublinear f.t.}, after some processing, we can create a sorted matrix 
+with linear number of rows and columns that contains all pairwise distances in such a caterpillar. As before, this is done by pruning the caterpillars so that the distances of leaves from the root and the hole are monotone, thus obtaining a matrix that is row and column sorted. For any level of the heavy path decomposition the maximum side length of a matrix is $B^{3}$ (i.e., the parameter $n_j$ in Theorem \ref{Frederickson's theorem} is equal to $B^3$) and of total size of all matrices in the level is at most $n$ ($m=n$).
+We use Theorem~\ref{Frederickson's theorem} with the parameter $p$ set to $\frac{n}{B^7}$. We thus need to use the
 test $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (B^{3}), \log(\frac{n}{n/B^{7}} \rbrace) = O(\log B)$ times, and additionally spend linear time exclusive of the feasibility tests. This allows us to eliminate all pairwise distances in the caterpillars of the heavy paths at the current level for most of the fragments. We proceed to compute the candidate and certain node of each path as we did before, and continue with the next level
 of the heavy path decompositions, until we are left with only the top heavy path of each fragment.
 Since $p>0$, during this preprocessing some fragments become active. Once a fragment becomes active we stop
@@ -679,38 +679,44 @@ Additionally, in every iteration we spend linear time to construct a good partit
 path decompositions, and finally for the Frederickson's search, so in total $O(n \log ^*n)$. 
 
 After the preprocessing is done, we have at most $\log B \cdot \frac{n}{B^7}\leq \frac{n}{B^{6}}$ active fragments (because we have not eliminated at most $p$ pairwise distances for each level), which we will process in $O(B^{3})$
-time each in the new test. For all other fragments we have obtained a pruned caterpillar, so that we can, in linear time, precompute the required information for any possible eliminated suffix as described in Subsection \ref{Pre-Processing Fragments}. We will process these inactive fragments in logarithmic time in the new test. Thus we have obtained an $O(\frac{n}{B^3} \cdot \log B)$ time test.
+time each in the new test. For all other fragments we have obtained a pruned caterpillar, so that we can, in linear time, precompute the required information for any candidate and certain node with respect to the hole
+as described in Subsection \ref{Pre-Processing Fragments}. We will process these inactive fragments in logarithmic time in the new test. Thus we have obtained an $O(\frac{n}{B^3} \cdot \log B)$ time test.
 
 We do this iteratively until we have an $O(\frac{n}{\log ^3n} \cdot \log \log n)$ time test, and then use it to
-solve the dispersion optimization problem in linear time (in the same manner as in each of the previous
-$\log ^*n$ iterations, this time with only one fragment of size $n$, and setting $p$ to zero).
+solve the dispersion optimization problem in linear time as explained in Section~\ref{sec:nloglogn}, that is
+by performing a heavy path decomposition on the whole tree and applying Theorem~\ref{Frederickson's theorem} with $p=0$.
 
 \subsection{Overview of the linear time algorithm}
 In the rest of the section we describe how to improve the running time to $O(n)$, giving an optimal solution for the dispersion optimization problem.
+Now we cannot afford to divide the tree into fragments separately in every iteration, as this would already add up to superlinear time.
+Therefore, we will first modify the construction so that the partition (into small fragments) in the previous iteration is a refinement of the partition
+(into large fragments) in the current iteration.
 
-Consider a large fragment. It is composed of small fragments. Notice that some of these small fragments are active fragments, i.e., have not been reduced to caterpillars in the previous iteration, but most are inactive fragments, which have
+Consider a large fragment, that is composed of multiple small fragments. Notice that some of these small fragments are active fragments, i.e., have not been reduced to caterpillars in the previous iteration, but most are inactive fragments, which have
 been reduced to caterpillars. The large fragment contains some small fragments whose roots and holes are spine nodes of the large fragment,
 and other fragments that form subtrees hanging off of the large fragment's spine (each hanging subtree may
-contain several small fragments), see Figure \ref{figure of small fragments inside a large fragment}.
+contain several small fragments), see Figure \ref{figure of small fragments inside a large fragment}. This will allow us to
+reuse some of the precomputation done in the previous iteration.
 
 \begin{figure}[h]
 \begin{center}
 \includegraphics[scale=1]{refinement}
 \end{center}
-\caption{A large fragment containing a number of smaller fragments. The small fragments on the spine are gray, and the subtrees hanging off of the spine are black (each of them may contain many small fragments). %We start by reducing the hanging subtrees to just two nodes, then handle the small active fragments on the spine, and finally reduce the entire large fragment to one caterpillar and process it. 
+\caption{A large fragment containing a number of smaller fragments. The small fragments on the spine are gray, and hanging subtrees attache to the subtrees hanging off of the spine are black (each of them may contain many small fragments). %We start by reducing the hanging subtrees to just two nodes, then handle the small active fragments on the spine, and finally reduce the entire large fragment to one caterpillar and process it. 
 \label{figure of small fragments inside a large fragment}}
 \end{figure}
 
-\noindent The partitioning used in the algorithm is presented in Subsection \ref{section:partioioning}. In Subsection~\ref{section:lemma1} we show how to reduce the hanging subtrees to at most two nodes, one candidate and one certain. Then, in Subsection~\ref{section:lemma2} we reduce the small active fragments on the spine to caterpillars. This turns the entire fragment into a large caterpillar. In Subsection~\ref{section:lemma3} we prune this large caterpillar so that it becomes monotone and without collisions. Finally, in Subsection~\ref{section:lemma4} we preprocess the resulting large caterpillar for eliminated suffix queries. 
+The partitioning used in the algorithm is presented in Subsection \ref{section:partioioning}. In Subsection~\ref{section:lemma1} we show how to reduce the hanging subtrees to at most two nodes, one candidate and one certain. Then, in Subsection~\ref{section:lemma2} we reduce the small active fragments on the spine to caterpillars. This turns the entire fragment into a large caterpillar. In Subsection~\ref{section:lemma3} we prune this large caterpillar so that it becomes monotone and without collisions. Finally, in Subsection~\ref{section:lemma4} we precompute
+the resulting large caterpillar for any candidate and certain node with respect to the hole.
 
 \subsection{Partitioning into fragments}\label{section:partioioning}
-We would like to partition the tree into fragments of growing sizes, and only spend linear time overall for this. We cannot repeatedly apply Lemma~\ref{basic partitioning lemma} as it is, since the constant hidden in its statement may become non-constant over the $\log^*n$ iterations. We therefore slightly augment the definition of a good partitioning, s.t. for a parameter $b$ it must have at most $n/b$ fragments, each of which is of size $O(b)$ (as opposed to the original definition, where we had $O(n/b)$ fragments of size at most $b$). We can achieve such a partitioning by applying Lemma \ref{basic partitioning lemma} with the parameter set to $b \cdot \alpha$, where $\alpha$ is the constant hidden in the statement of Lemma~\ref{basic partitioning lemma}. This results in a partition with at most $n/b$ fragments, each of size at most $\alpha \cdot b$. The following lemma uses this new definition.
-
+We would like to partition the tree into fragments of growing sizes, and only spend linear time overall for this. We cannot repeatedly apply Lemma~\ref{basic partitioning lemma} as it is, since the constant hidden in its statement may become non-constant over the $\log^*n$ iterations. We therefore slightly tweak the definition of a good partition, so that for a parameter $b$ there are at most $n/b$ fragments, each of them of size $O(b)$ (as opposed to the original definition, where we had $O(n/b)$ fragments of size at most $b$). We can achieve such a partitioning by applying Lemma \ref{basic partitioning lemma} with the parameter set to $b \cdot \alpha$, where $\alpha$ is the constant hidden in the statement of Lemma~\ref{basic partitioning lemma}. This results in a partition with at most $n/b$ fragments, each of size at most $\alpha \cdot b$. The following lemma uses this new definition.
 
 \begin{lemma}\label{good partition refinement lemma}
-Given a good partition of a binary tree into at most $n/b^{4}$ fragments each of size at most $\alpha^{\ell}\cdot b^{4}$, there
-exists a good partition of the tree into at most $n/(2^b)^{4}$ fragments each of size at most $\alpha^{\ell+1}\cdot (2^{b})^{4}$,
-where every fragment in the first partition is contained inside a fragment in the second partition.
+Given a good partition of a binary tree into at most $n/b^{4}$ fragments each of size at most $\alpha^{\ell}\cdot b^{4}$, 
+a good partition of the tree into at most $n/(2^b)^{4}$ fragments each of size at most $\alpha^{\ell+1}\cdot (2^{b})^{4}$
+with the additional property that every fragment in the first partition is contained inside a fragment in the second partition
+can be found in $O(n/b^{4})$ time.
 \end{lemma}
 \begin{proof}
 Define $T'$ as the tree obtained by collapsing each fragment of the given partition into a single node. Partition $T'$ with the parameter set to $B= {(2^{b})^{4}}/{b^{4}}$. We obtain at most $\frac{n/b^4}{B}=n/(2^{b})^{4}$ fragments. Each of the new large fragments corresponds to a fragment of the original tree of size at most $\alpha\cdot \alpha^{\ell}\cdot b^{4}\cdot B = \alpha^{\ell+1}\cdot (2^{b})^{4}$. Clearly, it holds that each fragment of the given partition is contained in a single large fragment.
@@ -719,7 +725,9 @@ Define $T'$ as the tree obtained by collapsing each fragment of the given partit
 \noindent The entire partition is obtained by applying Lemma~\ref{good partition refinement lemma} $\log^{*}n$ times. 
 If $b_{\ell}$ denotes the value of the parameter $b$ in the $\ell$-th application, then  $b_{\ell+1}=2^{b_{\ell}}$. The time to construct the $(\ell+1)$-th partition is $O(n/(b_{\ell})^{4})=O(n/b_{\ell})$. The overall time to construct all partitions is therefore 
 $$ O(\sum_{\ell} {n}/{b_{\ell}}) = O(\sum_{\ell} {n}/{2^{\ell}}) = O(n).$$
-Observe that the size of a (large) fragment in the $(\ell+1)$-th partition is at most $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$ which is at most $O((b_{\ell+1})^5)$ for a large enough $\ell$ (i.e., an $\ell$ s.t. $\alpha^{\ell+1}\leq 2^{2^{\ell+1}}$ and $b_{\ell+1}\geq 2^{2^{\ell+1}}$).  Denoting by $b=b_{\ell}$ and $B=b_{\ell+1}$  we get that every large fragment is of size $O(B^5)$ and is composed of (small) fragments of the $\ell$-th partition (each of size $O(b^5)$). 
+Observe that the size of a (large) fragment in the $(\ell+1)$-th partition is at most $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$ which is at most $O((b_{\ell+1})^5)$ for a large enough $\ell$ (i.e., an $\ell$ s.t. $\alpha^{\ell+1}\leq 2^{2^{\ell+1}}$ and $b_{\ell+1}\geq 2^{2^{\ell+1}}$, so
+this $\ell$ depends only on the constant $\alpha$).  Denoting by $b=b_{\ell}$ and $B=b_{\ell+1}$  we conclude that every large
+of the $(\ell+1)$-th partition is of size $O(B^5)$ and is composed of small fragments of the $\ell$-th partition (each of size $O(b^5)$). 
 
 \subsection{Reducing a hanging subtree into two nodes}\label{section:lemma1}
 The first step in reducing a large fragment into a caterpillar is reducing the hanging subtrees of the large fragment into at most two nodes. The following lemma shows that this can be done in total $O(n)$ time for all fragments in all the $\log^* n$ partitions.
@@ -743,7 +751,7 @@ of nodes in the subtrees. If all of them were then reduced to at most two nodes,
 node for each subtree, this would take $O(n)$ time when summed over all the $\log^{*}n$  iterations. However, we have set
 the parameter $p$ to $\frac{n}{B^{10}}$. Thus, considering all the levels, there
 might be up to $\log B\cdot\frac{n}{B^{10}}\leq \frac{n}{B^{9}}$ large fragments in which we cannot fully reduce
-all the hanging subtrees. These are active large fragments. We preprocess such fragments naively in time linear in their size. 
+all the hanging subtrees. These are the active large fragments. We preprocess such fragments naively in time linear in their size. 
 This requires only $O(\frac{n}{B^{4}})$ per iteration (and so $O(n)$ overall) since the total size of all active large fragments is at most
 $\frac{n}{B^9} \cdot O(B^5)$. 
 %We cannot amortize the time spent on processing their hanging
@@ -760,8 +768,8 @@ Having processed the hanging subtrees, we now deal with the active small fragmen
 \begin{proof}
 
 In the previous iteration we had $O(\frac{n}{b^9})$ active fragments, which is of course
-too many for the current level. We take the remaining active small fragments (the ones on spines of large 
-fragments), and reduce them to caterpillars (again by constructing the heavy path decomposition and running
+too many for the current level. We take the remaining active small fragments (the ones on spines of the large 
+fragments), and reduce them to caterpillars (again by constructing a heavy path decomposition and running
 Frederickson's search with $p$ set to $\frac{n}{B^{10}}$). In each fragment we have $O(\log b)$ levels of the heavy
 path decomposition, and for each level we need $O(\log B)$ calls to the feasibility test, which takes
 $O(\frac{n}{b^4} \cdot \log b \cdot \log B \cdot \log b) = O(\frac{n}{b})$ time in total. We also do linear
