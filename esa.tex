@@ -211,6 +211,9 @@ For any binary tree on $n$ nodes and a parameter $b$, a good partition of the tr
 %\end{figure}
  
 \subsection{Preprocessing fragments} \label{Pre-Processing Fragments}
+Recall that $\lambda^*$ is the distance between an unknown pair of vertices in the tree. The first goal of the preprocessing step is to eliminate many possible pairwise distances, so that $\lambda^*$ is in an interval $[\lambda_1,\lambda_2)$. We want this interval to be sufficiently small, so that for (almost) every fragment, no distance between any pair of nodes in the fragment is in  $[\lambda_1,\lambda_2)$. We call such fragments {\emph inactive}. Roughly speaking, inactive fragments are not sensitive to changes in $\lambda$ in the range  $[\lambda_1,\lambda_2)$. In other words, handling an inactive fragment during a feasibility test is the same for any $\lambda$ in the interval $[\lambda_1,\lambda_2)$. The second goal of the preprocessing step is to precompute, for each inactive fragment, information that only depends on the interval $[\lambda_1,\lambda_2)$ so that we will be able to process the fragment in $O(\log b)$ time during any feasibility test with $\lambda \in [\lambda_1,\lambda_2)$.
+
+We achieve the first goal 
 To solve the optimization problem, we will maintain an interval $[\lambda_1,\lambda_2)$ such that
 the value we are searching for in the optimization problem, $\lambda^{*}$, is inside the interval. That is, $\lambda_{1}$ is feasible
 while $\lambda_{2}$ is not. In the beginning, the interval is simply $[0,\infty)$. In the preprocessing stage,
@@ -223,7 +226,7 @@ We will achieve this goal for {\em most} of the fragments using  $O(\log b)$ cal
 %Choosing which tests to perform to achieve this is the gist of Frederickson's method.
 
 For each fragment, we construct an implicit representation of $O(b)$ sorted matrices of total side length $O(b\log b)$
-(where a matrix is sorted if it is both row- and column-sorted), s.t. any pairwise distance (and any pairwise distance multiplied by 2) inside the fragment is an entry in some matrix. This is done using the standard centroid 
+(a matrix is called sorted if every row is monotone and every column is monotone), s.t. any pairwise distance (and any pairwise distance multiplied by 2) inside the fragment is an entry in some matrix. This is done using the standard centroid 
 decomposition, in $O(n/b\cdot b\log b)=O(n\log b)$ total time using the following lemma. 
 \begin{restatable}{lemmarestatable}{centroidmatrix}
 Given a tree $T$ on $b$ nodes, we can construct in $O(b\log b)$ time an implicit representation of $O(b)$ sorted matrices of total
