@@ -100,10 +100,10 @@ Consider the unweighted $k$-dispersion problem. This optimization problem can be
 \begin{itemize} 
 \item {\em The Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, and a number $k$, find a subset $P$ of nodes of size $k$ such that $f(P)$ is maximized. 
 
-\item  {\em The Dispersion Decision Problem (feasibility test).}  Given a tree with non-negative edge lengths, a number $k$, and a number $\lambda$, find a subset $P$ of nodes of size $k$ such that  $f(P)\geq\lambda$, or declare no such subset exists. 
+\item  {\em The Dispersion Decision Problem (feasibility test).}  Given a tree with non-negative edge lengths, a number $k$, and a number $\lambda$, find a subset $P$ of nodes of size $k$ such that  $f(P)\geq\lambda$, or declare that no such subset exists. 
 \end{itemize}
 
-Bhattacharya and Houle~\cite{Bhattacharya1991} present an efficient feasibility test, and use a result by Fredrickson \cite{Frederickson1983} that enables binary searching over all possible values of $\lambda$ (i.e., all pairwise distances in the tree). In other words, a feasibility test with a running time $\tau$ implies an $O(n \log n + \tau \cdot \log n)$ time algorithm for the dispersion optimization problem. We present a simplified version of their linear time
+Bhattacharya and Houle~\cite{Bhattacharya1991} present a linear-time feasibility test, and use a result by Fredrickson \cite{Frederickson1983} that enables binary searching over all possible values of $\lambda$ (i.e., all pairwise distances in the tree). In other words, a feasibility test with a running time $\tau$ implies an $O(n \log n + \tau \cdot \log n)$ time algorithm for the dispersion optimization problem. We present a simplified version of their linear time
 feasibility test in Section~\ref{linear F.T.}.
 
 In the {\em weighted} dispersion problem, nodes have non-negative weights. Instead of $k$ we are given $W$, and the goal is then to find a subset
@@ -133,7 +133,7 @@ The test is then translated into a solution for the optimization problem. This i
 $[\lambda_{1},\lambda_{2})$ and applying Frederickson's parametric search, but now we apply a heavy path decomposition to construct
 the monotone matrices.
 To accelerate the $O(n\log\log n)$ time algorithm, we construct a hierarchy of feasibility tests by partitioning the input tree
-into larger and larger fragments. In each iteration we construct a feasibility test with better running time, until finally, after $\log ^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time, which we use to solve the dispersion optimization problem in linear $O(n)$ time. The linear-time algorithm is described in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
+into larger and larger fragments. In each iteration we construct a feasibility test with better running time, until finally, after $\log ^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time, which we use to solve the dispersion optimization problem in linear  time. The details of the linear-time algorithm are rather technically difficult and are differed to Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
 
 
 \medskip \noindent {\bf Our solution for the weighted dispersion problem.}
