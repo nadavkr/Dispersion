@@ -96,10 +96,10 @@ The focus of this paper is the  {\em $k$-dispersion} problem, where we wish to d
 \begin{itemize} 
 \item {\em The Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, and a number $k$, find a subset $P$ of nodes of size $k$ such that $f(P)$ is maximized.
 \end{itemize}
-In other words, we wish to select $k$ nodes that are as spread-apart as possible. The dispersion problem be seen as a generalization of the classical maximum independent set problem (that can be solved by binary searching for the largest value of $k$ for which the minimum distance is at least 2).  
+In other words, we wish to select $k$ nodes that are as spread-apart as possible. The dispersion problem can be seen as a generalization of the classical maximum independent set problem (that can be solved by binary searching for the largest value of $k$ for which the minimum distance is at least 2).  
 %
 It turns out that the dispersion and the $k$-partitioning problems are actually equivalent in the one-dimensional case (i.e., when the tree is a path). The reduction simply creates a new path whose edges correspond to nodes in the original path and whose nodes correspond to edges in the original path. However, such equivalence does not apply to general trees, on which $k$-dispersion seems more difficult than $k$-partitioning. In particular, until the present work, no linear time solution for $k$-dispersion was known. 
-The optimization problem can be solved by repeatedly querying a {\em feasibility test} that solves the search version of this problem. 
+The optimization problem can be solved by repeatedly querying a {\em feasibility test} that solves the search problem. 
 \begin{itemize}
 \item  {\em The Dispersion Search Problem (feasibility test).}  Given a tree with non-negative edge lengths, a number $k$, and a number $\lambda$, find a subset $P$ of nodes of size $k$ such that  $f(P)\geq\lambda$, or declare that no such subset exists. 
 \end{itemize}
@@ -120,7 +120,7 @@ Our algorithm begins by partitioning the input tree $T$ into $O(n/b)$ {\em fragm
 We use this to simulate a bottom-up feasibility test by jumping over entire 
 fragments, i.e., knowing $\lambda$, we wish to extend in $O(\log b)$ time a solution for a subtree of $T$ rooted at the fragment's hole to a subtree of $T$ rooted at the fragment's root. This is achieved by an efficient preprocessing: 
 % 
-The first step of the preprocessing computes values $\lambda_1$ and  $\lambda_2$ such that (1) there is no solution to the decision problem on $T$ for any $\lambda \geq \lambda_2$, (2) there is a solution to the decision problem on $T$ for any $\lambda \le \lambda_1$, and (3) for {\em most} of the fragments, the distance between any two nodes is either smaller or equal to $\lambda_1$ or larger or equal to $\lambda_2$. This is achieved by applying Frederickson's parametric search on sorted matrices capturing the pairwise distances between nodes in the same fragment. The (few) fragments that do not satisfy property (3) are handled naively in $O(b)$ time during query time. 
+The first step of the preprocessing computes values $\lambda_1$ and  $\lambda_2$ such that (1) there is no solution to the search problem on $T$ for any $\lambda \geq \lambda_2$, (2) there is a solution to the search problem on $T$ for any $\lambda \le \lambda_1$, and (3) for {\em most} of the fragments, the distance between any two nodes is either smaller or equal to $\lambda_1$ or larger or equal to $\lambda_2$. This is achieved by applying Frederickson's parametric search on sorted matrices capturing the pairwise distances between nodes in the same fragment. The (few) fragments that do not satisfy property (3) are handled naively in $O(b)$ time during query time. 
 The fragments that do satisfy property (3) are further preprocessed. We look at the path from the hole to the root of the
 fragment and run the linear-time feasibility test for all subtrees hanging off from it. This can be done without knowing the exact value of $\lambda$, due to property (3). Then, we can conceptually
 prune the fragment and think of it as a caterpillar connecting the root and the hole.
