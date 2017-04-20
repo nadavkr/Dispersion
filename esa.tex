@@ -224,7 +224,7 @@ A method of choosing which tests to perform to achieve this is the gist of Frede
 
 For each fragment, we construct an implicit representation of $O(b)$ sorted matrices of total side length $O(b\log b)$
 (where a matrix is sorted if it is both row- and column-sorted), s.t. any pairwise distance (and any pairwise distance multiplied by 2) inside the fragment is an entry in some matrix. This is done using the standard centroid 
-decomposition, in $O(n/b\cdot b\log b)=O(n\log b)$ total time. Then, we can apply a theorem Frederickson on the obtained set of matrices.
+decomposition, in $O(n/b\cdot b\log b)=O(n\log b)$ total time. Then, we can apply a theorem by Frederickson on the obtained set of matrices.
 
 \begin{restatable}{lemmarestatable}{centroidmatrix}
 Given a tree $T$ on $b$ nodes, we can construct in $O(b\log b)$ time an implicit representation of $O(b)$ sorted matrices of total
@@ -491,7 +491,7 @@ To conclude, the final polyline $p$ is obtained by concatenating the value compu
 We now describe the data structure we use for polylines, which will allow us to implement the above interface efficiently. We represent a polyline by storing its breakpoints in an augmented 2-3 tree, where the data is stored in the leaves. Each node of the tree stores a key-value pair, and we maintain the following property: the key of each breakpoint is the sum of the keys of the corresponding leaf and of all its ancestors, and similarly for the values. In addition, we store in each node the maximal sum of keys and values on a path from that node to a leaf in its subtree. We also store in each node the number of leaves in its subtree. We next describe the implementation of each operation.
 
 Operations~\ref{op1} and~\ref{op2} use standard split and join procedures for 2-3 trees in logarithmic time. 
-Operation~\ref{op3} runs a predecessor query and returning the value at the returned breakpoint in logarithmic time.
+Operation~\ref{op3} runs a predecessor query and returns the value at the returned breakpoint in logarithmic time.
 Operation~\ref{op4} is done by an inorder traversal of the tree. 
 Operations~\ref{op1}-\ref{op3} are performed only a constant number of times per step, and so their total cost is logarithmic (i.e., $O(\log x + \log y)$). Operation~\ref{op4} is also performed a constant number of times to iterate over the breakpoints of $p_{1}$ (in $O(x)$ time). The next four operations are more costly, since they consists a batch of $O(x)$ operations given in sorted order (by keys).
 
