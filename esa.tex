@@ -280,7 +280,7 @@ remaining leaves from the root are non-decreasing.
 \textbf{Prune leaves to make their distances to the hole non-increasing:}
 this is done as in the previous step, except we scan in the other direction.
 \item\label{precompute for any candidate node}
-\textbf{Precompute for any candidate node with respect to the hole:}
+\textbf{Precompute for any candidate and certain node with respect to the hole:}
 we call $u_{1},u_{2},\ldots,u_{i}$ a {\em prefix} of the caterpillar and, similarly, $u_{i+1},u_{i+2}, \ldots,u_{s}$ a {\em suffix}.
 For every possible prefix, we would like to precompute the result of running the linear-time feasibility
 test on that prefix. In Section~\ref{sec:feasibility test} we will show that, in fact, this is enough to efficiently
@@ -296,7 +296,7 @@ This suggests the following implementation: scan the caterpillar from top to bot
 the number of chosen nodes, the certain node and the candidate node. While scanning we maintain $i'$ in amortised constant time.
 After increasing $i$, we only have to keep increasing $i'$ as long as $d(u_{i},u_{i'}) \ge \lambda$.
 To store the information for the current prefix, copy the computed information for $u_{1},u_{2},\ldots,u_{i'}$
-and increase the number of chosen nodes by one. Then, if the certain node is set to NULL, we set it to be $u_{i}$. If there is no $u_{i'}$, and $u_i$ is the top-most chosen candidate, we need to set it to be the candidate (if $\d(r,u_i) < \frac{\lambda}{2}$) or the certain node otherwise.
+and increase the number of chosen nodes by one. Then, if the certain node is set to NULL, we set it to be $u_{i}$. If there is no $u_{i'}$, and $u_i$ is the top-most chosen candidate, we need to set it to be the candidate (if $d(r,u_i) < \frac{\lambda}{2}$) or the certain node otherwise.
 \end{noindlist}
 
 \subsection{Feasibility test}
