@@ -103,12 +103,11 @@ Consider the unweighted $k$-dispersion problem. This optimization problem can be
 \item  {\em The Dispersion Decision Problem (feasibility test).}  Given a tree with non-negative edge lengths, a number $k$, and a number $\lambda$, find a subset $P$ of nodes of size $k$ such that  $f(P)\geq\lambda$, or declare no such subset exists. 
 \end{itemize}
 
-\cite{Bhattacharya1991} presents an efficient feasibility test, and uses a result by Fredrickson \cite{Frederickson1983} that enables binary searching over the possible values of $\lambda$ (which are all pairwise distances in the tree). In other words, a feasibility test with a running time $\tau$ implies an $O(n \log n + \tau \cdot \log n)$ time algorithm for the dispersion optimization problem. We present a simplified version of their linear time
+Bhattacharya and Houle~\cite{Bhattacharya1991} present an efficient feasibility test, and use a result by Fredrickson \cite{Frederickson1983} that enables binary searching over all possible values of $\lambda$ (i.e., all pairwise distances in the tree). In other words, a feasibility test with a running time $\tau$ implies an $O(n \log n + \tau \cdot \log n)$ time algorithm for the dispersion optimization problem. We present a simplified version of their linear time
 feasibility test in Section~\ref{linear F.T.}.
 
-In the weighted $k$-dispersion problem, nodes have non-negative weights and instead of $k$ we are given $W$. The goal is then to find a subset
-$P$ of nodes of total weight at least $W$, s.t. $f(P)$ is maximized. \cite{Bhattacharya1999} present an efficient feasibility test for this generalization, and by the same
-reasoning above solves the weighted dispersion optmization problem.
+In the {\em weighted} dispersion problem, nodes have non-negative weights. Instead of $k$ we are given $W$, and the goal is then to find a subset
+$P$ of nodes of total weight at least $W$ s.t. $f(P)$ is maximized. \cite{Bhattacharya1999} present an efficient feasibility test for this generalization, that by the same reasoning above solves the weighted optimization problem with a logarithmic overhead.
  
 \medskip \noindent {\bf Our solution for the unweighted dispersion problem.}
 We are able to decrease the total time to $O(n)$ by
@@ -131,10 +130,10 @@ of the fragment included in the solution, what are all the other nodes in the so
 
 The above feasibility test is presented in~Section~\ref{sublinear f.t.}, with an overall preprocessing time of $O(n\log\log n)$.
 The test is then translated into a solution for the optimization problem. This is done by, again, maintaining an interval
-$[\lambda_{1},\lambda_{2})$ and applying Frederickson's parametric search, but now we apply the heavy path decomposition to construct
+$[\lambda_{1},\lambda_{2})$ and applying Frederickson's parametric search, but now we apply a heavy path decomposition to construct
 the monotone matrices.
 To accelerate the $O(n\log\log n)$ time algorithm, we construct a hierarchy of feasibility tests by partitioning the input tree
-into larger and larger fragments. In each iteration we construct a feasibility test with better running time, until finally, after $\log ^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time, which we use to solve the dispersion optimization problem in $O(n)$. The  algorithm is described in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
+into larger and larger fragments. In each iteration we construct a feasibility test with better running time, until finally, after $\log ^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time, which we use to solve the dispersion optimization problem in linear $O(n)$ time. The linear-time algorithm is described in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
 
 
 \medskip \noindent {\bf Our solution for the weighted dispersion problem.}
@@ -152,18 +151,20 @@ An old result of Brown and Tarjan~\cite{Brown1980} is that, in exactly such time
 Mehlhorn~\cite{huddlestonM82} to any sequence of operations that exhibits a certain locality of reference. However, in our specific
 application we need various non-standard batch operations on the lists, and hence applying these results would require effort.
 Instead, we present a simpler data structure for merging polylines that efficiently supports the required batch operations and works with %essentially 
-any balanced search tree with split and join capabilities. Our data structure both simplifies and extends that of Brown and Tarjan~\cite{Brown1980}, and we believe it to be of independent interest. All missing proofs can be found in Appendix \ref{appendix missing proofs}.
+any balanced search tree with split and join capabilities. Our data structure both simplifies and extends that of Brown and Tarjan~\cite{Brown1980}, and we believe it to be of independent interest. 
+
+Due to space constraints, all  missing proofs are differed to Appendix \ref{appendix missing proofs}.
 
 
 \section{A Linear Time Feasibility Test}
 \label{linear F.T.}
 
-Given a tree $T$ with non-negative lengths and a number $\lambda$, the feasibility tests finds a subset of nodes $P$ such that $f(P)\geq\lambda$
+Given a tree $T$ with non-negative lengths and a number $\lambda$, the feasibility test finds a subset of nodes $P$ such that $f(P)\geq\lambda$
 and $|P|$ is maximized, and then checks if $|P|\geq k$.
 To this end, the tree is processed bottom-up while computing, for every subtree $T_{r}$ rooted at a node $r$, a subset of nodes $P$ such that
 $f(P)\geq\lambda$, $|P|$ is maximized, and in case of a tie $\min_{u\in P}d(r,u)$ is additionally maximized.
-We call node $u\in P$, s.t. $d(r,u)<\frac{\lambda}{2}$, the \emph{candidate} node of the subtree (or a candidate with respect to $r$). There is at most one such candidate node.
-The remaining nodes in $P$ are called \emph{certain} (w.r.t. $r$) and the one that is nearest to the root is called the certain node.
+We call the node $u\in P$, s.t. $d(r,u)<\frac{\lambda}{2}$, the \emph{candidate} node of the subtree (or a candidate with respect to $r$). There is at most one such candidate node.
+The remaining nodes in $P$ are called \emph{certain} (with respect to $r$) and the one that is nearest to the root is called the certain node.
 When clear from the context, we will not explicitly say which subtree we are referring to.
 
 In each step we are given a node $r$, its children nodes $r_{1},r_{2},\ldots,r_{\ell}$, and for each child $r_{i}$ we are given a maximal valid
