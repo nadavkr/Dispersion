@@ -139,7 +139,9 @@ The test is then used to solve the optimization problem within the same time. Th
 $[\lambda_{1},\lambda_{2})$ and applying Frederickson's parametric search, but now we apply a heavy path decomposition to construct
 the sorted matrices.
 To accelerate the $O(n\log\log n)$ time algorithm, we construct a hierarchy of feasibility tests by partitioning the input tree
-into larger and larger fragments. In each iteration we construct a feasibility test with better running time, until finally, after $\log ^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time, which we use to solve the dispersion optimization problem in linear  time. The details of the linear-time algorithm are rather technically difficult and appear in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
+into larger and larger fragments. In each iteration we construct a feasibility test with better running time, until finally, after $\log ^*n$ iterations
+we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time, which we use to solve the dispersion optimization problem in linear  time. It is relatively straightforward to implement the precomputation done in every iteration in $O(n)$ time, however to achieve $O(n)$ total time over all the iterations we need to reuse the results of the precomputation between the iterations and then an intricate global analysis of the overall complexity.
+This makes the details of the linear-time algorithm technically difficult and appear in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
 
 
 \vspace{0.04in} \noindent {\bf Our technique for the weighted dispersion problem.}
