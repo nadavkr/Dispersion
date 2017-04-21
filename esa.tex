@@ -113,7 +113,7 @@ In the {\em weighted} dispersion problem, nodes have non-negative weights. Inste
 $P$ of nodes of total weight at least $W$ s.t. $f(P)$ is maximized. Bhattacharya and Houle considered this generalization in~\cite{Bhattacharya1999}. They present an $O(n \log^3 n)$ feasibility test for this generalization, that by the same reasoning above solves the weighted optimization problem in $O(n \log^4 n)$ time. We give an $O(n \log n$)-time feasibility test, so our algorithm for the weighted optimization problem runs in $O(n \log^2 n)$ time. Our solution here uses novel ideas, and differs substantially from Frederickson's approach.
 
  
-\medskip \noindent {\bf Our technique for the unweighted dispersion problem.}
+\vspace{0.05in} \noindent {\bf Our technique for the unweighted dispersion problem.}
 We are able to decrease the total time to $O(n)$ by
 developing a feasibility test that requires {\em linear} time preprocessing and can then be queried in \emph{sublinear} time. This was Frederickson approach for $k$-partitioning and $k$-center, and it is plausible that his framework can be adapted to solve our problem as well.
 However, this has not been done to date. Our (slightly different) take on $k$-dispersion allows us to develop a  simpler and more structured algorithm, and hence might be of independent interest.
@@ -140,7 +140,7 @@ To accelerate the $O(n\log\log n)$ time algorithm, we construct a hierarchy of f
 into larger and larger fragments. In each iteration we construct a feasibility test with better running time, until finally, after $\log ^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time, which we use to solve the dispersion optimization problem in linear  time. The details of the linear-time algorithm are rather technically difficult and are differed to Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
 
 
-\medskip \noindent {\bf Our technique for the weighted dispersion problem.}
+\vspace{0.05in} \noindent {\bf Our technique for the weighted dispersion problem.}
 %In Section~\ref{section:weighted} we consider the weighted version of the dispersion problem. Our main result is an $O(n\log n)$ feasibility test (for which we also give a simple tight $\Omega(n\log n)$ lower bound) implying an $\Oh(n\log^2n)$ time solution for the optimization problem. 
 Our solution for the weighted case differ substantially from Frederickson's approach.
 In contrast to the unweighted case, where each subtree had only one candidate, in the weighted case each subtree can have a large number of candidates. 
@@ -235,15 +235,14 @@ of the entries with very few feasibility tests.
 
 \begin{theorem}[\cite{Frederickson1991}]\label{Frederickson's theorem}
 Let  ${M_1, M_2, . . . , M_N}$ be a collection of sorted matrices in which matrix $M_j$ is of dimension $m_j \times n_j$, $m_j \leq n_j$, and $\sum_{j=1}^{N} m_j = m$.
-Let p be nonnegative. The number of feasibility tests needed to discard all but at most $p$ of the elements is $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace)$, and the total running time exclusive of the feasibility tests is $O(\sum_{j=1}^{N} m_j \cdot \log (2n_j/m_j))$.
+Let $p$ be nonnegative. The number of feasibility tests needed to discard all but at most $p$ of the elements is $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace)$, and the total running time exclusive of the feasibility tests is $O(\sum_{j=1}^{N} m_j \cdot \log (2n_j/m_j))$.
 \end{theorem}
 
 Setting $m=b \log b \cdot \frac{n}{b} = n \log b$ and $p=n/b^2$, the theorem implies that we can use $O(\log b)$ calls to the linear time feasibility test and discard all but $n/b^2$ elements of the matrices. Therefore, all but at most $n/b^{2}$ fragments are inactive.
 
 The second goal of the preprocessing step is to
 compute information for each inactive fragment that will allow us to later ``jump'' over it in $O(\log b)$ time when running the feasibility test.  We next describe this computation.  We choose $\lambda$ arbitrarily in
-$[\lambda_1,\lambda_2)$ This is done just so that we have a concrete value of $\lambda$ to work with.
-
+$[\lambda_1,\lambda_2)$. This is done just so that we have a concrete value of $\lambda$ to work with.
 \begin{noindlist}
 \item\textbf{Reduce the fragment to a caterpillar:}
 a fragment consists of the spine and the subtrees hanging off the spine. %Because we can compare any pairwise distance in the fragment to $\lambda$ and $\lambda/2$, we can run 
@@ -415,7 +414,7 @@ implement this step in time $O(x \log (\frac{2y}{x}))$, where $x$ is the number 
 We need to consider several cases, as the closest chosen node $h$ in the subtree of $v$ could be $v$ itself, or a node in the subtree of a child of $v$. This means that for any key $d(h,v)$ in the polyline, the value for that key can represent a solution $P$ in which $h$ is in the subtree rooted at $v$'s left child, or in the subtree rooted at $v$'s right child, or it could be $v$ itself.
 
 
-\medskip \noindent {\bf Constructing a polyline.} We now present a single step of the algorithm. We postpone the discussion of the data structure used to store the polylines for now, and first describe how to obtain the polyline of $v$ from the polylines of its children. Then, we state the exact interface of the data structure that allows executing such a procedure efficiently, show how to implement such an interface, and finally analyze the complexity of the resulting algorithm.
+\vspace{0.05in} \noindent {\bf Constructing a polyline.} We now present a single step of the algorithm. We postpone the discussion of the data structure used to store the polylines for now, and first describe how to obtain the polyline of $v$ from the polylines of its children. Then, we state the exact interface of the data structure that allows executing such a procedure efficiently, show how to implement such an interface, and finally analyze the complexity of the resulting algorithm.
 
 If $v$ has only one child $u$, then we build $v$'s polyline by querying $u$'s polyline for the case that $v$ is in the solution (i.e., query $u$'s polyline with distance of the closest chosen node being $\lambda-d(v,u)$), and add to this value the weight of $v$ itself. We then construct the polyline by taking the obtained value for $d(h,v)=0$ and merging it with the polyline computed for $u$, shifted to the right by $d(v,u)$ (since we now measure the weight of the solution as a function of the distance of the closest chosen node to $v$, not to $u$). The value between zero and $d(v,u)$ will be the same as the value of the first interval in the polyline constructed for $u$, so the shift is actually done by increasing the keys of all but the first breakpoint by $d(v,u)$.
 
@@ -438,7 +437,7 @@ It remains to construct the rest of the polyline $p$. Notice that we need to mai
 
 \subsection{Constructing the first half of the polyline.} We need to consider two possible cases: either $d(h_1,v) < d(h_2,v)$ (i.e. the closest chosen node in $v$'s subtree is inside $u_1$'s subtree), or $d(h_1,v) > d(h_2,v)$ (note that in this half of the polyline $d(h,v)<\frac{\lambda}{2}$, and therefore $d(h_1,v) \neq d(h_2,v)$). For each of the two cases we will construct the first half of the polyline, and then we take the maximum of the two polylines at every point, in order to have the optimal solution for each key.
 
-\medskip \noindent {\bf Case I: \boldmath$d(h_1,v) < d(h_2,v)$.} Since we are only interested in the first half of the polyline, we know that $d(h_1,v) < \frac{\lambda}{2}$. Since $d(h_2,v) +d(h_1,v)\geq \lambda$ we have that  $d(h_2,v) > \frac{\lambda}{2}$. Again, we cannot afford to iterate over the breakpoints of $p_2$, so we need to be more subtle.
+\vspace{0.05in} \noindent {\bf Case I: \boldmath$d(h_1,v) < d(h_2,v)$.} Since we are only interested in the first half of the polyline, we know that $d(h_1,v) < \frac{\lambda}{2}$. Since $d(h_2,v) +d(h_1,v)\geq \lambda$ we have that  $d(h_2,v) > \frac{\lambda}{2}$. Again, we cannot afford to iterate over the breakpoints of $p_2$, so we need to be more subtle.
 
 We start by splitting $p_1$ at $\frac{\lambda}{2}$ and taking the first half (denoted by $p_1'$). We then split $p_2$ at $\frac{\lambda}{2}$ and take the second half (denoted by $p_2'$). Consider two consecutive breakpoints of $p_1'$ with keys $x$ and $x+y$. We would like to increase the value of $p_1'$ in the interval $[x,x+y)$ s.t. the new value is the maximal weight of a valid subset of nodes from \emph{both} subtrees rooted at $u_1$ and $u_2$, s.t. $x \leq d(h_1,v)<x+y$. Therefore $d(h_2,v)>\lambda-x-y$. $p_2'$ is monotonically decreasing, and so we query it at $\lambda-x-y+\epsilon$, and increase by the resulting value.
 
@@ -455,7 +454,7 @@ Note that in the above description we have assumed that we have access to the or
 %}
 %\end{figure}
 
-\medskip \noindent {\bf Case II: \boldmath$d(h_1,v) > d(h_2,v)$.}
+\vspace{0.05in} \noindent {\bf Case II: \boldmath$d(h_1,v) > d(h_2,v)$.}
 Symmetrically to the previous case, we increase the values in the intervals of $p_2$ induced by the breakpoints of $p_1$ by the appropriate values of $p_{1}$ (similarly to what we do in Subsection \ref{subsection constructing the second half of the polyline}). Again, the resulting polyline may be non-monotone, but this time we cannot solve the problem by scanning the new polyline and deleting breakpoints, since there are too many of them. Instead, we go over the breakpoints of the second half of $p_1$ from right to left. For each such breakpoint  with key $x$, we find the {\em value} of key $\lambda - x$ in the new polyline. These are the points where we might have increased the value of $p_2$. Denote this value by $y$. We then query the new polyline with a \emph{value predecessor} query: this returns the breakpoint   with the largest key s.t. its key is smaller than $\lambda - x$ and its value is at least $y$. 
 %
 If this breakpoint exists, then the values of the new polyline between its successor breakpoint and $\lambda - x$ should all be $y$ (i.e. we delete all breakpoints in this interval except for the first one whose value we set to $y$). % (if it is the predecessor of $x$ in the list of breakpoints, then this is already the case).
@@ -473,7 +472,7 @@ See  Figure~\ref{figure of the second case in the construction of the first half
 %}
 %\end{figure}
 
-\medskip \noindent {\bf Merging cases I and II.}
+\vspace{0.05in} \noindent {\bf Merging cases I and II.}
 We now need to build one polyline for the first half of the polyline, taking into account both cases. Let $p_a$ and $p_b$ denote the polylines we have constructed in cases I and II respectively (so the number of breakpoint in $p_a$ is at most the number of breakpoints in $p_b$). We start by shifting $p_a$ and $p_b$ to the right by $d(v,u_1)$ and $d(v,u_2)$ respectively, because now we measure the distance of $h$ from $v$, not from $u_1$ or $u_2$. 
 
 We now need to take the maximum of the values of $p_a$ and $p_b$, for each key. We do this by finding the intersection points of the two polylines. Notice that since both polylines are monotonically decreasing, these intersections can only occur at (i) the breakpoints of $p_a$, and (ii) at most one point between two consecutive breakpoints of $p_a$. We iterate over $p_a$ and for every pair of consecutive breakpoints we check which polyline has the higher value at both points. If the answer for both points is the same, we carry on. Otherwise, there must be a single intersection point of the two polylines inside this interval. We find this intersection by running a value predecessor query on $p_b$, with the key being the right endpoint of the interval. After such computation, we know which polyline gives us the best solution for every point between zero and $\frac{\lambda}{2}$, and where are the intersection points where this changes. We can now build the new polyline by doing insertions and deletions in $p_b$ according to the intersection points: For every interval of $p_b$ defined by a pair of consecutive intersection points, we check if the value of $p_a$ is larger than the value of $p_b$ in the interval, and if so, delete all the breakpoints of $p_b$ in the interval, and insert the relevant breakpoints from $p_a$. The number of intersection points is linear in the number of breakpoints of $p_a$ which is $O(x)$, and so, the total number of interval deletions and insertions is also $O(x)$.
@@ -499,7 +498,7 @@ Operation~\ref{op3} runs a predecessor query and returns the value at the return
 Operation~\ref{op4} is done by an inorder traversal of the tree. 
 Operations~\ref{op1}-\ref{op3} are performed only a constant number of times per step, and so their total cost is logarithmic (i.e., $O(\log x + \log y)$). Operation~\ref{op4} is also performed a constant number of times to iterate over the breakpoints of $p_{1}$ (in $O(x)$ time). The next four operations are more costly, since they consists a batch of $O(x)$ operations given in sorted order (by keys).
 
-\medskip \noindent {\bf Operation~\ref{op5} -- batched interval increase.}
+\vspace{0.05in} \noindent {\bf Operation~\ref{op5} -- batched interval increase.}
 Consider the following implementation for Operation \ref{op5}. We iterate over the intervals, and for each of them, we find its left endpoint, and traverse the path from the left endpoint, through the LCA, to the right endpoint.
 The traversal is guided by the maximal key stored in the current node (that are used to find the maximal key of a breakpoint stored in its subtree
 by adding the sum of all keys from the root to the current node, which is maintained in constant time after moving to a child or the parent).
@@ -518,10 +517,9 @@ The time to obtain the small trees is $O(x \log (\frac{2y}{x}))$.
 \end{restatable}
 
 The cost of all joins required to patch the small trees together can be bounded by the same calculation as the cost of the splits made to obtain them, and so the operation takes $O(x \log (\frac{2y}{x}))$ time in total.
-The rest of the batched operations are implemented similarly, using the same trick of splitting the tree and working with the small trees. 
-There is an additional technical difficulty in Operation~\ref{op6}, as the intervals $(k_{i'},k_{i})$ might not be disjoint in our algorithm and
-hence we need some extra work to make them disjoint. 
-In Operation~\ref{op7}, some of the small trees might become much larger due to the insertions, and this also requires some extra work.
+The rest of the batched operations are also done by splitting the tree into small trees. 
+There is an additional technical difficulty in Operation~\ref{op6}, as in our case the intervals $(k_{i'},k_{i})$ might not be disjoint. We make them disjoint with some extra work. 
+In Operation~\ref{op7}, some of the small trees might become much larger due to the insertions. This also requires some extra work.
 The full description of Operation 6-8 is in Appendix \ref{appendix batched operations}.
 
 \begin{restatable}{theoremrestatable}{nlognweighted}
@@ -892,7 +890,7 @@ compute such information for every node in every iteration,
 as this might take linear time per iteration. We start with reinterpreting it in terms of
 \emph{jump pointers}. 
 
-\medskip \noindent {\bf Jump pointers.} For each candidate node in a caterpillar, its jump pointers leads to the nearest
+\vspace{0.05in} \noindent {\bf Jump pointers.} For each candidate node in a caterpillar, its jump pointers leads to the nearest
 candidate above (in the same caterpillar) that is at distance at least $\lambda^{*}$. Then, the information
 stored at the bottom node $u$ of every prefix can be computed by starting at $u$ and following
 the jump pointers as long as possible. The number of nodes chosen for the solution is simply the number of visited
@@ -908,7 +906,7 @@ one. This is because we might remove some nodes (a prefix and a suffix)
 from every small caterpillar before the merge. To overcome this, we divide every caterpillar into
 three parts as described below.
 
-\medskip \noindent {\bf The unstable prefix,  unstable  suffix, and stable infix.} 
+\vspace{0.05in} \noindent {\bf The unstable prefix,  unstable  suffix, and stable infix.} 
 Consider a caterpillar with root $r$ and hole $h$, and let $u_{i}$ denote its $i$-th candidate node. In Lemma~\ref{lemma3} we have already made sure that $d(r,u_{i}) < d(r,u_{i+1})$
 and that $d(h,u_{i}) > d(h,u_{i+1})$. We define the \emph{unstable prefix} to
 consist of all nodes $u_{i}$ such that $d(r,u_{i})\leq \frac{\lambda^{*}}{2}$, and similarly the
@@ -954,7 +952,7 @@ their corresponding binary search trees available.
 Then we have to construct the structure for the stable infix of the large caterpillar.
 We next describe these two steps.
 
-\medskip \noindent {\bf Maintaining the unstable suffixes.}
+\vspace{0.05in} \noindent {\bf Maintaining the unstable suffixes.}
 Consider the unstable suffix of the large caterpillar (the situation for the unstable prefix is
 symmetric). It is easy to see that all of its nodes are contained in unstable suffixes of
 the small caterpillars. We merge all the binary search trees storing these unstable suffixes.
@@ -968,7 +966,7 @@ but $\frac{n}{B^{10}}$ binary searches. This needs
 $O(\frac{n}{b^{4}}\cdot\log b\cdot\log B\cdot\log B)=O(\frac{n}{b})$ additional time for
 all the feasibility tests and creates additional $O(\frac{n}{B^{9}})$ active large fragments.
 
-\medskip \noindent {\bf Maintaining the stable infixes.}
+\vspace{0.05in} \noindent {\bf Maintaining the stable infixes.}
 We now describe the structure for maintaining the stable infix of a caterpillar consisting of candidate nodes $u_{1},u_{2},\ldots,u_{k}$ with root $r$ and hole $h$. 
 Recall that, for each candidate node $u_i$, its jump pointer leads to the closest candidate node above it (in the same caterpillar) that is at distance at least $\lambda ^*$. 
 We need a structure that allows us to query, given a node $u$ attached to $h$, for the nearest candidate node $u_{i}$ at distance at least $\lambda^{*}$ from $u$, and then follow the jump pointers from $u_{i}$.
