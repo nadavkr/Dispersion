@@ -295,7 +295,7 @@ Due to distances of the leaves to the hole
 being non-decreasing, nodes $u_{i'+1},u_{i'+2},\ldots,u_{i-1}$ cannot be chosen and furthermore $d(u_{j},u_{i})\geq \lambda$
 for any $j=1,2,\ldots,i'$. Therefore, to continue the simulation we should repeat the reasoning for $u_{1},u_{2},\ldots,u_{i'}$.
 This suggests the following implementation: scan the caterpillar from top to bottom and store, for every prefix $u_{1},u_{2},\ldots,u_{i}$,
-the number of chosen nodes, the certain node and the candidate node. While scanning we maintain $i'$ in amortised constant time.
+the number of chosen nodes, the certain node and the candidate node. While scanning we maintain $i'$ in amortized constant time.
 After increasing $i$, we only have to keep increasing $i'$ as long as $d(u_{i},u_{i'}) \ge \lambda$.
 To store the information for the current prefix, copy the computed information for $u_{1},u_{2},\ldots,u_{i'}$
 and increase the number of chosen nodes by one. Then, if the certain node is set to NULL, we set it to be $u_{i}$. If there is no $u_{i'}$, and $u_i$ is the top-most chosen candidate, we need to set it to be the candidate (if $d(r,u_i) < \frac{\lambda}{2}$) or the certain node otherwise.
@@ -665,8 +665,8 @@ We start with $O(n/c^{3})$ fragments of size at most $c^3$ for some constant $c$
 We pay $O(n)$ time for preprocessing and get an $O(\frac{n}{c^3} \cdot \log c)$ time test.
 We use this test to do the same preprocessing again, this time with $O(n/(2^{c})^{3})$ fragments of size at most $(2^c)^3$.
 We will now construct an $O(\frac{n}{2^{3c}} \cdot c)$ time test.
-We do this for $\log ^*n$ iterations until we get to $O(n/\log^{3}n)$ fragments of size at most $\log ^3n$, and have
-an $O(\frac{n \log \log n}{\log ^3n})$ time test. Since we do $\log ^*n$ iterations and linear time work for each
+After $\log ^*n$ such iterations we obtain $O(n/\log^{3}n)$ fragments of size at most $\log ^3n$, and have
+an $O(\frac{n \log \log n}{\log ^3n})$ time test. Since we have $\log ^*n$ iterations and linear time work for each
 iteration, the total preprocessing is in $O(n \log ^*n)$ time.
 
 We now describe one iteration of this process. Assuming we have obtained an $O(\frac{n}{b^3} \cdot \log b)$ time 
@@ -721,9 +721,9 @@ We would like to partition the tree into fragments of growing sizes, and only sp
 
 \begin{lemma}\label{good partition refinement lemma}
 Given a good partition of a binary tree into at most $n/b^{4}$ fragments each of size at most $\alpha^{\ell}\cdot b^{4}$, 
+we can find in $O(n/b^{4})$ time
 a good partition of the tree into at most $n/(2^b)^{4}$ fragments each of size at most $\alpha^{\ell+1}\cdot (2^{b})^{4}$
-with the additional property that every fragment in the first partition is contained inside a fragment in the second partition
-can be found in $O(n/b^{4})$ time.
+with the additional property that every fragment in the first partition is contained inside a fragment in the second partition.
 \end{lemma}
 \begin{proof}
 Define $T'$ as the tree obtained by collapsing each fragment of the given partition into a single node. Partition $T'$ with the parameter set to $B= {(2^{b})^{4}}/{b^{4}}$. We obtain at most $\frac{n/b^4}{B}=n/(2^{b})^{4}$ fragments. Each of the new large fragments corresponds to a fragment of the original tree of size at most $\alpha\cdot \alpha^{\ell}\cdot b^{4}\cdot B = \alpha^{\ell+1}\cdot (2^{b})^{4}$. Clearly, it holds that each fragment of the given partition is contained in a single large fragment.
@@ -733,8 +733,15 @@ Define $T'$ as the tree obtained by collapsing each fragment of the given partit
 If $b_{\ell}$ denotes the value of the parameter $b$ in the $\ell$-th application, then  $b_{\ell+1}=2^{b_{\ell}}$. The time to construct the $(\ell+1)$-th partition is $O(n/(b_{\ell})^{4})=O(n/b_{\ell})$. The overall time to construct all partitions is therefore 
 $$ O(\sum_{\ell} {n}/{b_{\ell}}) = O(\sum_{\ell} {n}/{2^{\ell}}) = O(n).$$
 Observe that the size of a (large) fragment in the $(\ell+1)$-th partition is at most $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$ which is at most $O((b_{\ell+1})^5)$ for a large enough $\ell$ (i.e., an $\ell$ s.t. $\alpha^{\ell+1}\leq 2^{2^{\ell+1}}$ and $b_{\ell+1}\geq 2^{2^{\ell+1}}$, so
-this $\ell$ depends only on the constant $\alpha$).  Denoting by $b=b_{\ell}$ and $B=b_{\ell+1}$  we conclude that every large
-of the $(\ell+1)$-th partition is of size $O(B^5)$ and is composed of small fragments of the $\ell$-th partition (each of size $O(b^5)$). 
+this $\ell$ depends only on the constant $\alpha$).
+
+Setting $b=b_{\ell}$ and $B=b_{\ell+1}$  we conclude that every large fragment of the $(\ell+1)$-th partition is of size $O(B^5)$ and consists
+of small fragments of the $\ell$-th partition (each of size $O(b^5)$). 
+The goal of the $(\ell+1)$-th iteration will be now to preprocess all $O(n/B^{4})$ large fragments, so that we obtain an $O(\frac{n}{B^{4}}\log B)$
+time test. To this end, we will preprocess all inactive fragments, so that they can be skipped in $O(\log B)$ time. For the remaining active
+large fragments, we guarantee that there are only $O(n/B^{9})$ of them, so processing each in $O(B^{5})$ time in query time leads
+to the claimed query time. To make sure that the total preprocessing time is linear, we will reuse the preprocessing already done
+for the $O(n/b^{4})$ small fragments (by induction, only $O(n/b^{9})$ of them are active, while the others are preprocessed).
 
 \subsection{Reducing a hanging subtree into two nodes}\label{section:lemma1}
 The first step in reducing a large fragment into a caterpillar is reducing the hanging subtrees of the large fragment into at most two nodes. The following lemma shows that this can be done in total $O(n)$ time for all fragments in all the $\log^* n$ partitions.
@@ -755,12 +762,15 @@ Summing over all $\log^{*}n$ iterations, this is $O(\sum_{\ell}\frac{n}{b_\ell})
 
 Constructing the heavy path decompositions and then running Frederickson's search takes linear time in the number
 of nodes in the subtrees. If all of them were then reduced to at most two nodes, one candidate and one certain
-node for each subtree, this would take $O(n)$ time when summed over all the $\log^{*}n$  iterations. However, we have set
+node for each subtree, this would amortize to $O(n)$ time when summed over all the $\log^{*}n$  iterations. However, we have set
 the parameter $p$ to $\frac{n}{B^{10}}$. Thus, considering all the levels, there
 might be up to $\log B\cdot\frac{n}{B^{10}}\leq \frac{n}{B^{9}}$ large fragments in which we cannot fully reduce
-all the hanging subtrees. These are the active large fragments. We preprocess such fragments naively in time linear in their size. 
-This requires only $O(\frac{n}{B^{4}})$ per iteration (and so $O(n)$ overall) since the total size of all active large fragments is at most
-$\frac{n}{B^9} \cdot O(B^5)$. 
+all the hanging subtrees. We declare them the active large fragments and do not preprocess further.
+Considering the total preprocessing time when summed over all the iterations, it is $O(n)$
+plus the total size of the active fragments in all iterations, which is $O(\sum_{\ell} n/b_{\ell}^{9}\cdot b_{\ell}^{5})=O(\sum_{\ell} n/b_{\ell})=O(n)$.
+%We preprocess such fragments naively in time linear in their size. 
+%This requires only $O(\frac{n}{B^{4}})$ per iteration (and so $O(n)$ overall) since the total size of all active large fragments is at most
+%$\frac{n}{B^9} \cdot O(B^5)$. 
 %We cannot amortize the time spent on processing their hanging
 %subtrees  by simply saying that each such hanging subtree is reduced to at most
 %two nodes, but we can easily afford to separately pay $O(\frac{n}{B^{4}})$ per iteration for this processing.
@@ -782,16 +792,24 @@ path decomposition, and for each level we need $O(\log B)$ calls to the feasibil
 $O(\frac{n}{b^4} \cdot \log b \cdot \log B \cdot \log b) = O(\frac{n}{b})$ time in total. We also do linear
 work exclusive of the feasibility tests. This processing of small active fragments takes $O(n)$ time over all
 $\log ^*n$ iterations, by the same reasoning as for the hanging subtrees.
+As before, we declare a large fragment active if we were not able to reduce some remaining active small
+fragment inside and do not preproces further.
 \end{proof}
 
+Note that even though we have reduced the small active fragments to caterpillars, we have not preprocessed them yet
+(as opposed to the small inactive fragments, that have been reduced to caterpillars and then further preprocessed).
+However, there are only $O(n/b^{9})$ such fragments, each of size $O(b^{5})$, so we can split each
+of these caterpillars into caterpillars containing exactly one spine node, that are trivial to preprocess.
+The total number of small caterpillars is then still $O(n/b^{4}+n/b^{9}\cdot b^{5})=O(n/b^{4})$,
+so does not increase asymptotically.
 
-We now have $O(\frac{n}{B^9})$ small active fragments in total. We declare each large fragment that contains a small active fragment as active. 
+%We now have $O(\frac{n}{B^9})$ small active fragments in total. We declare each large fragment that contains a small active fragment as active. 
 
 \subsection{Pruning the resulting large caterpillar}\label{section:lemma3}
 So far, each inactive large fragment was reduced to one large caterpillar consisting of the concatenation of caterpillars from the smaller fragments on its spine. We want
-to prune this large caterpillar (as we have done to the inactive fragments before) in order to ensure
+to prune this large caterpillar (as we have done with the inactive fragments before) in order to ensure
 that it is monotone and contains no collisions.   Then, we will
-be able to preprocess the caterpillar for every possible eliminated suffix.
+be able to preprocess the caterpillar for every possible candidate and certain node with respect to the hole.
 
 \begin{lemma}\label{lemma3}
 	The inactive large fragments can be processed in overall $O(n)$ time so that each of them is a caterpillar, the distances of the leaves from the root and the hole are monotone, and there are no collisions between candidate nodes and certain nodes.
@@ -839,7 +857,7 @@ caterpillars is at most $m=n$, so setting $p$ to $\frac{n}{B^9}$ would imply
 $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (b^{5}), \log(\frac{n}{n/B^{9}} \rbrace) = O(\log B)$ calls to the $O(\frac{n}{b^{4}} \cdot \log b)$ time test.
 There are two difficulties, though. First, we cannot guarantee that the processing exclusive of the feasibility tests
 would sum up to $O(n)$ over all iterations. Second, it is not clear how to provide constant time access
-to these matrices, as the candidates nodes inside every small caterpillar are stored in a doubly-linked list,
+to these matrices, as the candidate nodes inside every small caterpillar are stored in a doubly-linked list,
 so we are not able to retrieve any of them in constant time. 
 %We could have maintained the candidate
 %nodes in an array, but then after the whole pruning and eliminating we would need to merge the arrays
