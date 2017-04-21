@@ -833,7 +833,7 @@ remove $u$ from the front of its doubly-linked list, pop the list from the stack
 and repeat. Now the distances of the remaining candidates from the root are
 non-decreasing. We repeat the symmetric process from top to bottom to ensure that also the distances
 from the hole are non-decreasing. The whole procedure takes linear time in the number of eliminated
-candidate nodes plus the number of small fragments, which sums up to $O(n)$ overall.
+candidate nodes plus the number of small fragments, so $O(n)$ overall.
 
 Now we need to eliminate all internal ``collisions'' inside the large caterpillar (i.e., remove candidate nodes that
 are too close to certain nodes). These collisions can occur between a candidate node of one small caterpillar
@@ -990,7 +990,7 @@ is $O(\frac{n}{b^{4}}\cdot \log (B^{5}))=O(\frac{n}{b})$. Note that the smaller 
 trees could either be associated with a stable infix of a small caterpillar or be obtained
 by splitting a balanced search tree stored for an unstable prefix or an unstable suffix of
 a small caterpillar.
-We will show how to maintain the answer, that is the number of traversed jump pointers and the
+We will maintain the answer, that is the number of traversed jump pointers and the
 last visited node, explicitly for every $u_{i}$ that could be queried.
 
 We write $\jump(i)=j$ if the jump pointer of $u_{i}$ points to $u_{j}$, where $j<i$, and $\jump(i)=-1$
