@@ -115,8 +115,7 @@ $P$ of nodes of total weight at least $W$ s.t. $f(P)$ is maximized. Bhattacharya
  
 \vspace{0.04in} \noindent {\bf Our technique for the unweighted dispersion problem.}
 We are able to decrease the total time to $O(n)$ by
-developing a feasibility test that requires {\em linear} time preprocessing and can then be queried in \emph{sublinear} time. This was Frederickson's approach for $k$-partitioning and $k$-center, and it is plausible that his framework can be adapted to solve our problem as well.
-However, this has not been done to date. Our (slightly different) take on $k$-dispersion allows us to develop a  simpler and more structured algorithm, and hence might be of independent interest.
+developing a feasibility test that requires {\em linear} time preprocessing and can then be queried in \emph{sublinear} time. This was Frederickson's approach for $k$-partitioning and $k$-center. Our solution to the $k$-dispersion problem can be seen as a modern adaptation of Frederickson's approach based on a hierarchy of micro-macro decompositions. While achieving this adaptation is technically involved, we believe this modern view might be of independent interest.
 Equipped with a sublinear feasibility test, it is still not clear how to solve the whole problem in $O(n)$ time, as in such complexity it is not trivial to represent all the pairwise distances in the tree in a structure that enables binary searching. To cope with this, we maintain only a subset of candidate distances and represent them using matrices where both rows and columns are sorted. Running feasibility tests on only a few candidate entries from such matrices allows us to eliminate many other candidates, and prune the tree accordingly. We then repeat the process with the new smaller tree.
 This is similar to Frederickson's approach, but our algorithm (highlighted below) differs in how we construct these matrices,  in how we partition the input tree, and in how we prune it. 
 
@@ -922,7 +921,7 @@ The remaining nodes $u_{i}$ are called the \emph{stable infix}.  We have the fol
 
 \begin{lemma}
 \label{stable infix}
-If a node of a small caterpillar is removed due to the pruning or collision elimination then it
+If a node of a small caterpillar is removed due to the pruning or collision elimination (due to Lemma~\ref{lemma3}) then it
 belongs to the unstable prefix or to the unstable suffix.
 \end{lemma}
 
@@ -932,10 +931,11 @@ small caterpillars. If a candidate node $u_{i}$ of the former is pruned then the
 $v$ of one of the subsequent caterpillars such that $d(h,u_{i}) < d(h,v)$, where $h$ is the hole
 of the large caterpillar. But the distance of $v$ from the spine is less than $\frac{\lambda^{*}}{2}$ (since it is a candidate node),
  and it follows that the distance of $u_{i}$ to the hole of its small caterpillar is also less
-than $\frac{\lambda^{*}}{2}$. If $u_{i}$ collides with a certain node $v$ of one of the subsequent
+than $\frac{\lambda^{*}}{2}$. Hence, $u_{i}$ belongs to the unstable suffix.
+If on the other hand $u_{i}$ collides with a certain node $v$ of one of the subsequent
 caterpillars then $d(u_{i},v)<\lambda^{*}$. But the distance of $v$ from the spine is at least
 $\frac{\lambda^{*}}{2}$, so the distance of $u_{i}$ to the hole of its small caterpillar must be
-less than $\frac{\lambda^{*}}{2}$. Hence, $u_{i}$ belongs to the unstable suffix.
+less than $\frac{\lambda^{*}}{2}$. Again, this means that $u_{i}$ belongs to the unstable suffix.
 \end{proof}
 
 We maintain the unstable prefix and the unstable suffix  in balanced search
@@ -946,18 +946,16 @@ In query time, we first use the balanced search tree storing the unstable suffix
 $u_{i}$ that is sufficiently far away. Observe that after taking $u_{i}$ we cannot
 take any further nodes from the unstable suffix, as they are all within distance less than
 $\lambda^{*}$ from each other. Hence, we need to continue in the stable infix (it can also
-happen than no $u_{i}$ from the unstable suffix can be taken, and we directly start in the stable
+happen that no $u_{i}$ from the unstable suffix can be taken, and we directly start in the stable
 infix). Then, we use the structure maintained for the stable infix, which gives us the top-most
 node that we would reach by following up the jump pointers. Finally, we  continue in the unstable prefix. 
 
-By the same argument as before, we can visit at most one node in the unstable prefix.
-Therefore, if we can efficiently answer a query in the stable infix, then answering a query in
-the whole caterpillar requires only additional logarithmic time (in the size of the caterpillar).
-Additionally, after merging multiple small caterpillars into one, we need to determine the unstable
+There are two challenges remaining. First, after merging multiple small caterpillars into one, we need to determine the unstable
 prefix and the unstable suffix of the resulting large caterpillar and make sure that we have
 their corresponding binary search trees available.
-Then we have to construct the structure for the stable infix of the large caterpillar.
-We next describe these two steps.
+Second, we need to construct and maintain an efficient structure for the stable infix. Since we can visit at most one node in the unstable prefix then if we can efficiently answer a query in the stable infix, then answering a query in
+the whole caterpillar requires only additional logarithmic time (in the size of the caterpillar).
+We next address these two challenges.
 
 \vspace{0.04in} \noindent {\bf Maintaining the unstable suffixes.}
 Consider the unstable suffix of the large caterpillar (the situation for the unstable prefix is
@@ -971,7 +969,7 @@ do not know $\lambda^{*}$ yet. Therefore, we perform all these binary searches i
 with parameter $p$ set to $\frac{n}{B^{10}}$ to determine  the outcome of the comparison for all
 but $\frac{n}{B^{10}}$ binary searches. This needs
 $O(\frac{n}{b^{4}}\cdot\log b\cdot\log B\cdot\log B)=O(\frac{n}{b})$ additional time for
-all the feasibility tests and creates additional $O(\frac{n}{B^{9}})$ active large fragments.
+all the feasibility tests and creates only  $O(\frac{n}{B^{9}})$  additional active large fragments.
 
 \vspace{0.04in} \noindent {\bf Maintaining the stable infixes.}
 We now describe the structure for maintaining the stable infix of a caterpillar consisting of candidate nodes $u_{1},u_{2},\ldots,u_{k}$ with root $r$ and hole $h$. 
@@ -983,34 +981,40 @@ $\frac{\lambda^{*}}{2}$, or $u$ is a subsequent candidate node from the same cat
 or we start the query with comparing these two distances.
 
 We are interested in the number of traversed jump pointers and in the last visited node.
+We will maintain the answer, that is the number of traversed jump pointers and the
+last visited node, explicitly for every $u_{i}$ that could be queried.
+%
+We keep all candidate
+nodes of a caterpillar in a mergeable balanced search tree. This allows us to locate $u_{i}$
+in logarithmic time (in the size of the caterpillar). It also allows us to  
 %(because of the unstable prefix, we do not need to retrieve both the last node
 %and its predecessor). 
-During the preprocessing, we need to merge multiple stable infixes
+%During the preprocessing, we need to 
+merge multiple stable infixes
 into one, while possibly inserting some nodes in-between (these new nodes have previously
-belonged to some unstable prefixes and suffixes). To find $u_{i}$, we keep all candidate
-nodes of a caterpillar in a mergeable balanced search tree. This allows us to locate $u_{i}$
-in logarithmic time (in the size of the caterpillar), and the total time to construct the balanced
+belonged to some unstable prefixes and suffixes). 
+The total time to construct the balanced
 search trees for all stable infixes by merging the smaller balanced search trees
 is $O(\frac{n}{b^{4}}\cdot \log (B^{5}))=O(\frac{n}{b})$. Note that the smaller balanced search
 trees could either be associated with a stable infix of a small caterpillar or be obtained
 by splitting a balanced search tree stored for an unstable prefix or an unstable suffix of
 a small caterpillar.
-We will maintain the answer, that is the number of traversed jump pointers and the
-last visited node, explicitly for every $u_{i}$ that could be queried.
+
 
 We write $\jump(i)=j$ if the jump pointer of $u_{i}$ points to $u_{j}$, where $j<i$, and $\jump(i)=-1$
 if the jump pointer of $u_{i}$ is not defined, that is $d(u_{1},u_{i})<\lambda^{*}$.
 The {\em interesting prefix} of the caterpillar consists of all nodes $u_{i}$ such that $\jump(i)=-1$,
-and the {\em interesting suffix} consists of the nodes $u_{\jump(k)},u_{\jump(k+1)},\ldots,u_{k}$.
+and the {\em interesting suffix} consists of the nodes $u_{\jump(k)}, \ldots,u_{k}$.
 Because we always query with a node $u$ such that $d(r,u) \geq d(r,u_{k})$, we only
 need to maintain the answer for the nodes in the interesting suffix. As a special case,
 if $\jump(k)=-1$ we call the caterpillar \emph{fresh}.
+
 After merging multiple small caterpillars into one we might need to update some of the jump pointers.
-However, once a jump pointer has been set, it will never change. Therefore, we might only
+However, once a jump pointer has been set, it will never change. Therefore, we only
 need to set up the jump pointers in the interesting prefixes of the small caterpillars
-(and the new nodes inserted in-between). We also observe that these new jump pointers
+(and the new nodes inserted in-between). Observe that these new jump pointers
 must lead either to a node in the interesting suffix of some small caterpillar
-or to some new node. We start with checking if the large caterpillar is fresh. This can be
+or to some new node. We start by checking if the large caterpillar is fresh. This can be
 done by applying Frederickson's search in parallel for all large caterpillars with $p$ set to
 be $\frac{n}{B^{9}}$, using $O(\frac{n}{b^{4}}\cdot \log b \cdot \log B)=O(\frac{n}{b})$
 total time for the feasibility tests and creating up to $O(\frac{n}{B^{9}})$ additional active large
@@ -1022,6 +1026,7 @@ We arrange all relevant nodes in an array and apply Frederickson's search to det
 pointers using the array to facilitate constant time access to any relevant node. We again
 set $p$ to be $\frac{n}{B^{9}}$, need $O(\frac{n}{b^{4}}\cdot \log b \cdot \log B)=O(\frac{n}{b})$
 time for the feasibility tests, and create $O(\frac{n}{B^{9}})$ additional active large fragments.
+
 The time exclusive of the feasibility tests is bounded by the number of relevant nodes.
 We claim that once we know all the missing jump pointers we can actually update the answers
 for all nodes in the interesting suffix of the large caterpillar in time proportional to the
@@ -1033,7 +1038,9 @@ we can use its previously computed answer to access an already processed relevan
 interesting prefix by definition) and, by combining with the already updated answer for that
 relevant node, recalculate the answer, or follow its freshly found jump pointer to also access
 an already processed relevant node. The total time for this update is again proportional to the
-number of relevant nodes. It remains to bound this quantity. We claim that it
+number of relevant nodes. 
+
+It remains to bound this quantity. We claim that it
 amortizes to $O(n)$. To this end, we maintain the following invariant: every node
 of an interesting prefix and suffix has one credit. If a caterpillar is fresh
 then every node $u_{1},u_{2},\ldots,u_{k}$ has two credits. Initially, every node of the tree
@@ -1050,7 +1057,7 @@ caterpillar. This sums up to $O(\frac{n}{B^{4}}\cdot b^{5}) = O(\frac{n}{b})$ pe
 
 To conclude, we have shown how to obtain an $O(\frac{n}{B^{4}}\log B)$ time test given an $O(\frac{n}{b^{4}}\log b)$
 time test, in $O(\frac{n}{b})$ time plus amortized constant time per
-node. After $\log ^*n$ iterations, we have a $O(\frac{n}{\log ^4n} \cdot \log \log n)$ test,
+node. After $\log ^*n$ iterations, we have an  $O(\frac{n}{\log ^4n} \cdot \log \log n)$ test,
 which we use to solve the dispersion optimization problem in linear time. All iterations of the preprocessing
 cost $O(n)$ time altogether.
 % why do we stop at fragments of size polylog(n)? Can't we get one large fragment?
