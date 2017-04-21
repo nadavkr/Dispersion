@@ -683,10 +683,12 @@ test $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rb
 of the heavy path decompositions, until we are left with only the top heavy path of each fragment.
 Since $p>0$, during this preprocessing some fragments become active. Once a fragment becomes active we stop
 its preprocessing. Accounting for all the levels, we use $O(\log^{2}B)$ calls to the previous tests,
-which costs $O(\log ^2B \cdot \frac{n}{b^3} \cdot \log b)=O(\frac{n}{b} \cdot \log b)$. This sums to $O(n)$
-over all iterations.
-Additionally, in every iteration we spend linear time to construct a good partition, then find all heavy
-path decompositions, and finally for the Frederickson's search, so in total $O(n \log ^*n)$. 
+which costs $O(\log ^2B \cdot \frac{n}{b^3} \cdot \log b)=O(\frac{n}{b} \cdot \log b)$.
+Additionally, we need linear time to construct a good partition, find all heavy path decomposition,
+and apply Theorem~\ref{Frederickson's theorem} on the obtained matrices. Thus, overall
+a single iteration takes $O(n)$ time, so summing up over all iterations $O(n\log^{*}n)$.
+Actually, the total time spend on calls to the previous tests sums up to only $O(n)$ over all iterations, which will
+be important for the improved algorithm presented later.
 
 After the preprocessing is done, we have at most $\log B \cdot \frac{n}{B^7}\leq \frac{n}{B^{6}}$ active fragments (because we have not eliminated at most $p$ pairwise distances for each level), which we will process in $O(B^{3})$
 time each in the new test. For all other fragments we have obtained a pruned caterpillar, so that we can, in linear time, precompute the required information for any candidate and certain node with respect to the hole
