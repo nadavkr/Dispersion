@@ -499,7 +499,7 @@ To conclude, the final polyline $p$ is obtained by concatenating the value compu
 We now describe the data structure implementing the above interface. We represent a polyline by storing its breakpoints in an augmented 2-3 tree, where the data is stored in the leaves. Each node stores a key-value pair, and we maintain the following property: the key of each breakpoint is the sum of the keys of the corresponding leaf and of all its ancestors, and similarly for the values. In addition, we store in each node the maximal sum of keys and values on a path from that node to a leaf in its subtree. We also store in each node the number of leaves in its subtree. %We next describe the implementation of each operation.
 Operations~\ref{op1} and~\ref{op2} use standard split and join procedures for 2-3 trees in logarithmic time. 
 Operation~\ref{op3} runs a predecessor query and returns the value at the returned breakpoint in logarithmic time.
-Operation~\ref{op4} is done by an inorder traversal of the tree. 
+Operation~\ref{op4} is done by an inorder traversal of the tree (of $p_{1}$ in $O(x)$ time). 
 Operations~\ref{op1}-\ref{op4} are performed only a constant number of times per step, and so their total cost is $O(\log x + \log y + x)$. The next four operations are more costly, since they consists a batch of $O(x)$ operations given in sorted order (by keys).
 
 \vspace{0.04in} \noindent {\bf Operation~\ref{op5} -- batched interval increase.}
@@ -547,7 +547,7 @@ whole tree and using lowest common ancestor queries~\cite{Bender2000}.
 
 To prove correctness, we will argue by induction that the following invariant holds: for every node $r$ of the tree, the algorithm
 produces $P$, a subset of the vertices of the subtree rooted at $r$, s.t. $f(P)\geq\lambda$, $|P|$ is maximal and, if there are multiple
-such valid subsets with maximal cardinality, $\min_{u\in P} d(r,u)$ is maximal. The proof is by induction.
+such valid subsets with maximal cardinality, $\min_{u\in P} d(r,u)$ is maximal. %The proof is by induction.
 
 Consider a node $r$ of the tree and and assume that the invariant holds for all of its children $r_{1},r_{2},\ldots,r_{\ell}$.
 We want to show that the invariant also holds for $r$.
