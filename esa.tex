@@ -179,7 +179,7 @@ solution $P_{i}$ for the feasibility test on $T_{r_{i}}$ together with the candi
 \item Take all candidate nodes $u$ s.t. $d(u,r) \geq \frac{\lambda}{2}$ (i.e., they are certain w.r.t. $r$).
 \item If it exists, take $u'$, the candidate node farthest from $r$ s.t. $d(u',r) < \frac{\lambda}{2}$ and $d(u',x)\geq \lambda$, where $x$ is the closest node to $u'$ we have taken so far.\label{linear time step 3}
 %\item Check if it is possible to add $r$ to $P$ by looking at the closest vertex to it we have already put in $P$, and if so take $r$.
-\item If the distance from $r$ to the closet vertex in $P$ is at most $\lambda$, add $r$ to $P$.
+\item If the distance from $r$ to the closet vertex in $P$ is at least $\lambda$, add $r$ to $P$.
 \end{enumerate}
 Iterating over the input tree bottom-up as described results in a valid solution $P$ for the whole tree. Finally, we check if $|P|\geq k$.
 
