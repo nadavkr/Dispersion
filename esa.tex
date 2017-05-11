@@ -177,11 +177,11 @@ When clear from the context, we will not explicitly say which subtree we are ref
 In each step we are given a node $r$, its children nodes $r_{1},r_{2},\ldots,r_{\ell}$ and, for each child $r_{i}$, a maximal valid
 solution $P_{i}$ for the feasibility test on $T_{r_{i}}$ together with the candidate and the certain node. We obtain a maximal valid solution $P$ for the feasibility test on $T_{r}$ as follows:
 \begin{enumerate}
-\item Take all nodes in $P_{1},\ldots,P_{\ell}$, except for the candidate nodes.
-\item Take all candidate nodes $u$ s.t. $d(u,r) \geq \frac{\lambda}{2}$ (i.e., they are certain w.r.t. $r$).
+\item Take all nodes in $P_{1},\ldots,P_{\ell}$, except for the candidate nodes.\label{linear time step 1}
+\item Take all candidate nodes $u$ s.t. $d(u,r) \geq \frac{\lambda}{2}$ (i.e., they are certain w.r.t. $r$).\label{linear time step 2}
 \item If it exists, take $u'$, the candidate node farthest from $r$ s.t. $d(u',r) < \frac{\lambda}{2}$ and $d(u',x)\geq \lambda$, where $x$ is the closest node to $u'$ we have taken so far.\label{linear time step 3}
 %\item Check if it is possible to add $r$ to $P$ by looking at the closest vertex to it we have already put in $P$, and if so take $r$.
-\item If the distance from $r$ to the closest vertex in $P$ is at least $\lambda$, add $r$ to $P$.
+\item If the distance from $r$ to the closest vertex in $P$ is at least $\lambda$, add $r$ to $P$.\label{linear time step 4}
 \end{enumerate}
 Iterating over the input tree bottom-up as described results in a valid solution $P$ for the whole tree. Finally, we check if $|P|\geq k$.
 
@@ -545,10 +545,9 @@ The above implementation implies an $O(n \log n)$ weighted feasibility test.
 
 \lineartimecorrectness*
 \begin{proof}
-We first analyze the time complexity. To show that the total running time is $O(n)$, we only have to argue that a single step
-takes $O(\ell)$ time. This holds because in step \ref{linear time step 3} it is enough to consider $x$ being the already taken
-node nearest to $r$, and any $d(u,v)$ can be computed in $O(1)$ time after storing the distance of every node to the root of the
-whole tree and using lowest common ancestor queries~\cite{Bender2000}.
+We first analyze the time complexity. To show that the total running time is $O(n)$, we only have to argue that each step of the bottom up computation takes $O(\ell)$ time. In order to perform the algorithm efficiently we preprocess the input tree in linear time, and store the distance of every node to the root of the whole tree. We can now use lowest common ancestor queries~\cite{Bender2000}, to compute any pairwise distance in the tree in $O(1)$ time.
+
+We now show that each step takes $O(\ell)$ time. Step \ref{linear time step 1} can be done in $O(\ell)$ time by storing the subsets computed in each iteration in any data structure that allows merging in constant time. Step \ref{linear time step 2} takes $O(\ell)$ time, since there is at most one candidate node in each subtree rooted at a child of $r$. In step \ref{linear time step 3} we find $x$, the node nearest to $r$ taken thus far, by iterating over the certain node of each of the subsets $P_{1},\ldots,P_{\ell}$, and the candidate nodes we have chosen in step \ref{linear time step 2}. The number of the nodes we need to consider is $O(\ell)$. We then iterate over the remaining candidate nodes, find the one farthest from $r$, and check if its distance to $x$ is greater or equal to $\lambda$. This is all done in $O(\ell)$ time. In Step \ref{linear time step 4} we only need to consider  the node $x$ which we found in Step \ref{linear time step 3}, since if the a candidate node w.r.t $r$ was taken in Step \ref{linear time step 3}, $r$ cannot be included in the solution.
 
 To prove correctness, we will argue by induction that the following invariant holds: for every node $r$ of the tree, the algorithm
 produces $P$, a subset of the vertices of the subtree rooted at $r$, s.t. $f(P)\geq\lambda$, $|P|$ is maximal and, if there are multiple
@@ -558,10 +557,10 @@ Consider a node $r$ of the tree and and assume that the invariant holds for all 
 We want to show that the invariant also holds for $r$.
 Assume for contradiction that $P'$ is a subset of the vertices of $T_r$, s.t. $f(P')\geq\lambda$ and $|P'| > |P|$. Let us look at the two possible cases:
 \begin{enumerate}
-\item \textbf{\boldmath$P'$ has more certain nodes w.r.t. \boldmath$r$ than \boldmath$P'$}: All certain nodes w.r.t. $r$ are in subtrees rooted at children of $r$, and so there must be some child $r_{i}$ of $r$ s.t. $P'_{r_i}$ has more certain nodes w.r.t. $r$ than $P_{r_i}$ (where $P'_{r_i}$ is $P'$ restricted to $T_{r_i}$). This can only be if $|P'_{r_i}| > |P_{r_i}|$, or if the closest node to $r_i$ in $P'_{r_i}$ is farther than the closest node in $P_{r_i}$, and so the invariant does not hold for $r_i$.
+\item \textbf{\boldmath$P'$ has more certain nodes w.r.t. \boldmath$r$ than \boldmath$P$}: All certain nodes w.r.t. $r$ are in subtrees rooted at children of $r$, and so there must be some child $r_{i}$ of $r$ s.t. $P'_{r_i}$ has more certain nodes w.r.t. $r$ than $P_{r_i}$ (where $P'_{r_i}$ is $P'$ restricted to $T_{r_i}$). This can only be if $|P'_{r_i}| > |P_{r_i}|$, or if the closest node to $r_i$ in $P'_{r_i}$ is farther than the closest node in $P_{r_i}$, and so the invariant does not hold for $r_i$.
 \item \textbf{\boldmath$P'$ has the same number of certain nodes w.r.t. \boldmath$r$ as \boldmath$P$, but \boldmath$P'$ has a candidate node w.r.t. \boldmath$r$  and \boldmath$P$ does not}: Denote the candidate node of $P'$ by $u$. We have two possible cases. First, if $u=r$, then there is some node $v \in P$ s.t. $d(u,v)<\lambda$. Assume that $v$ is in the subtree rooted at $r_i$. In this case, either $|P'_{r_i}| \geq |P_{r_i}|$ and the closest node to $r_i$ in $P'_{r_i}$ is farther than the closest node in $P_{r_i}$, and the invariant does not hold for $r_i$, or $|P'_{r_i}|<|P_{r_i}|$ and so there must be some $r_j$ s.t. $|P'_{r_j}|>|P_{r_j}|$, and the invariant does not hold for $r_j$. Second, if $u$ is in one of the subtrees rooted at children of $r$, since all certain nodes w.r.t. $r$ are also in these subtrees, there must be one such subtree, $T_{r_m}$ s.t. $|P'_{r_m}| > |P_{r_m}|$, and so the invariant does not hold for it.
 \end{enumerate} 
-Thus we have proven that $P$ is of maximal cardinality. Now, assume for contradiction that $P'$ is a subset of the vertices of the subtree rooted at $r$, s.t. $f(P')\geq\lambda$ and $|P'| = |P|$, but the closest node to $r$ in $P$ (denoted by $u$) is closer to $r$ than the closest node to $r$ in $P'$. Assume that $u \neq r$ and denote by $T_{r_i}$ the subtree that $u$ is in. Thus, either $|P'_{r_i}| = |P_{r_i}|$, but the closest vertex to $r_i$ in $P'_{r_i}$ is farther away from $r_i$ than $u$, which means that the invariant does not hold for $T_{r_i}$, or $|P'_{r_i}| < |P_{r_i}|$, and it makes up for it in some other subtree where the invariant does not hold. If $u=r$, then since $|P'| = |P|$, there must some child $r_{i}$ of $r$ s.t. $|P'_{r_i}| > |P_{r_i}|$, and so the invariant does not hold for $r_i$. We have proven that the invariant holds also for $r$ and, consequently, the algorithm indeed is correct.
+Thus we have proven that $P$ is of maximal cardinality. Now, assume for contradiction that $P'$ is a subset of the vertices of the subtree rooted at $r$, s.t. $f(P')\geq\lambda$ and $|P'| = |P|$, but the closest node to $r$ in $P$ (denoted by $u$) is closer to $r$ than the closest node to $r$ in $P'$. Assume that $u \neq r$ and denote by $T_{r_i}$ the subtree that $u$ is in. Thus, either $|P'_{r_i}| = |P_{r_i}|$, but the closest vertex to $r_i$ in $P'_{r_i}$ is farther away from $r_i$ than $u$, which means that the invariant does not hold for $T_{r_i}$, or $|P'_{r_i}| < |P_{r_i}|$, and so there exists a subtree $T_{r_j}$, s.t. $|P'_{r_i}| > |P_{r_i}|$ and therefore the invariant does not hold for $r_j$. If $u=r$, then since $|P'| = |P|$, there must some child $r_{i}$ of $r$ s.t. $|P'_{r_i}| > |P_{r_i}|$, and so the invariant does not hold for $r_i$. We have proven that the invariant holds also for $r$ and, consequently, the algorithm is indeed correct.
 \end{proof}
 \basicpartitioninglemma*
 
