@@ -1,31 +1,68 @@
-\documentclass[a4paper,UKenglish]{lipics-v2016}
-
-\usepackage{microtype}%if unwanted, comment out or use option "draft"
-
+\documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
-\usepackage[noadjust]{cite}
-\usepackage{floatrow}
-\usepackage{amsthm,thmtools,thm-restate}
+\usepackage[T1]{fontenc}
 
-\usepackage{lipsum}
+\usepackage[dvipsnames,usenames]{color}
+\usepackage[usenames,dvipsnames]{xcolor}
+
+\usepackage{amsthm,amsmath,amssymb,breqn}
+\usepackage{fullpage}
+\usepackage[ruled,noend,linesnumbered]{algorithm2e}     
+\usepackage{enumerate,comment}
+\usepackage{url}
+\usepackage[capitalise]{cleveref}
+\usepackage{todonotes}
+\usepackage{tikz}
+\usepackage[noadjust]{cite}
+\usepackage{xspace}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amsfonts}
+\usepackage{color}
+\usepackage{array}
+\usepackage[colorlinks=true,urlcolor=Blue,citecolor=Green,linkcolor=BrickRed]{hyperref}
+\urlstyle{same}
+
+%\pagestyle{plain}
+
 \newcounter{mycounter}  
 \newenvironment{noindlist}
  {\begin{list}{\arabic{mycounter}.~~}{\usecounter{mycounter} \labelsep=0em \labelwidth=0em \leftmargin=0em \itemindent=0em}}
  {\end{list}}
-
-\theoremstyle{plain}
-\newtheorem{lemmarestatable}[theorem]{Lemma}
-\newtheorem{theoremrestatable}[theorem]{Theorem}
-
-\newcommand{\jump}{\text{jump}}
-\newcommand{\Oh}{{O}}
+ 
+ 
 \newcommand{\head}{\textsf{head}}
 \newcommand{\tail}{\textsf{tail}}
+\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\poly}{\text{poly}}
+\newcommand{\jump}{\text{jump}}
 
-\bibliographystyle{plainurl}% the recommended bibstyle
+\newcommand{\Oh}{{O}}
 
-\title{Dispersion on Trees\protect \thanks{The research was supported in part by Israel Science Foundation grant 794/13.}}
-\titlerunning{Dispersion on Trees}
+% For cleverref compatibility
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{algo}{Algorithm}[section]
+\newtheorem{corollary}{Corollary}
+\newtheorem{lemma}{Lemma}
+\newtheorem{observation}{Observation}
+\newtheorem{fact}[theorem]{Fact}
+\theoremstyle{definition}   
+\newtheorem{definition}{Definition}
+\usepackage{authblk}
+\theoremstyle{remark}
+\newtheorem{example}[theorem]{Example}
+\newtheorem*{claim}{Claim}
+\newtheorem{case}{Case}
+\newtheorem{invariant}{Invariant}
+\newtheorem{step}{Step}[section]
+
+\newtheorem{property}[theorem]{Property}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+\begin{document}
+
+\title{Dispersion on Trees\thanks{The research was supported in part by Israel Science Foundation grant 794/13.}}
 \author[1]{Pawe\l{} Gawrychowski}
 \author[1]{Nadav Krasnopolsky}
 \author[2]{Shay Mozes}
@@ -33,36 +70,8 @@
 \affil[1]{University of Haifa, Israel}
 \affil[2]{IDC Herzliya, Israel}
 
-\authorrunning{P. Gawrychowski, N. Krasnopolsky, S. Mozes, and O. Weimann}
 
-\Copyright{Pawe\l{} Gawrychowski, Nadav Krasnopolsky, Shay Mozes, and Oren Weimann}%mandatory, please use full first names. LIPIcs license is "CC-BY";  http://creativecommons.org/licenses/by/3.0/
-
-%\subjclass{F.2.2 Nonnumerical Algorithms and Problems} 
-%\keywords{parametric search, dispersion, $k$-center, dynamic programming}% mandatory: Please provide 1-5 keywords
-
-%Editor-only macros:: begin (do not touch as author)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\EventEditors{John Q. Open and Joan R. Acces}
-\EventNoEds{2}
-\EventLongTitle{42nd Conference on Very Important Topics (CVIT 2016)}
-\EventShortTitle{CVIT 2016}
-\EventAcronym{CVIT}
-\EventYear{2016}
-\EventDate{December 24--27, 2016}
-\EventLocation{Little Whinging, United Kingdom}
-\EventLogo{}
-\SeriesVolume{42}
-\ArticleNo{23}
-% Editor-only macros::end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% lipics aligns to the left, I don't like this.
-\usepackage{etoolbox}
-\makeatletter
-\setbool{@fleqn}{false}
-\makeatother
-\renewcommand{\paragraph}{\subparagraph}
-
-\begin{document}
-
+\date{}
 \maketitle
 
 \begin{abstract}
@@ -184,10 +193,10 @@ solution $P_{i}$ for the feasibility test on $T_{r_{i}}$ together with the candi
 \end{enumerate}
 Iterating over the input tree bottom-up as described results in a valid solution $P$ for the whole tree. Finally, we check if $|P|\geq k$.
 
-\begin{restatable}{lemmarestatable}{lineartimecorrectness}
+\begin{lemma}
 \label{lineartimecorrectness}
 The above feasibility test works in linear time and finds $P$ such that $f(P)\geq\lambda$ and $|P|$ is maximized.
-\end{restatable}
+\end{lemma}
 
 \begin{proof}
 We first analyze the time complexity. To show that the total running time is $O(n)$, we only have to argue that each step of the bottom up computation takes $O(\ell)$ time. In order to perform the algorithm efficiently we preprocess the input tree in linear time, and store the distance of every node to the root of the whole tree. We can now use lowest common ancestor queries~\cite{Bender2000}, to compute any pairwise distance in the tree in $O(1)$ time.
@@ -223,15 +232,17 @@ Note that we can assume that the input tree is binary: given a non-binary tree, 
 $d$ leaves. The edges of the binary tree are all of length zero, so at most one node in the tree can be taken.
 
 \begin{figure}[ht]
+\begin{center}
 \includegraphics[scale=0.7]{fragment}
+\end{center}
 \caption{A fragment in a good partition consists of the subtree of $u$ without the subtree of $v$.
 $u$ is the root, $v$ is the hole, and the path from $u$ to $v$ is the spine of the fragment. \label{fig:fragment}}
 \end{figure}
 
-\begin{restatable}{lemmarestatable}{basicpartitioninglemma}
+\begin{lemma}
 \label{basic partitioning lemma}
 For any binary tree on $n$ nodes and a parameter $b$, a good partition of the tree can be found in $O(n)$ time.
-\end{restatable}
+\end{lemma}
 
 \begin{proof}
 We prove the lemma by construction. Call a node \textit{large} if the size of its subtree is at least $b$
@@ -272,10 +283,10 @@ is a distance between an unknown pair of vertices in the tree. The first goal of
 
 The first goal of the preprocessing step is therefore to find a small enough interval $[\lambda_1,\lambda_2)$. We call a matrix sorted if the elements of every row and every column are sorted (s.t. all the rows are monotone increasing or all the rows are monotone decreasing, and the same holds for the columns).
 For each fragment $F$, we construct an implicit representation of $O(b)$ sorted matrices of total side length $O(b\log b)$ s.t. for every two nodes $u_1,u_2$ in $F$, $d(u_1,u_2)$ (and also $2d(u_1,u_2)$) is an entry in some matrix. This is done by using the following lemma. 
-\begin{restatable}{lemmarestatable}{centroidmatrix}
+\begin{lemma}
 Given a tree $T$ on $b$ nodes, we can construct in $O(b\log b)$ time an implicit representation of $O(b)$ sorted matrices of total
 side length $O(b\log b)$ such that, for any $u,v\in T$, $d(u,v)$ is an entry in some matrix.
-\end{restatable}
+\end{lemma}
 \begin{proof}
 To construct the matrices we apply the standard centroid decomposition. A node $v\in T$ is a centroid if every connected component of
 $T\setminus\{v\}$ consists of at most $\frac{|T|}{2}$ nodes. The centroid decomposition of $T$ is defined recursively by first choosing a centroid
@@ -284,6 +295,15 @@ Overall, this process takes $O(b\log b)$ time. Since we assume that the input tr
 into three pieces. Now, we run the following bottom-up computation: assuming that we are given the three pieces, and for each of
 them a sorted list of the distances to their centroid, we would like to compute a sorted list of distances of the nodes in all three pieces
 to the centroid used to separate them. The difficulty is that we would like to produce this sorted list in linear time.
+
+
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[scale=1]{centroid}
+\end{center}
+\caption{A single step in the centroid decomposition. Removing $v$ splits $T$ into three pieces, s.t. none of them has more than $\frac{|T|}{2}$ nodes. The white piece is problematic, since the paths from its nodes to $v$ do not pass through the inner centroid $v'$.}
+\end{figure}
+
 
 Consider one of the three already processed pieces obtained by removing the outer centroid. It contains three smaller pieces of its own,
 that have been obtained by removing the inner centroid.
@@ -596,10 +616,10 @@ Since the intervals are disjoint and we do at most two interval increases on sma
 
 Before the operation terminates, we need to join the small trees to form one large tree. This is symmetric to splitting and analyzed with the same
 calculation.
-\begin{restatable}{lemmarestatable}{runningtimetoobtainsmalltreeslemma}
+\begin{lemma}
 \label{running time to obtain small trees lemma}
 The time to obtain the small trees is $O(x \log (\frac{2y}{x}))$.
-\end{restatable}
+\end{lemma}
 
 The cost of all joins required to patch the small trees together can be bounded by the same calculation as the cost of the splits made to obtain them, and so the operation takes $O(x \log (\frac{2y}{x}))$ time in total.
 The rest of the batched operations are also done by splitting the tree into small trees. 
@@ -607,10 +627,11 @@ There is an additional technical difficulty in Operation~\ref{op6}, as in our ca
 In Operation~\ref{op7}, some of the small trees might become much larger due to the insertions. This also requires some extra work.
 The full description of Operation 6-8 is in Appendix \ref{appendix batched operations}.
 
-\begin{restatable}{theoremrestatable}{nlognweighted}
+\begin{theorem}
 \label{nlogn weighted f.t. theorem}
 The above implementation implies an $O(n \log n)$ weighted feasibility test.
-\end{restatable}
+\end{theorem}
+
 
 \bibliography{dispersion}
 
@@ -619,24 +640,10 @@ The above implementation implies an $O(n \log n)$ weighted feasibility test.
 
 \section{Missing proofs}\label{appendix missing proofs}
 
-\lineartimecorrectness*
-
-\basicpartitioninglemma*
 
 
 
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[scale=1]{centroid}
-\end{center}
-\caption{A single step in the centroid decomposition. Removing $v$ splits $T$ into three pieces, s.t. none of them has more than $\frac{|T|}{2}$ nodes. The white piece is problematic, since the paths from its nodes to $v$ do not pass through the inner centroid $v'$.}
-\end{figure}
-
-\centroidmatrix*
-
-
-
-\runningtimetoobtainsmalltreeslemma*
+%runningtimetoobtainsmalltreeslemma*
 
 \begin{proof}
 We start with a tree that has $y$ leaves, select the middle leaf by traversing from the root and using the number of leaves stored in every node of the tree, and the split the tree into two in $O(\log y)$ time. Then split the resulting two trees in $O(\log(\frac{y}{2}))$ time each, and so on. The cost of this process sums up to:
@@ -649,7 +656,7 @@ We start with a tree that has $y$ leaves, select the middle leaf by traversing f
 \end{align*}
 \end{proof}
 
-\nlognweighted*
+%nlognweighted*
 
 \begin{proof}The running time of the algorithm is the sum of the time required for constructing the polylines of the subtrees rooted at each node of the tree.
 %
@@ -1172,6 +1179,9 @@ The weight of $P$ only decreases at certain points called breakpoints (in bold).
 \caption{Case II of constructing the first half of the polyline. The first half of $p_2$ is in blue. The vertical black dashed lines are the breakpoints of $p_1$. We increase the values of $p_{2}$ and obtain the red polyline, which is not monotone. To make it monotone, we delete all the breakpoints below the green intervals, which are found with value predecessor queries (the results of these queries are the bold points).\label{figure of the second case in the construction of the first half of the polyline}
 }
 \end{figure}
+
+\bibliographystyle{abbrv}
+\bibliography{dispersion}
 
 \end{document}
 
