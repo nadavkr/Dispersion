@@ -124,7 +124,7 @@ fragments, i.e., knowing $\lambda$, we wish to extend in $O(\log b)$ time a solu
 % 
 The first step of the preprocessing computes values $\lambda_1$ and  $\lambda_2$ such that (1) there is no solution to the search problem on $T$ for any $\lambda \geq \lambda_2$, (2) there is a solution to the search problem on $T$ for any $\lambda \le \lambda_1$, and (3) for {\em most} of the fragments, the distance between any two nodes is either smaller or equal to $\lambda_1$ or larger or equal to $\lambda_2$. This is achieved by applying Frederickson's parametric search on sorted matrices capturing the pairwise distances between nodes in the same fragment. The (few) fragments that do not satisfy property (3) are handled naively in $O(b)$ time during query time. 
 The fragments that do satisfy property (3) are further preprocessed. We look at the path from the hole to the root of the
-fragment and run the linear-time feasibility test for all subtrees hanging off from it. Because of property (3), this can be done in advance without knowing the actual exact value of $\lambda \in [\lambda_1,\lambda_2)$, which will only be determined at query time. 
+fragment and run the linear-time feasibility test for all subtrees hanging off from it. Because of property (3), this can be done in advance without knowing the actual exact value of $\lambda \in (\lambda_1,\lambda_2)$, which will only be determined at query time. 
 Let $P$ be a solution produced by the feasibility test to a subtree rooted at a node $u$. It turns out that the interaction between $P$ and the solution to the entire tree depends only on two nodes of $P$, which we call we call the {\em certain} node and the {\em candidate} node. We can therefore conceptually replace each hanging subtree by two leafs, and think of the fragment as a caterpillar connecting the root and the hole. 
 %%The spine of the caterpillar is the hole-to-root path and each spine node has two leaf children: a \emph{certain} node (that is guaranteed to be included %in an optimal solution for any $\lambda$, and a \emph{candidate} node (whose inclusion in an optimal solution depends on $\lambda$). 
 %With some additional pruning, we can make sure that the distances of its leaves from both the hole and the root are monotonically increasing. This structure enables us to precompute for each candidate node, assuming this node is the bottom-most candidate
@@ -220,7 +220,7 @@ For any binary tree on $n$ nodes and a parameter $b$, a good partition of the tr
 
 %We first give an intuitive, but more detailed, explanation of our approach. 
 Recall that the goal in the optimization problem is to find the largest feasible $\lambda^{*}$. Such $\lambda^{*}$
-is a distance between an unknown pair of vertices in the tree. The first goal of the preprocessing step is to eliminate many possible pairwise distances, so that we can identify a small interval $[\lambda_1,\lambda_2)$ that contains $\lambda^*$. We want this interval to be sufficiently small so that for (almost) every fragment $F$, handling $F$ during the bottom up feasibility test for any value $\lambda$ in $[\lambda_1,\lambda_2)$ is the same. Observe that the feasibility test in Section~\ref{linear F.T.} for value $\lambda$ only compares distances to $\lambda$ and to $\lambda/2$. We therefore call a fragment $F$ \emph{inactive} if for any two nodes $u_1,u_2\in F$ the following two conditions hold: (1) $d(u_{1},u_{2})\leq \lambda_{1}$ or $d(u_{1},u_{2})\geq\lambda_{2}$, and (2) $d(u_{1},u_{2})\leq \frac{\lambda_{1}}{2}$ or $d(u_{1},u_{2})\geq \frac{\lambda_{2}}{2}$. For an inactive fragment $F$, all the comparisons performed by the feasibility test for any $\lambda \in [\lambda_1,\lambda_2)$ only depend on the interval $[\lambda_1,\lambda_2)$, but not on the particular value of $\lambda$. Therefore, once we find an interval $[\lambda_1,\lambda_2)$ for which (almost) all fragments are inactive, we can precompute, for each inactive fragment $F$, information that will enable us to process $F$ in $O(\log b)$ time during any subsequent feasibility test with $\lambda \in [\lambda_1,\lambda_2)$.
+is a distance between an unknown pair of vertices in the tree. The first goal of the preprocessing step is to eliminate many possible pairwise distances, so that we can identify a small interval $[\lambda_1,\lambda_2)$ that contains $\lambda^*$. We want this interval to be sufficiently small so that for (almost) every fragment $F$, handling $F$ during the bottom up feasibility test for any value $\lambda$ in $[\lambda_1,\lambda_2)$ is the same. Observe that the feasibility test in Section~\ref{linear F.T.} for value $\lambda$ only compares distances to $\lambda$ and to $\lambda/2$. We therefore call a fragment $F$ \emph{inactive} if for any two nodes $u_1,u_2\in F$ the following two conditions hold: (1) $d(u_{1},u_{2})\leq \lambda_{1}$ or $d(u_{1},u_{2})\geq\lambda_{2}$, and (2) $d(u_{1},u_{2})\leq \frac{\lambda_{1}}{2}$ or $d(u_{1},u_{2})\geq \frac{\lambda_{2}}{2}$. For an inactive fragment $F$, all the comparisons performed by the feasibility test for any $\lambda \in [\lambda_1,\lambda_2)$ only depend on the interval $[\lambda_1,\lambda_2)$, but not on the particular value of $\lambda$. Therefore, once we find an interval $[\lambda_1,\lambda_2)$ for which (almost) all fragments are inactive, we can precompute, for each inactive fragment $F$, information that will enable us to process $F$ in $O(\log b)$ time during any subsequent feasibility test with $\lambda \in (\lambda_1,\lambda_2)$.
 
 
 The first goal of the preprocessing step is therefore to find a small enough interval $[\lambda_1,\lambda_2)$.
@@ -246,7 +246,6 @@ Setting $m=b \log b \cdot \frac{n}{b} = n \log b$ and $p=n/b^2$, the theorem imp
 
 The second goal of the preprocessing step is to
 compute information for each inactive fragment that will allow us to later ``jump'' over it in $O(\log b)$ time when running the feasibility test.  We next describe this computation.  We choose $\lambda$ arbitrarily in
-$[\lambda_1,\lambda_2)$. This is done just so that we have a concrete value of $\lambda$ to work with.
 \begin{noindlist}
 \item\textbf{Reduce the fragment to a caterpillar:}
 a fragment consists of the spine and the subtrees hanging off the spine. %Because we can compare any pairwise distance in the fragment to $\lambda$ and $\lambda/2$, we can run 
@@ -259,7 +258,6 @@ for each candidate node we find its nearest certain node. Then, we compare their
 candidate node if it cannot be taken. To find the nearest certain node, we first scan all nodes bottom-up (according to the natural order
 on the spine nodes they are attached to) and compute for each of them the nearest certain node below it. Then, we repeat the scan
 in the other direction to compute the nearest certain node above. This gives us, for every candidate node, the nearest certain node above
-and below. We delete all candidate nodes for which one of these distances is smaller or equal to $\lambda$.
 We store the certain node nearest to the root, the certain node nearest to the hole and the total number of certain nodes,
 and from now on ignore certain nodes and consider only the remaining candidate nodes.
 \item\label{making distances from the root monotone}
@@ -307,7 +305,6 @@ and increase the number of chosen nodes by one. Then, if the certain node is set
 \subsection{The feasibility test}
 \label{sec:feasibility test}
 
-The sublinear feasibility test for a value $\lambda \in [\lambda_1,\lambda_2)$ processes the tree bottom-up. For every fragment with root $r$, we would like to simulate running the
 linear-time feasibility test on the subtree rooted at $r$ to compute: the number of chosen nodes, the candidate node, and the certain
 node. We assume that we already have such information for the fragment rooted at the hole of the current fragment.
 If the current fragment is active, we process it naively in $O(b)$ time
@@ -317,7 +314,6 @@ This can be seen as, roughly speaking, attaching the hole as another spine node 
 
 We start by considering the case where there is no candidate node w.r.t. the hole. Let $v$ be the certain node w.r.t. the hole.
 Because distances of the leaves from the hole are non-increasing,  we can compute the prefix of the caterpillar consisting of
-leaves that can be chosen by binary searching for the largest $i$ such that $d(v,u_{i})\geq \lambda$. Then, we retrieve and return the result
 stored for $u_{1},u_{2},\ldots,u_{i}$ (after increasing the number of chosen nodes and, if the certain node is set to NULL, updating it to $v$).
 
 Now consider the case where there is a candidate node $u$ w.r.t. the hole. We start with binary searching for $i$ as explained above. Then,
