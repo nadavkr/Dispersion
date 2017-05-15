@@ -587,7 +587,7 @@ the parameter $p$ to $\frac{n}{B^{10}}$. Thus, considering all the levels, there
 might be up to $\log B\cdot\frac{n}{B^{10}}\leq \frac{n}{B^{9}}$ large fragments in which we cannot fully reduce
 all the hanging subtrees. We declare them the active large fragments and do not preprocess further.
 Considering the total preprocessing time when summed over all the iterations, it is $O(n)$
-plus the total size of the active fragments in all iterations, which is $O(\sum_{\ell} n/b_{\ell}^{9}\cdot b_{\ell}^{5})=O(\sum_{\ell} n/b_{\ell})=O(n)$.
+plus the total size of the active fragments in all iterations, which is $O(\sum_{\ell} \frac{n}{b_{\ell}^{9}}\cdot b_{\ell}^{5})=O(\sum_{\ell} n/b_{\ell})=O(n)$.
 %We preprocess such fragments naively in time linear in their size. 
 %This requires only $O(\frac{n}{B^{4}})$ per iteration (and so $O(n)$ overall) since the total size of all active large fragments is at most
 %$\frac{n}{B^9} \cdot O(B^5)$. 
@@ -621,7 +621,7 @@ Note that even though we have reduced the small active fragments to caterpillars
 However, there are only $O(n/b^{9})$ such fragments, each of size $O(b^{5})$, so we can split each
 of these caterpillars into caterpillars containing exactly one spine node, that are trivial to preprocess.
 The total number of small caterpillars is then still $O(n/b^{4}+n/b^{9}\cdot b^{5})=O(n/b^{4})$,
-so does not increase asymptotically.
+so it does not increase asymptotically.
 
 %We now have $O(\frac{n}{B^9})$ small active fragments in total. We declare each large fragment that contains a small active fragment as active. 
 
