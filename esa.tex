@@ -224,7 +224,7 @@ is a distance between an unknown pair of vertices in the tree. The first goal of
 
 
 The first goal of the preprocessing step is therefore to find a small enough interval $[\lambda_1,\lambda_2)$.
-For each fragment $F$, we construct an implicit representation of $O(b)$ sorted matrices of total side length $O(b\log b)$
+For each fragment $F$, we construct an implicit representation of $O(b)$ sorted matrices of total side length $O(b\log b)$, s.t. for every two nodes $u_1,u_2$ in $F$, $d(u_1,u_2)$ (and also $2d(u_1,u_2)$) is an entry in some matrix. This is done using the standard centroid 
 decomposition, in $O(\frac n b \cdot b\log b)=O(n\log b)$ total time using the following lemma. 
 \begin{restatable}{lemmarestatable}{centroidmatrix}
 Given a tree $T$ on $b$ nodes, we can construct in $O(b\log b)$ time an implicit representation of $O(b)$ sorted matrices of total
@@ -246,6 +246,7 @@ Setting $m=b \log b \cdot \frac{n}{b} = n \log b$ and $p=n/b^2$, the theorem imp
 
 The second goal of the preprocessing step is to
 compute information for each inactive fragment that will allow us to later ``jump'' over it in $O(\log b)$ time when running the feasibility test.  We next describe this computation.  We choose $\lambda$ arbitrarily in
+$(\lambda_1,\lambda_2)$. This is done just so that we have a concrete value of $\lambda$ to work with.
 \begin{noindlist}
 \item\textbf{Reduce the fragment to a caterpillar:}
 a fragment consists of the spine and the subtrees hanging off the spine. %Because we can compare any pairwise distance in the fragment to $\lambda$ and $\lambda/2$, we can run 
@@ -258,6 +259,7 @@ for each candidate node we find its nearest certain node. Then, we compare their
 candidate node if it cannot be taken. To find the nearest certain node, we first scan all nodes bottom-up (according to the natural order
 on the spine nodes they are attached to) and compute for each of them the nearest certain node below it. Then, we repeat the scan
 in the other direction to compute the nearest certain node above. This gives us, for every candidate node, the nearest certain node above
+and below. We delete all candidate nodes for which one of these distances is smaller than $\lambda$.
 We store the certain node nearest to the root, the certain node nearest to the hole and the total number of certain nodes,
 and from now on ignore certain nodes and consider only the remaining candidate nodes.
 \item\label{making distances from the root monotone}
@@ -305,6 +307,7 @@ and increase the number of chosen nodes by one. Then, if the certain node is set
 \subsection{The feasibility test}
 \label{sec:feasibility test}
 
+The sublinear feasibility test for a value $\lambda \in (\lambda_1,\lambda_2)$ processes the tree bottom-up. For every fragment with root $r$, we would like to simulate running the
 linear-time feasibility test on the subtree rooted at $r$ to compute: the number of chosen nodes, the candidate node, and the certain
 node. We assume that we already have such information for the fragment rooted at the hole of the current fragment.
 If the current fragment is active, we process it naively in $O(b)$ time
@@ -314,6 +317,7 @@ This can be seen as, roughly speaking, attaching the hole as another spine node 
 
 We start by considering the case where there is no candidate node w.r.t. the hole. Let $v$ be the certain node w.r.t. the hole.
 Because distances of the leaves from the hole are non-increasing,  we can compute the prefix of the caterpillar consisting of
+leaves that can be chosen, by binary searching for the largest $i$ such that $d(v,u_{i})\geq \lambda$. Then, we retrieve and return the result
 stored for $u_{1},u_{2},\ldots,u_{i}$ (after increasing the number of chosen nodes and, if the certain node is set to NULL, updating it to $v$).
 
 Now consider the case where there is a candidate node $u$ w.r.t. the hole. We start with binary searching for $i$ as explained above. Then,
@@ -712,7 +716,7 @@ reuse some of the precomputation done in the previous iteration.
 \begin{center}
 \includegraphics[scale=1]{refinement}
 \end{center}
-\caption{A large fragment containing a number of smaller fragments. The small fragments on the spine are gray, and hanging subtrees attache to the subtrees hanging off of the spine are black (each of them may contain many small fragments). %We start by reducing the hanging subtrees to just two nodes, then handle the small active fragments on the spine, and finally reduce the entire large fragment to one caterpillar and process it. 
+\caption{A large fragment containing a number of smaller fragments. The small fragments on the spine are gray, and the subtrees hanging off of the spine are black (each of them may contain many small fragments). %We start by reducing the hanging subtrees to just two nodes, then handle the small active fragments on the spine, and finally reduce the entire large fragment to one caterpillar and process it. 
 \label{figure of small fragments inside a large fragment}}
 \end{figure}
 

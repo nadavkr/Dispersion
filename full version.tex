@@ -519,7 +519,7 @@ Now we cannot afford to divide the tree into fragments separately in every itera
 Therefore, we will first modify the construction so that the partition (into small fragments) in the previous iteration is a refinement of the partition
 (into large fragments) in the current iteration.
 
-Consider a large fragment, that is composed of multiple small fragments. Notice that some of these small fragments are active fragments, i.e., have not been reduced to caterpillars in the previous iteration, but most are inactive fragments, which have
+Consider a large fragment that is composed of multiple small fragments. Notice that some of these small fragments are active fragments, i.e., have not been reduced to caterpillars in the previous iteration, but most are inactive fragments, which have
 been reduced to caterpillars. The large fragment contains some small fragments whose roots and holes are spine nodes of the large fragment,
 and other fragments that form subtrees hanging off of the large fragment's spine (each hanging subtree may
 contain several small fragments), see Figure \ref{figure of small fragments inside a large fragment}. This will allow us to
@@ -529,7 +529,7 @@ reuse some of the precomputation done in the previous iteration.
 \begin{center}
 \includegraphics[scale=1]{refinement}
 \end{center}
-\caption{A large fragment containing a number of smaller fragments. The small fragments on the spine are gray, and hanging subtrees attache to the subtrees hanging off of the spine are black (each of them may contain many small fragments). %We start by reducing the hanging subtrees to just two nodes, then handle the small active fragments on the spine, and finally reduce the entire large fragment to one caterpillar and process it. 
+\caption{A large fragment containing a number of smaller fragments. The small fragments on the spine are gray, and the subtrees hanging off of the spine are black (each of them may contain many small fragments). %We start by reducing the hanging subtrees to just two nodes, then handle the small active fragments on the spine, and finally reduce the entire large fragment to one caterpillar and process it. 
 \label{figure of small fragments inside a large fragment}}
 \end{figure}
 
@@ -543,7 +543,7 @@ We would like to partition the tree into fragments of growing sizes, and only sp
 Given a good partition of a binary tree into at most $n/b^{4}$ fragments each of size at most $\alpha^{\ell}\cdot b^{4}$, 
 we can find in $O(n/b^{4})$ time
 a good partition of the tree into at most $n/(2^b)^{4}$ fragments each of size at most $\alpha^{\ell+1}\cdot (2^{b})^{4}$
-with the additional property that every fragment in the first partition is contained inside a fragment in the second partition.
+s.t. every fragment in the first partition is contained inside a fragment in the second partition.
 \end{lemma}
 \begin{proof}
 Define $T'$ as the tree obtained by collapsing each fragment of the given partition into a single node. Partition $T'$ with the parameter set to $B= {(2^{b})^{4}}/{b^{4}}$. We obtain at most $\frac{n/b^4}{B}=n/(2^{b})^{4}$ fragments. Each of the new large fragments corresponds to a fragment of the original tree of size at most $\alpha\cdot \alpha^{\ell}\cdot b^{4}\cdot B = \alpha^{\ell+1}\cdot (2^{b})^{4}$. Clearly, it holds that each fragment of the given partition is contained in a single large fragment.
@@ -559,7 +559,7 @@ Setting $b=b_{\ell}$ and $B=b_{\ell+1}$  we conclude that every large fragment o
 of small fragments of the $\ell$-th partition (each of size $O(b^5)$). 
 The goal of the $(\ell+1)$-th iteration will be now to preprocess all $O(n/B^{4})$ large fragments, so that we obtain an $O(\frac{n}{B^{4}}\log B)$
 time test. To this end, we will preprocess all inactive fragments, so that they can be skipped in $O(\log B)$ time. For the remaining active
-large fragments, we guarantee that there are only $O(n/B^{9})$ of them, so processing each in $O(B^{5})$ time in query time leads
+large fragments, we guarantee that there are only $O(n/B^{9})$ of them, so processing each in $O(B^{5})$ time leads
 to the claimed query time. To make sure that the total preprocessing time is linear, we will reuse the preprocessing already done
 for the $O(n/b^{4})$ small fragments (by induction, only $O(n/b^{9})$ of them are active, while the others are preprocessed).
 
