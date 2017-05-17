@@ -497,21 +497,23 @@ We use Theorem~\ref{Frederickson's theorem} with the parameter $p$ set to $\frac
 test $O(\max \lbrace \log(\max_{j} \lbrace n_j \rbrace), \log(\frac{m}{p+1}) \rbrace) = O(\max \lbrace \log (B^{3}), \log(\frac{n}{n/B^{7}} \rbrace) = O(\log B)$ times, and additionally spend linear time exclusive of the feasibility tests. This allows us to eliminate all pairwise distances in the caterpillars of the heavy paths at the current level for most of the fragments. We proceed to compute the candidate and certain node of each path as we did before, and continue with the next level
 of the heavy path decompositions, until we are left with only the top heavy path of each fragment.
 Since $p>0$, during this preprocessing some fragments become active. Once a fragment becomes active we stop
-its preprocessing. Accounting for all the levels, we use $O(\log^{2}B)$ calls to the previous tests,
+its preprocessing. 
+
+After the preprocessing is done, we have at most $\log B \cdot \frac{n}{B^7}\leq \frac{n}{B^{6}}$ active fragments (because we have not eliminated at most $\frac{n}{B^7}$ pairwise distances for each level), which we will process in $O(B^{3})$
+time each in the new test. For all other fragments we have obtained a pruned caterpillar, so that we can, in linear time, precompute the required information for any candidate and certain node with respect to the hole
+as described in Subsection \ref{Pre-Processing Fragments}. Notice that this requires the spine of the obtained caterpillar (i.e. the heavy path of depth zero in the decomposition) to also be the spine of the fragment. This can be ensured by simply tweaking the heavy path decomposition so that the first heavy path is always the root-to-hole path in every fragment. This change does not affect the maximal depth of a heavy path, and allows us to preprocess the pruned caterpillars, so that inactive fragments can be processed in logarithmic time in the new test. Thus we have obtained an $O(\frac{n}{B^3} \cdot \log B)$ time test.
+
+We repeat this step iteratively until we have an $O(\frac{n}{\log ^3n} \cdot \log \log n)$ time test, and then use it to
+solve the dispersion optimization problem in linear time as explained in Section~\ref{sec:nloglogn}, that is
+by performing a heavy path decomposition on the whole tree and applying Theorem~\ref{Frederickson's theorem} with $p=0$.
+
+In each step, accounting for all the levels, we use $O(\log^{2}B)$ calls to the previous test,
 which costs $O(\log ^2B \cdot \frac{n}{b^3} \cdot \log b)=O(\frac{n}{b} \cdot \log b)$.
 Additionally, we need linear time to construct a good partition, find all the heavy path decompositions,
 and apply Theorem~\ref{Frederickson's theorem} on the obtained matrices. Thus, overall
 a single iteration takes $O(n)$ time, so summing up over all iterations $O(n\log^{*}n)$.
 Actually, the total time spent on calls to the previous tests sums up to only $O(n)$ over all iterations, which will
-be important for the improved algorithm presented later.
-
-After the preprocessing is done, we have at most $\log B \cdot \frac{n}{B^7}\leq \frac{n}{B^{6}}$ active fragments (because we have not eliminated at most $\frac{n}{B^7}$ pairwise distances for each level), which we will process in $O(B^{3})$
-time each in the new test. For all other fragments we have obtained a pruned caterpillar, so that we can, in linear time, precompute the required information for any candidate and certain node with respect to the hole
-as described in Subsection \ref{Pre-Processing Fragments}. We will process these inactive fragments in logarithmic time in the new test. Thus we have obtained an $O(\frac{n}{B^3} \cdot \log B)$ time test.
-
-We do this iteratively until we have an $O(\frac{n}{\log ^3n} \cdot \log \log n)$ time test, and then use it to
-solve the dispersion optimization problem in linear time as explained in Section~\ref{sec:nloglogn}, that is
-by performing a heavy path decomposition on the whole tree and applying Theorem~\ref{Frederickson's theorem} with $p=0$.
+be important for the improved algorithm presented in the following subsections.
 
 \subsection{Overview of the linear time algorithm}
 In the rest of the section we describe how to improve the running time to $O(n)$, giving an optimal solution for the dispersion optimization problem.
