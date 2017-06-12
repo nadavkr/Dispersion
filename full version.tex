@@ -722,7 +722,7 @@ We have the following property.
 
 \begin{lemma}
 \label{stable infix}
-If a node of a small caterpillar is removed due to pruning or collision elimination (due to Lemma~\ref{lemma3}) then it
+If a node of a small caterpillar is removed due to pruning or collision elimination (i.e. due to Lemma~\ref{lemma3}) then it
 belongs to the unstable prefix or to the unstable suffix.
 \end{lemma}
 
@@ -739,7 +739,7 @@ $\frac{\lambda^{*}}{2}$, so the distance of $u_{i}$ to the hole of its small cat
 less than $\frac{\lambda^{*}}{2}$. Again, this means that $u_{i}$ belongs to the unstable suffix.
 \end{proof}
 
-We define the \emph{interesting prefix} of a caterpillar as all the candidate nodes s.t. there is no candidate above them in the caterpillar that is at distance at least $\lambda^*$ from them.
+We define the \emph{interesting prefix} of a caterpillar as all the candidate nodes whose distance from every candidate node above them is less than $\lambda^*$.
 The \emph{interesting suffix} of a caterpillar is the suffix where the top-most node is the first node above the hole which is at distance greater or equal to $\lambda^*$ from the bottom-most candidate of the caterpillar. If such a node does not exist, the interesting suffix is the entire caterpillar.
 If the interesting suffix is the entire caterpillar, then by definition, the interesting prefix is also the entire caterpillar. We call such a caterpillar \emph{fresh}. Note that these definitions immediately imply that the unstable prefix (suffix) of any caterpillar is contained in its interesting prefix (suffix).
 
