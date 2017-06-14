@@ -47,15 +47,16 @@
 \newtheorem{lemma}{Lemma}
 \newtheorem{observation}{Observation}
 \newtheorem{fact}[theorem]{Fact}
-\theoremstyle{definition}   
-\newtheorem{definition}{Definition}
-\usepackage{authblk}
-\theoremstyle{remark}
 \newtheorem{example}[theorem]{Example}
 \newtheorem*{claim}{Claim}
 \newtheorem{case}{Case}
 \newtheorem{invariant}{Invariant}
 \newtheorem{step}{Step}[section]
+\theoremstyle{definition}   
+\newtheorem{definition}{Definition}
+\usepackage{authblk}
+\theoremstyle{remark}
+
 
 \newtheorem{property}[theorem]{Property}
 \newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
@@ -707,10 +708,12 @@ by the choice of $p$.
 Having reduced a large fragment to a large caterpillar, we are now left only with preprocessing this large caterpillar for every possible eliminated suffix.
 Because we have already pruned the large caterpillar and removed any collisions between a certain
 node and a candidate node, we only have to consider the remaining candidate nodes.
-We need to store the caterpillars in a data structure that will allow us to both merge caterpillars efficiently, and search for the bottom-most candidate in a caterpillar which is at distance greater or equal to $d$ from the hole, for any given $d$ s.t. $d \le \lambda^*$. We therefore store the candidates of each caterpillar in a balanced search tree ordered by the distance to the hole of the caterpillar. Note that when we merge two such trees, each tree is ordered by the distance to another node (the two small caterpillars have different holes), but the order of each search tree is the same is the order by the distance to the hole of the large caterpillar. Since we merge the balanced search trees of small caterpillars into one large tree for each large caterpillar, each merge operation costs at most $O(\log B)$, and we have $O(n/b^9)$ such operations (one per small caterpillar), this sums up to $O(\frac{n}{b})$ and $O(n)$ overall.
-Maintaining predecessor and successor pointers in the search trees enables the linked list interface that was used in previous steps, and since in the previous step we only prune prefixes and suffixes of small caterpillars, we can use split operations for that.
+We need to store the caterpillars in a data structure that will allow us to merge caterpillars efficiently, as well as search for the bottom-most candidate in a caterpillar that is at distance at least $d$ from the hole, for any given $d \le \lambda^*$. 
 
-The main goal of this step is to update the information stored in each node (i.e. the certain node, candidate node, and number of chosen nodes) for any node that might be queried in the future, so that the information matches the solution for the large caterpillar. When doing this, we need to take into account that the information that is currently stored in nodes might be false, even with regard to the appropriate small caterpillar, since we have eliminated some nodes in the previous step.
+We therefore store the candidates of each caterpillar in a balanced search tree keyed by the candidate's distance to the hole of the caterpillar. Note that, even though each search tree is keyed by distances to a different hole, we can merge two trees in logarithmic time since they correspond to two small caterpillars where one is above the other (and hence all its keys can be thought of as larger than all the keys of the bottom one). Since we merge search trees of small caterpillars into one  search tree of a large caterpillar, each merge operation costs at most $O(\log B)$, and we have $O(n/b^9)$ such operations (one per small caterpillar), this sums up to $O(\frac{n}{b})$ and $O(n)$ overall.
+Maintaining predecessor and successor pointers in the search trees enables the linked list interface that was used in the previous steps, and since in the previous steps we only prune prefixes and suffixes of small caterpillars, we can use split operations for that.
+
+The main goal of the current step is to update the information stored in each node (i.e. the certain node, candidate node, and number of chosen nodes) for any node that might be queried in the future, so that the information holds the solution for the large caterpillar. When doing this, we need to take into account that the information that is currently stored in nodes might be false, even with regard to the appropriate small caterpillar, since we have eliminated some nodes in the previous step.
 We next define a few terms and show a lemma that will be used in the rest of this section.
 
 \vspace{0.04in} \noindent {\bf The unstable and interesting affixes of a caterpillar.} 
@@ -739,16 +742,15 @@ $\frac{\lambda^{*}}{2}$, so the distance of $u_{i}$ to the hole of its small cat
 less than $\frac{\lambda^{*}}{2}$. Again, this means that $u_{i}$ belongs to the unstable suffix.
 \end{proof}
 
-We define the \emph{interesting prefix} of a caterpillar as all the candidate nodes whose distance from every candidate node above them is less than $\lambda^*$.
-The \emph{interesting suffix} of a caterpillar is the suffix where the top-most node is the first node above the hole which is at distance greater or equal to $\lambda^*$ from the bottom-most candidate of the caterpillar. If such a node does not exist, the interesting suffix is the entire caterpillar.
-If the interesting suffix is the entire caterpillar, then by definition, the interesting prefix is also the entire caterpillar. We call such a caterpillar \emph{fresh}. Note that these definitions immediately imply that the unstable prefix (suffix) of any caterpillar is contained in its interesting prefix (suffix).
+We define the \emph{interesting prefix} of a caterpillar to be all the candidate nodes whose distance from the top-most candidate node is less than $\lambda^*$.
+Similarly, the \emph{interesting suffix} contains all the candidate nodes whose distance from the bottom-most candidate node is less than $\lambda^*$. The interesting suffix contains one more additional node -- the lowest candidate node whose distance from the bottom-most candidate node is greater or equal to $\lambda^*$. If such a node does not exist, then the interesting suffix as well as the interesting prefix are the entire caterpillar. We call such a caterpillar \emph{fresh}. Note that the unstable prefix (suffix) of any caterpillar is contained in its interesting prefix (suffix).
 
-
-We now describe the preprocessing done on a given large caterpillar. We start by checking if the large caterpillar is fresh, i.e. if the distance between the bottom-most candidate and the top-most candidate is smaller than $\lambda^*$. This can be
+\paragraph{The preprocessing procedure.}
+We now describe the preprocessing procedure on a given large caterpillar. We start by checking if the large caterpillar is fresh, i.e. if the distance between the bottom-most candidate and the top-most candidate is smaller than $\lambda^*$. This can be
 done by applying Frederickson's search in parallel for all large caterpillars with $p$ set to
 be $\frac{n}{B^{9}}$, using $O(\frac{n}{b^{4}}\cdot \log b \cdot \log B)=O(\frac{n}{b})$
 total time for the feasibility tests and creating up to $O(\frac{n}{B^{9}})$ additional active large
-fragments. If a large caterpillar is fresh, there is nothing to update. 
+fragments. If we discover that a large caterpillar is fresh, there is nothing to update. 
 Otherwise, we gather all candidate nodes in the large caterpillar belonging to
 an interesting prefix or suffix (of some small caterpillar) and call them \emph{relevant}. In particular,
 all nodes of a fresh small caterpillar are relevant.
@@ -758,11 +760,11 @@ time for the feasibility tests, and create $O(\frac{n}{B^{9}})$ additional activ
 The time exclusive of the feasibility tests is bounded by the number of relevant nodes.
 
 
-In order to preprocess the large caterpillar and compute the required information, we iterate over the small caterpillars from top to bottom, and process each small caterpillar. We will show that the following invariant holds:
-\begin{invariant} \label{invariat small caterpillar is correct after prep.} After we preprocess a small caterpillar, each node in its interesting suffix stores the correct information for the solution where this node is the bottom-most chosen candidate in the large caterpillar. 
+We next iterate over the small caterpillars from top to bottom, and process each of them while maintaining the following invariant:
+\begin{invariant} \label{invariant small caterpillar is correct after prep.} After we process a small caterpillar, each node in its interesting suffix stores the correct information for the case where this node is the bottom-most chosen candidate in the large caterpillar. 
 \end{invariant}
 
-Let us describe the preprocessing of a small caterpillar:
+We now describe how to process each small caterpillar assuming the invariant holds for all small caterpillars above it. We then show that the invariant also holds for the just processed small caterpillar. 
 
 \begin{noindlist}
 \item \textbf{preprocessing the interesting prefix:}
@@ -770,7 +772,7 @@ Before preprocessing, each node of the interesting prefix of the small caterpill
 The node we seek is in the interesting suffix of the small caterpillar above the current one. If the above caterpillar is fresh, we also need to look at the interesting suffix of the small caterpillar above it (which might also be fresh, and so on). 
 We iterate over the interesting prefix top to bottom, while iterating over the set of fresh caterpillars and interesting suffix where we need to search. For each node in the interesting prefix we find the closest node at distance at least $\lambda^*$ above it (if it exists), and update the the information stored with the current node of the interesting prefix, using the information stored in the node we found (i.e. add the number of chosen nodes, and copy the certain node and candidate node stored in it). Note that we only look at relevant nodes here, and for each pair of relevant nodes we already know whether the distance between them is smaller than $\lambda^*$ or not.
 
-Since Invariant \ref{invariat small caterpillar is correct after prep.} holds for every small caterpillar above the current one, we now have the correct information stored for every node of the interesting prefix.
+Since Invariant \ref{invariant small caterpillar is correct after prep.} holds for every small caterpillar above the current one, we now have the correct information stored for every node of the interesting prefix.
 
 
 
@@ -785,7 +787,7 @@ If the information stored in node $x$ was not updated, then $x$ is not in the in
 \end{noindlist}
 
 \begin{lemma}
-Invariant \ref{invariat small caterpillar is correct after prep.} holds.
+Invariant \ref{invariant small caterpillar is correct after prep.} holds.
 \end{lemma}
 \begin{proof}
 We assume the invariant holds for every small caterpillar above the current one, and show that after the preprocessing it also holds for the current one. During the preprocessing we update the information stored in the nodes of the interesting suffix by using the information stored in nodes of previously processed caterpillars (where the information is already correct), so we only need to show that we do not use nodes of the current small caterpillar that were pruned due to Lemma \ref{lemma3}. Any such pruned node is either in the unstable suffix or the unstable prefix of the small caterpillar. If the node is in the pruned suffix, it cannot be stored in a solution where the bottom-most candidate is above the pruned suffix, and so any node where it might be stored was also pruned. If the pruned node is in the unstable prefix, its distance to the root is less than $\frac{\lambda^*}{2}$, and so if it is stored in some solution, it must be the candidate node for that solution. Because we always check if the stored candidate node for some node in the interesting suffix still exists, we do not use such pruned nodes in the solutions we store.
