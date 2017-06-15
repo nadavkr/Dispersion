@@ -148,7 +148,7 @@ The test is then used to solve the optimization problem within the same time. Th
 $[\lambda_{1},\lambda_{2})$ and applying Frederickson's parametric search, but now we apply a heavy path decomposition to construct
 the sorted matrices.
 To accelerate the $O(n\log\log n)$ time algorithm, we construct a hierarchy of feasibility tests by partitioning the input tree
-into larger and larger fragments. In each iteration we construct a feasibility test with better running time, until finally, after $\log ^*n$ iterations
+into larger and larger fragments. In each iteration we construct a feasibility test with better running time, until finally, after $\log^*n$ iterations
 we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time, which we use to solve the dispersion optimization problem in linear  time. It is relatively straightforward to implement the precomputation done in a single iteration in $O(n)$ time. However, achieving total $O(n)$ time over all the iterations, requires reusing the results of the precomputation across iterations as well as an intricate global analysis of the overall complexity.
 The algorithm is described in Section \ref{linear algorithm for the dispersion optimization problem}.
 
@@ -479,14 +479,14 @@ this is $O(n)$ plus $O(\log^{2}n)$ calls to the feasibility test. Setting $b=\lo
 We first present an $O(n \log^* n)$ time algorithm that uses the procedures of the $O(n \log \log n)$ time algorithm (from Section~\ref{sublinear f.t.}) iteratively, and then move to the more complex linear time algorithm.
 
 \subsection{An \texorpdfstring{\boldmath$O(n\log^{*}n)$}{O(nlog^*n)} time algorithm for the dispersion optimization problem} \label{sectionlog*}
-The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test (or test for short) to get a sublinear feasibility test. In order to get the complexity down to $O(n \log ^*n)$ we will use a similar process, iteratively, with growing fragments size, improving in each iteration the performance of our test.
+The high level idea of the $O(n \log \log n)$ algorithm was dividing the input tree into fragments, and preprocessing them using the linear feasibility test (or test for short) to get a sublinear feasibility test. In order to get the complexity down to $O(n \log^*n)$ we will use a similar process, iteratively, with growing fragments size, improving in each iteration the performance of our test.
 We start with $O(n/c^{3})$ fragments of size at most $c^3$ for some constant $c$.
 We pay $O(n)$ time for preprocessing and get an $O(\frac{n}{c^3} \cdot \log c)$ time test.
 We use this test to do the same preprocessing again, this time with $O(n/(2^{c})^{3})$ fragments of size at most $(2^c)^3$.
 We now construct an $O(\frac{n}{2^{3c}} \cdot c)$ time test.
-After $\log ^*n$ such iterations we obtain $O(n/\log^{3}n)$ fragments of size at most $\log ^3n$, and have
-an $O(\frac{n \log \log n}{\log ^3n})$ time test, which we use to solve the dispersion optimization problem in $O(n)$ time. Since we have $\log ^*n$ iterations and linear time work for each
-iteration, the total preprocessing is in $O(n \log ^*n)$ time.
+After $\log^*n$ such iterations we obtain $O(n/\log^{3}n)$ fragments of size at most $\log ^3n$, and have
+an $O(\frac{n \log \log n}{\log ^3n})$ time test, which we use to solve the dispersion optimization problem in $O(n)$ time. Since we have $\log^*n$ iterations and linear time work for each
+iteration, the total preprocessing is in $O(n \log^*n)$ time.
 
 We now describe one iteration of this process. Assuming we have obtained an $O(\frac{n}{b^3} \cdot \log b)$ time 
 test from the previous step, we now find a good partition of the tree with $O(n/B^{3})$ fragments of size at most $B^3$, 
@@ -614,7 +614,7 @@ Frederickson's search with $p$ set to $\frac{n}{B^{10}}$). In each fragment we h
 path decomposition, and for each level we need $O(\log B)$ calls to the feasibility test, which takes
 $O(\frac{n}{b^4} \cdot \log b \cdot \log B \cdot \log b) = O(\frac{n}{b})$ time in total. We also do linear
 work exclusive of the feasibility tests. This processing of small active fragments takes $O(n)$ time over all
-$\log ^*n$ iterations, by the same reasoning as for the hanging subtrees.
+$\log^*n$ iterations, by the same reasoning as for the hanging subtrees.
 As before, we declare a large fragment active if we were not able to reduce some remaining active small
 fragment inside and do not preproces further.
 \end{proof}
@@ -716,7 +716,7 @@ Maintaining predecessor and successor pointers in the search trees enables the l
 The main goal of the current step is to update the information stored in each node (i.e. the certain node, candidate node, and number of chosen nodes) for any node that might be queried in the future, so that the information holds the solution for the large caterpillar. When doing this, we need to take into account that the information that is currently stored in nodes might be false, even with regard to the appropriate small caterpillar, since we have eliminated some nodes in the previous step.
 We next define a few terms and show a lemma that will be used in the rest of this section.
 
-\vspace{0.04in} \noindent {\bf The unstable and interesting affixes of a caterpillar.} 
+\vspace{0.04in} \noindent {\bf The unstable and interesting affixes.} 
 Consider a caterpillar with root $r$ and hole $h$, and let $u_{i}$ denote its $i$-th candidate node. In Lemma~\ref{lemma3} we have already made sure that $d(r,u_{i}) < d(r,u_{i+1})$
 and that $d(h,u_{i}) > d(h,u_{i+1})$. We define the \emph{unstable prefix} to
 consist of all nodes $u_{i}$ such that $d(r,u_{i}) < \frac{\lambda^{*}}{2}$, and similarly the
@@ -752,9 +752,9 @@ be $\frac{n}{B^{9}}$, using $O(\frac{n}{b^{4}}\cdot \log b \cdot \log B)=O(\frac
 total time for the feasibility tests and creating up to $O(\frac{n}{B^{9}})$ additional active large
 fragments. If we discover that a large caterpillar is fresh, there is nothing to update. 
 Otherwise, we gather all candidate nodes in the large caterpillar belonging to
-an interesting prefix or suffix (of some small caterpillar) and call them \emph{relevant}. In particular,
+an interesting prefix or suffix of some small caterpillar and call them \emph{relevant}. In particular,
 all nodes of a fresh small caterpillar are relevant.
-We arrange all relevant nodes in an array and apply Frederickson's search to determine whether the distance between any  pair of relevant nodes is smaller than $\lambda^*$ or not. We again
+We arrange all the relevant nodes in an array and apply Frederickson's search to determine whether the distance between any pair of them is smaller than $\lambda^*$. We again
 set $p$ to be $\frac{n}{B^{9}}$, need $O(\frac{n}{b^{4}}\cdot \log b \cdot \log B)=O(\frac{n}{b})$
 time for the feasibility tests, and create $O(\frac{n}{B^{9}})$ additional active large fragments.
 The time exclusive of the feasibility tests is bounded by the number of relevant nodes.
@@ -768,9 +768,10 @@ We now describe how to process each small caterpillar assuming the invariant hol
 
 \begin{noindlist}
 \item \textbf{preprocessing the interesting prefix:}
-Before preprocessing, each node of the interesting prefix of the small caterpillar stores only itself for the solution in case it is the bottom-most chosen node. In order for us to store the correct information for the current node with respect to the large caterpillar, we must find the bottom-most candidate node in the large caterpillar, s.t. its distance to the current node is greater or equal to $\lambda^*$.
-The node we seek is in the interesting suffix of the small caterpillar above the current one. If the above caterpillar is fresh, we also need to look at the interesting suffix of the small caterpillar above it (which might also be fresh, and so on). 
-We iterate over the interesting prefix top to bottom, while iterating over the set of fresh caterpillars and interesting suffix where we need to search. For each node in the interesting prefix we find the closest node at distance at least $\lambda^*$ above it (if it exists), and update the the information stored with the current node of the interesting prefix, using the information stored in the node we found (i.e. add the number of chosen nodes, and copy the certain node and candidate node stored in it). Note that we only look at relevant nodes here, and for each pair of relevant nodes we already know whether the distance between them is smaller than $\lambda^*$ or not.
+Before processing a small caterpillar, each node in its interesting prefix stores only itself as the solution for the case where this node is the bottom-most chosen node (since inside the current small caterpillar only one node can be taken from the interesting prefix). In order for us to store the correct information with respect to the large caterpillar (i.e. after concatenating the current small caterpillar with the ones above it) we need to find the bottom-most candidate node in the small caterpillars above s.t. its distance to the current node is greater or equal to $\lambda^*$.
+The node we seek is in the interesting suffix of the small caterpillar above the current one. If the above caterpillar is fresh, we also need to look at the interesting suffix of the small caterpillar above it (which might also be fresh) and so on. 
+We iterate over the interesting prefix of the current small caterpillar top to bottom. % while iterating over the set of fresh caterpillars and interesting suffixes where we need to search. 
+For each node in this interesting prefix, we find the closest node at distance at least $\lambda^*$ above it (if it exists), and update the the information stored with the current node of the interesting prefix, using the information stored in the node we found (i.e. add the number of chosen nodes, and copy the certain node and candidate nodes stored in it). Note that we only look at relevant nodes here, and for each pair of relevant nodes we already know whether the distance between them is smaller than $\lambda^*$ or not.
 
 Since Invariant \ref{invariant small caterpillar is correct after prep.} holds for every small caterpillar above the current one, we now have the correct information stored for every node of the interesting prefix.
 
@@ -778,39 +779,34 @@ Since Invariant \ref{invariant small caterpillar is correct after prep.} holds f
 
 \item \textbf{preprocessing the interesting suffix:}
 Consider a node of the interesting suffix. Denote the node stored in the candidate node field of this node by $x$, and if there is no candidate node, let $x$ denote the certain node stored there.
-We check if the information stored in node $x$ was updated when we processed the interesting prefix. If it was updated, we update the information stored in the current node (of the interesting suffix) accordingly, and move to the next node in the interesting suffix. 
+We check if the information stored in node $x$ was updated when we processed the interesting prefix. If it was updated, we update the information stored in the current node (of the interesting suffix) accordingly, and move on to the next node in the interesting suffix. 
 
-If the information stored in node $x$ was not updated, then $x$ is not in the interesting prefix of the current small caterpillar, which implies that it is the certain node stored for this solution (due to the definition of the interesting prefix). Moreover, since $x$ does not belong to the interesting prefix, there was a candidate node above $x$ in the small caterpillar which was at distance greater or equal to $\lambda^*$ from $x$. Therefore, this node (denoted by $y$) had been stored as the candidate node of the solution, and was removed due to Lemma \ref{lemma3}. Hence, we must find the bottom-most remaining candidate node above $x$ which is at distance greater or equal to $\lambda^*$ from it. We claim that this node is simply the bottom-most remaining candidate above the current small caterpillar. For this to be true, the pruning and elimination process performed in Subsection \ref{section:lemma3} must start with pruning the candidate nodes s.t. their distances from the hole are monotone, and only then prune s.t. their distances to the root are monotone and there are no collisions with certain nodes. This will ensure that any candidate node above the current small caterpillar is farther away from $x$ than $y$, and specifically its distance from $x$ is at least $\lambda^*$, and so we should take the first remaining candidate above $y$. Note that since we always remove an entire prefix or suffix during the pruning process, the first remaining candidate node above $y$ must be in a different small caterpillar. We update the information in the current node according to the information stored in that node, and proceed to the next node in the interesting suffix.
+If the information stored in node $x$ was not updated, then $x$ is not in the interesting prefix of the current small caterpillar, which implies (by definition of the interesting prefix) that it is the certain node stored for this solution. Moreover, since $x$ does not belong to the interesting prefix, there was a candidate node $y$ above $x$ in the current small caterpillar which was at distance greater or equal to $\lambda^*$ from $x$. Therefore, $y$ had been stored as the candidate node of the solution, and was removed due to Lemma \ref{lemma3}. Hence, we need to find the bottom-most remaining candidate node above $x$ which is at distance greater or equal to $\lambda^*$ from it. We claim that this node is simply the bottom-most remaining candidate above the current small caterpillar. For this to be true, the pruning and elimination process performed in Subsection \ref{section:lemma3} must first prune the candidate nodes so that their distances from the hole are monotone, and only then prune so that their distances to the root are monotone and there are no collisions with certain nodes. This will ensure that any candidate node above the current small caterpillar is farther away from $x$ than $y$, and specifically its distance from $x$ is at least $\lambda^*$ (and so we should take the first remaining candidate node above $y$). Note that since we always remove an entire prefix or suffix during the pruning process, the first remaining candidate node above $y$ must be in a different small caterpillar. We update the information in the current node according to the already computed information stored in that node, and proceed to the next node in the interesting suffix.
 
 
 
 \end{noindlist}
 
 \begin{lemma}
-Invariant \ref{invariant small caterpillar is correct after prep.} holds.
+Invariant \ref{invariant small caterpillar is correct after prep.} is maintained during the above preprocessing.
 \end{lemma}
 \begin{proof}
-We assume the invariant holds for every small caterpillar above the current one, and show that after the preprocessing it also holds for the current one. During the preprocessing we update the information stored in the nodes of the interesting suffix by using the information stored in nodes of previously processed caterpillars (where the information is already correct), so we only need to show that we do not use nodes of the current small caterpillar that were pruned due to Lemma \ref{lemma3}. Any such pruned node is either in the unstable suffix or the unstable prefix of the small caterpillar. If the node is in the pruned suffix, it cannot be stored in a solution where the bottom-most candidate is above the pruned suffix, and so any node where it might be stored was also pruned. If the pruned node is in the unstable prefix, its distance to the root is less than $\frac{\lambda^*}{2}$, and so if it is stored in some solution, it must be the candidate node for that solution. Because we always check if the stored candidate node for some node in the interesting suffix still exists, we do not use such pruned nodes in the solutions we store.
+We assume that the invariant holds for every small caterpillar above the current one, and show that after the preprocessing it also holds for the current one. During the preprocessing we update the information stored in the nodes of the interesting suffix by using the information stored in nodes of previously processed caterpillars (where the information is already correct), so we only need to show that we do not use nodes of the current small caterpillar that were pruned due to Lemma \ref{lemma3}. Any such pruned node is either in the unstable suffix or in the unstable prefix of the small caterpillar. If the node is in the pruned suffix, it cannot be stored in a solution where the bottom-most candidate is above the pruned suffix, and so any node where it might be stored was also pruned. If the pruned node is in the unstable prefix, its distance to the root is less than $\frac{\lambda^*}{2}$, and so if it is stored in some solution, it must be the candidate node for that solution. Because we always check if the stored candidate node for some node in the interesting suffix still exists, we do not use such pruned nodes in the solutions we store.
 \end{proof}
 
-We now have the correct information stored in every node of the interesting suffix of the large caterpillar, which are the only node that might be queried during the run of a feasibility test (since a node above the interesting suffix cannot be the bottom-most chosen node in the caterpillar).
+We now have the correct information stored in every node of the interesting suffix of the large caterpillar. These are the only nodes that might be queried when running a feasibility test (since a node above the interesting suffix cannot be the bottom-most chosen node in the caterpillar).
 
-%Consider the interesting prefix of some small caterpillar. It consists of all the nodes for which the next chosen candidate in the large caterpillar (i.e. the closest candidate node above the current one, which is at distance greater or equal to $\lambda^*$ from it) is in a different small caterpillar. We would like to find for each node in the interesting prefix, the closest node above it which is at distance at least $\lambda^*$ from it. The node we seek is in the interesting suffix of the small caterpillar above the current one. If the above caterpillar is fresh, we also need to look at the interesting suffix of the small caterpillar above it (which might also be fresh, and so on). We iterate over the interesting prefix top to bottom, while iterating over the set of fresh caterpillars and interesting suffix where we need to search. For each node in the interesting prefix we find the closest node at distance at least $\lambda^*$ above it (if it exists), and update the the information stored with the current node of the interesting prefix, using the information stored in the node we found (i.e. add the number of chosen nodes, and copy the certain node and candidate node stored in it). Note that we only look at relevant nodes here, and for each pair of relevant nodes we already know whether the distance between them is smaller than $\lambda^*$ or not.
-
-%We now need to update the information stored at some of the nodes of the small caterpillar which are not in the interesting prefix. Notice that from now on the only nodes of the current small caterpillar that we might query for information are the nodes of the interesting suffix (since any other node cannot be the bottom-most node that is far enough from the hole), and so we only need to update them. We iterate over the interesting suffix, and update the information as follows. Consider a node of the interesting suffix. Denote the node stored in the candidate node field of this node by $x$, and if there is no candidate node, let $x$ denote the certain node stored there. Note that any candidate node that was removed due to Lemma \ref{lemma3}, and was part of a solution stored in some candidate node,  must be the candidate node of the solution or the node where the information is stored, due to Lemma \ref{stable infix}, so this makes sure we do not take into account nodes that were removed in the previous step. We check if the information stored in node $x$ was updated when we processed the interesting prefix. If it was updated, we update the information stored in the current node (of the interesting suffix) accordingly, and move to the next node in the interesting suffix. If it was not updated, then $x$ is not in the interesting prefix of the current small caterpillar, which implies that it is the certain node stored for this solution (due to the definition of the interesting prefix). Moreover, since $x$ does not belong to the interesting prefix, there was a candidate node above $x$ in the small caterpillar which was at distance greater or equal to $\lambda^*$ from $x$, and this node (denoted by $y$) had been stored as the candidate node of the solution, and was removed due to Lemma \ref{lemma3}. Therefore, we must find the next remaining candidate node attached to the spine of the large caterpillar which is at distance greater or equal to $\lambda^*$ from $x$. We claim that this node is simply the next remaining candidate above the current small caterpillar. For this to be true, the pruning and elimination process performed in Subsection \ref{section:lemma3} must start with pruning the candidate nodes s.t. their distances from the hole are monotone, and only then prune s.t. their distances to the root are monotone and there are no collisions with certain nodes. This will ensure that any candidate node above the current small caterpillar is farther away from $x$ than $y$, and specifically its distance from $x$ is at least $\lambda^*$, and so we should take the first remaining candidate above $y$. Note that since we always remove an entire prefix or suffix during the pruning process, the first remaining candidate node above $y$ must be in a different small caterpillar. We update the information in the current node according to the information stored in that node, proceed to the next node in the interesting suffix, and update it in the same manner.
-
-
-It remains to analyze the running time of  this step. We claim that it
-amortizes to $O(n)$. 
-In every step, we spend time which is linear in the number of relevant nodes. Some of these nodes will not be relevant in the next iteration, but some of them might be relevant for many iterations. Observe that in each iteration, unless the large fragment is fresh (in which case we do not iterate over the relevant nodes), the nodes that will be relevant in the next iteration are only the ones in the interesting suffix and prefix of the large caterpillar. The interesting prefix (and similarly the interesting suffix) of the resulting large caterpillar
+\paragraph{The preprocessing analysis.}
+It remains to analyze the running time of this preprocessing procedure. We claim that it is amortizes $O(n)$. 
+In every step, we spend time which is linear in the number of relevant nodes. Some of these nodes will not be relevant in the next iteration, but some of them might be relevant for many iterations. Observe that in each iteration, unless the large fragment is fresh (in which case we do not iterate over the relevant nodes), the nodes that will be relevant in the next iteration are only the ones in the interesting suffix and prefix of the resulting large caterpillar. The interesting prefix (and similarly the interesting suffix) of the resulting large caterpillar
 consists of nodes belonging to fresh small caterpillars and at most one interesting prefix of
 a small caterpillar. The nodes belonging to fresh small caterpillars have not been processed as relevant nodes until now, but the nodes belonging to interesting prefixes (and suffixes) of small caterpillars have been, and such nodes might be relevant for many future iterations. Fortunately, since the number of nodes in an interesting prefix or suffix is bounded by the number of nodes in a small caterpillar, which is $O(b^{5})$, and since there is at most one interesting prefix (suffix) of a small caterpillar whose nodes will stay relevant, this sums up to $O(\frac{n}{B^{4}}\cdot b^{5}) = O(\frac{n}{b})$ per iteration, and $O(n)$ overall.
 
 To conclude, we have shown how to obtain an $O(\frac{n}{B^{4}}\log B)$ time test given an $O(\frac{n}{b^{4}}\log b)$
 time test, in $O(\frac{n}{b})$ time plus amortized constant time per
-node. After $\log ^*n$ iterations, we have an  $O(\frac{n}{\log ^4n} \cdot \log \log n)$ test,
+node. After $\log^*n$ iterations, we have an  $O(\frac{n}{\log ^4n} \cdot \log \log n)$ test,
 which we use to solve the dispersion optimization problem in linear time. All iterations of the preprocessing
-cost $O(n)$ time altogether.
+take $O(n)$ time altogether.
 % why do we stop at fragments of size polylog(n)? Can't we get one large fragment?
 
 %\section{A Linear Time Algorithm for the Dispersion Problem}
@@ -820,7 +816,7 @@ cost $O(n)$ time altogether.
 %into larger and larger fragments, starting from the linear-time implementation described in Section~\ref{linear F.T.}. 
 %Given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with
 %$O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
-%After $\log ^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time
+%After $\log^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time
 %which we use to solve the dispersion optimization problem in $O(n)$. 
 %
 %There are multiple technical difficulties that need to be overcome in order to keep the preprocessing time $O(\frac{n}{b})$.
@@ -1014,13 +1010,13 @@ We start with a tree that has $y$ leaves, select the middle leaf by traversing f
 & \leq x \log y - 2 \cdot (2^{ \log ( \frac{x}{2})} \cdot \log ( \frac{x}{2}) - 2^{ \log ( \frac{x}{2})}+1)  \\
 %& = x \log y  -  x \log (\frac{x}{2}) + x - 2 \\ 
 &= x \log (\frac{2y}{x}) + x -2 \\
-& = O(x \log (\frac{2y}{x})) .\qedhere
+& = O(x \log (\frac{2y}{x})).
 \end{align*}
 \end{proof}
 
 The cost of all joins required to patch the small trees together can be bounded by the same calculation as the cost of the splits made to obtain them, and so the operation takes $O(x \log (\frac{2y}{x}))$ time in total.
 
-\vspace{0.04in} \noindent {\bf Operation~\ref{op6} -- batched value predecessor}
+\vspace{0.04in} \noindent {\bf Operation~\ref{op6} -- batched value predecessor.}
 Similarly to Operation~\ref{op5}, we start by describing a procedure that works on one tree, then apply the same trick of splitting the tree into small trees, and work on them.
 
 We start each value predecessor query by first finding $k_i$ (or its predecessor, if there is no breakpoint at $k_i$). Then, we go up the path in the tree until the maximum value of a breakpoint corresponding to a leaf in a subtree hanging to the left of the path is at least $v_i$. We then keep going down to the rightmost child that has at least $v_i$ as the maximum value in its subtree. The overall runtime is $O(x \log y)$ since each value predecessor query takes $O(\log y)$ time.
