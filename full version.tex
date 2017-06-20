@@ -108,7 +108,7 @@ The focus of this paper is the  {\em $k$-dispersion} problem, where we wish to d
 \item {\em The Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, and a number $k$, find a subset $P$ of nodes of size $k$ such that $f(P)$ is maximized.
 \end{itemize}
 
-\noindent The dispersion problem can be seen as a generalization of the classical maximum independent set problem (that can be solved by binary searching for the largest value of $k$ for which the minimum distance is at least 2).  
+\noindent The dispersion problem can be seen as a generalization of the classical maximum independent set problem (that can be solved by binary searching for the largest value of $k$ for which the minimum distance is at least 2).  It can also be seen as a generalization of the diameter problem (i.e., when $k=2$).
 %
 It turns out that the dispersion and the $k$-partitioning problems are actually equivalent in the one-dimensional case (i.e., when the tree is a path). The reduction simply creates a new path whose edges correspond to nodes in the original path and whose nodes correspond to edges in the original path. However, such equivalence does not apply to general trees, on which $k$-dispersion seems more difficult than $k$-partitioning. In particular, until the present work, no linear time solution for $k$-dispersion was known. 
 The dispersion optimization problem can be solved by repeatedly querying a {\em feasibility test} that solves the dispersion search problem. 
