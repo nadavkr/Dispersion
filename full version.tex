@@ -540,31 +540,73 @@ The partitioning used in the algorithm is presented in Subsection \ref{section:p
 the resulting large caterpillar for any candidate and certain node with respect to the hole.
 
 \subsection{Partitioning into fragments}\label{section:partioioning}
-We would like to partition the tree into fragments of growing sizes, and only spend linear time overall for this. We cannot repeatedly apply Lemma~\ref{basic partitioning lemma} as it is, since the constant hidden in its statement may become non-constant over the $\log^*n$ iterations. We therefore slightly tweak the definition of a good partition, so that for a parameter $b$ there are at most $n/b$ fragments, each of them of size $O(b)$ (as opposed to the original definition, where we had $O(n/b)$ fragments of size at most $b$). We can achieve such a partitioning by applying Lemma \ref{basic partitioning lemma} with the parameter set to $b \cdot \alpha$, where $\alpha$ is the constant hidden in the statement of Lemma~\ref{basic partitioning lemma}. This results in a partition with at most $n/b$ fragments, each of size at most $\alpha \cdot b$. The following lemma uses this new definition.
+%We would like to partition the tree into fragments of growing sizes, and only spend linear time overall for this. We cannot repeatedly apply Lemma~\ref{basic partitioning lemma} as it is, since the constant hidden in its statement may become non-constant over the $\log^*n$ iterations. We therefore slightly tweak the definition of a good partition, so that for a parameter $b$ there are at most $n/b$ fragments, each of them of size $O(b)$ (as opposed to the original definition, where we had $O(n/b)$ fragments of size at most $b$). We can achieve such a partitioning by applying Lemma \ref{basic partitioning lemma} with the parameter set to $b \cdot \alpha$, where $\alpha$ is the constant hidden in the statement of Lemma~\ref{basic partitioning lemma}. This results in a partition with at most $n/b$ fragments, each of size at most $\alpha \cdot b$. The following lemma uses this new definition.
+%
 
 \begin{lemma}\label{good partition refinement lemma}
-Given a good partition of a binary tree into at most $n/b^{4}$ fragments each of size at most $\alpha^{\ell}\cdot b^{4}$, 
-we can find in $O(n/b^{4})$ time
-a good partition of the tree into at most $n/(2^b)^{4}$ fragments each of size at most $\alpha^{\ell+1}\cdot (2^{b})^{4}$
-s.t. every fragment in the first partition is contained inside a fragment in the second partition.
+Given a binary tree on $n$ nodes, there is a linear time algorithm for constructing a hierarchy of $O(\log^*n)$ good partitions of the tree with the following properties:
+\begin{itemize}
+\item The partition at level $\ell$ of the hierarchy has $O(n/{{b_{\ell}}^4})$ fragments, each of size $O({b_{\ell}}^5)$.
+\item $b_\ell = 2^{b_{\ell -1}}$.
+\item Every fragment in the partition at level $\ell-1$ of the hierarchy is contained inside a fragment in the partition at level $\ell$.
+\item At the first level of the hierarchy $b_{\ell}$ is a constant, and at the last level of the hierarchy $b_{\ell} = \Theta(\log n)$.
+\end{itemize}
+
+
+%Given a good partition of a binary tree into at most $n/b^{4}$ fragments each of size at most $\alpha^{\ell}\cdot b^{4}$, 
+%we can find in $O(n/b^{4})$ time
+%a good partition of the tree into at most $n/(2^b)^{4}$ fragments each of size at most $\alpha^{\ell+1}\cdot (2^{b})^{4}$
+%s.t. every fragment in the first partition is contained inside a fragment in the second partition.
 \end{lemma}
 \begin{proof}
-Define $T'$ as the tree obtained by collapsing each fragment of the given partition into a single node. Partition $T'$ with the parameter set to $B= {(2^{b})^{4}}/{b^{4}}$. We obtain at most $\frac{n/b^4}{B}=n/(2^{b})^{4}$ fragments. Each of the new large fragments corresponds to a fragment of the original tree of size at most $\alpha\cdot \alpha^{\ell}\cdot b^{4}\cdot B = \alpha^{\ell+1}\cdot (2^{b})^{4}$. Clearly, it holds that each fragment of the given partition is contained in a single large fragment.
-\end{proof}
+We would like to construct the hierarchy of partitions by repeatedly applying Lemma \ref{basic partitioning lemma}. For convenience we slightly tweak  the definition of a good partition, so that for a parameter $b$ there are at most $n/b$ fragments, each of them of size $O(b)$ (as opposed to the original definition, where we had $O(n/b)$ fragments of size at most $b$). We can achieve such a partitioning by applying Lemma \ref{basic partitioning lemma} with the parameter set to $b \cdot \alpha$, where $\alpha$ is the constant hidden in the statement of Lemma~\ref{basic partitioning lemma}. This results in a partition with at most $n/b$ fragments, each of size at most $\alpha \cdot b$. 
 
-\noindent The entire partition is obtained by applying Lemma~\ref{good partition refinement lemma} $\log^{*}n$ times. 
+We now show how to find a good partition of the tree into at most $n/(2^b)^{4}$ fragments each of size at most $\alpha^{\ell+1}\cdot (2^{b})^{4}$, in $O(n/b^{4})$ time, given a good partition of the tree into at most $n/b^4$ fragments each of size at most $\alpha^{\ell}\cdot b^{4}$, s.t. every fragment in the first partition is contained inside a fragment in the second partition.
+
+Define $T'$ as the tree obtained by collapsing each fragment of the given partition into a single node. Partition $T'$ with the parameter set to $B= {(2^{b})^{4}}/{b^{4}}$. We obtain at most $\frac{n/b^4}{B}=n/(2^{b})^{4}$ fragments. Each of the new large fragments corresponds to a fragment of the original tree of size at most $\alpha\cdot \alpha^{\ell}\cdot b^{4}\cdot B = \alpha^{\ell+1}\cdot (2^{b})^{4}$. Clearly, it holds that each fragment of the given partition is contained in a single large fragment.
+
+The entire hierarchy is obtained by applying this process $\log^{*}n$ times. 
 If $b_{\ell}$ denotes the value of the parameter $b$ in the $\ell$-th application, then  $b_{\ell+1}=2^{b_{\ell}}$. The time to construct the $(\ell+1)$-th partition is $O(n/(b_{\ell})^{4})=O(n/b_{\ell})$. The overall time to construct all partitions is therefore 
 $$ O(\sum_{\ell} {n}/{b_{\ell}}) = O(\sum_{\ell} {n}/{2^{\ell}}) = O(n).$$
 Observe that the size of a (large) fragment in the $(\ell+1)$-th partition is at most $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$ which is at most $O((b_{\ell+1})^5)$ for a large enough $\ell$ (i.e., an $\ell$ s.t. $\alpha^{\ell+1}\leq 2^{2^{\ell+1}}$ and $b_{\ell+1}\geq 2^{2^{\ell+1}}$, so
 this $\ell$ depends only on the constant $\alpha$).
 
-Setting $b=b_{\ell}$ and $B=b_{\ell+1}$  we conclude that every large fragment of the $(\ell+1)$-th partition is of size $O(B^5)$ and consists
-of small fragments of the $\ell$-th partition (each of size $O(b^5)$). 
+\end{proof}
+ 
+\noindent Setting $b=b_{\ell}$ and $B=b_{\ell+1}$  we conclude that every large fragment of the $(\ell+1)$-th partition is of size $O(B^5)$ and consists
+of small fragments of the $\ell$-th partition (each of size $O(b^5)$).
 The goal of the $(\ell+1)$-th iteration will be now to preprocess all $O(n/B^{4})$ large fragments, so that we obtain an $O(\frac{n}{B^{4}}\log B)$
 time test. To this end, we will preprocess all inactive fragments, so that they can be skipped in $O(\log B)$ time. For the remaining active
 large fragments, we guarantee that there are only $O(n/B^{9})$ of them, so processing each in $O(B^{5})$ time leads
 to the claimed query time. To make sure that the total preprocessing time is linear, we will reuse the preprocessing already done
 for the $O(n/b^{4})$ small fragments (by induction, only $O(n/b^{9})$ of them are active, while the others are preprocessed).
+
+
+
+
+%\begin{lemma}\label{good partition refinement lemma}
+%Given a good partition of a binary tree into at most $n/b^{4}$ fragments each of size at most $\alpha^{\ell}\cdot b^{4}$, 
+%we can find in $O(n/b^{4})$ time
+%a good partition of the tree into at most $n/(2^b)^{4}$ fragments each of size at most $\alpha^{\ell+1}\cdot (2^{b})^{4}$
+%s.t. every fragment in the first partition is contained inside a fragment in the second partition.
+%\end{lemma}
+%\begin{proof}
+%Define $T'$ as the tree obtained by collapsing each fragment of the given partition into a single node. Partition $T'$ with the parameter set to $B= {(2^{b})^{4}}/{b^{4}}$. We obtain at most $\frac{n/b^4}{B}=n/(2^{b})^{4}$ fragments. Each of the new large fragments corresponds to a fragment of the original tree of size at most $\alpha\cdot \alpha^{\ell}\cdot b^{4}\cdot B = \alpha^{\ell+1}\cdot (2^{b})^{4}$. Clearly, it holds that each fragment of the given partition is contained in a single large fragment.
+%\end{proof}
+%
+%\noindent The entire partition is obtained by applying Lemma~\ref{good partition refinement lemma} $\log^{*}n$ times. 
+%If $b_{\ell}$ denotes the value of the parameter $b$ in the $\ell$-th application, then  $b_{\ell+1}=2^{b_{\ell}}$. The time to construct the $(\ell+1)$-th partition is $O(n/(b_{\ell})^{4})=O(n/b_{\ell})$. The overall time to construct all partitions is therefore 
+%$$ O(\sum_{\ell} {n}/{b_{\ell}}) = O(\sum_{\ell} {n}/{2^{\ell}}) = O(n).$$
+%Observe that the size of a (large) fragment in the $(\ell+1)$-th partition is at most $\alpha^{\ell+1} \cdot (b_{\ell+1})^{4}$ which is at most $O((b_{\ell+1})^5)$ for a large enough $\ell$ (i.e., an $\ell$ s.t. $\alpha^{\ell+1}\leq 2^{2^{\ell+1}}$ and $b_{\ell+1}\geq 2^{2^{\ell+1}}$, so
+%this $\ell$ depends only on the constant $\alpha$).
+%
+%Setting $b=b_{\ell}$ and $B=b_{\ell+1}$  we conclude that every large fragment of the $(\ell+1)$-th partition is of size $O(B^5)$ and consists
+%of small fragments of the $\ell$-th partition (each of size $O(b^5)$). 
+%The goal of the $(\ell+1)$-th iteration will be now to preprocess all $O(n/B^{4})$ large fragments, so that we obtain an $O(\frac{n}{B^{4}}\log B)$
+%time test. To this end, we will preprocess all inactive fragments, so that they can be skipped in $O(\log B)$ time. For the remaining active
+%large fragments, we guarantee that there are only $O(n/B^{9})$ of them, so processing each in $O(B^{5})$ time leads
+%to the claimed query time. To make sure that the total preprocessing time is linear, we will reuse the preprocessing already done
+%for the $O(n/b^{4})$ small fragments (by induction, only $O(n/b^{9})$ of them are active, while the others are preprocessed).
 
 \subsection{Reducing a hanging subtree into two nodes}\label{section:lemma1}
 The first step in reducing a large fragment into a caterpillar is reducing the hanging subtrees of the large fragment into at most two nodes. The following lemma shows that this can be done in total $O(n)$ time for all fragments in all the $\log^* n$ partitions.
