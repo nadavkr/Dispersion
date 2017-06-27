@@ -162,7 +162,8 @@ application we need various non-standard batch operations on the lists.
 We present a simpler data structure for merging polylines that efficiently supports the required batch operations and works with %essentially 
 any balanced search tree with split and join capabilities. Our data structure both simplifies and extends that of Brown and Tarjan~\cite{Brown1980}, and we believe it to be of independent interest. 
 
-All missing proofs can be found in the full version.
+%All missing proofs can be found in the full version.
+%this was already said
 
 \section{A Linear Time Feasibility Test}
 \label{linear F.T.}
@@ -472,7 +473,7 @@ The cost of all joins required to patch the small trees together can be bounded 
 The rest of the batched operations are also done by splitting the tree into small trees. 
 There is an additional technical difficulty in Operation~\ref{op6}, as in our case the intervals $(k_{i'},k_{i})$ might not be disjoint. We make them disjoint with some extra work. 
 In Operation~\ref{op7}, some of the small trees might become much larger due to the insertions. This also requires some extra work.
-The full description of Operation 6-8 is in the full version.
+The complete description of Operation 6-8 appears in the full version.
 
 \begin{restatable}{theoremrestatable}{nlognweighted}
 \label{nlogn weighted f.t. theorem}
