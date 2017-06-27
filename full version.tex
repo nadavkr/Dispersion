@@ -304,14 +304,14 @@ to the centroid used to separate them. The difficulty is that we would like to p
 \begin{center}
 \includegraphics[scale=1]{centroid}
 \end{center}
-\caption{A single step in the centroid decomposition. Removing $v$ splits $T$ into three pieces, s.t. none of them has more than $\frac{|T|}{2}$ nodes. The white piece is problematic, since the paths from its nodes to $v$ do not pass through the inner centroid $v'$.}
+\caption{A single step in the centroid decomposition. Removing $v$ splits $T$ into three pieces, s.t. none of them has more than $\frac{|T|}{2}$ nodes. The white piece is problematic, since the paths from its nodes to $v$ do not pass through the inner centroid $v'$. \label{fig:problematic}}
 \end{figure}
 
 
 Consider one of the three already processed pieces obtained by removing the outer centroid. It contains three smaller pieces of its own,
 that have been obtained by removing the inner centroid.
 For two of these smaller pieces, it holds that the path from every node inside to the outer centroid passes through the inner centroid.
-We call the third piece, for which this does not hold, a \textit{problematic} piece. For the two pieces that are not problematic, we can 
+We call the third piece, for which this does not hold, a \textit{problematic} piece. See Figure~\ref{fig:problematic}. For the two pieces that are not problematic, we can 
 increase all entries of their lists by the distance from the inner centroid to the outer centroid, and then merge two sorted lists in linear time.
 Now consider the problematic piece, where paths to the outer centroid do not go through the inner centroid. Notice that if we go one step deeper
 in the recursion, the problematic piece consists of two pieces that are not problematic, as the paths from all their nodes to the outer centroid
@@ -796,7 +796,7 @@ If the information stored in node $x$ was not updated, then $x$ is not in the in
 We consider the three possible cases:
 \begin{itemize}
 \item $y$ was pruned because it was closer to the root than some node above it, which we call the removing node. The removing node cannot be above $z$, since otherwise it would either imply that $z$ should also be pruned, or that the removing node is not the cause for $y$'s pruning.
-Thus, the removing node is either below $z$, or it is $z$ itself. As shown in Step \ref{making distances from the root monotone} of the preprocessing described in Subsection \ref{Pre-Processing Fragments}), the removing node must be farther from any node below $y$, than $y$. Therefore $z$ is farther from $x$ than $y$.
+Thus, the removing node is either below $z$, or it is $z$ itself. As shown in Step \ref{making distances from the root monotone} of the preprocessing described in Subsection \ref{Pre-Processing Fragments}, the removing node must be farther from any node below $y$, than $y$. Therefore $z$ is farther from $x$ than $y$.
 
 \item If $y$ was pruned because it was closer to the hole than some node below it, then since $z$ was not pruned, it must be farther from the hole than $y$, and so it is also farther from $x$ than $y$.
 \item If $y$ was pruned due to a collision with some certain node, then in the process of pruning nodes s.t. they are sorted by their distance to the hole (which is done before collision elimination), $y$ and $z$ were not pruned. This implies that $z$ is farther from the hole than $y$, and so it is also farther from $x$.
