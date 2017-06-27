@@ -749,20 +749,20 @@ by the choice of $p$.
 
 Having reduced a large fragment to a large caterpillar, we are now left only with preprocessing this large caterpillar for every possible eliminated suffix.
 Because we have already pruned the large caterpillar and removed any collisions between a certain
-node and a candidate node, we only have to consider the remaining candidate nodes. For convenience we will refer to the remaining candidate nodes attached to the spine simply as nodes, and reserve the term candidate for the nodes stored as candidate nodes of solutions in the precomputed information.
+node and a candidate node, we only have to consider the remaining candidate nodes. For convenience, we will refer to the remaining candidate nodes (attached to the spine) simply as nodes, and reserve the term {\em candidate} for the nodes stored as candidate nodes of solutions in the precomputed information.
 
 We need to store the caterpillars in a data structure that will allow us to merge caterpillars efficiently, as well as search for the bottom-most node in a caterpillar that is at distance at least $d$ from the hole, for any given $d \le \lambda^*$. 
-We therefore store the nodes of each caterpillar in a balanced search tree keyed by the nodes' distance to the hole of the caterpillar. Note that even though each search tree is keyed by distances to a different hole, we can merge two trees in logarithmic time, since they correspond to two small caterpillars where one is above the other (and hence all its keys can be thought of as larger than all the keys of the bottom one). Since we merge search trees of small caterpillars into one  search tree of a large caterpillar, each merge operation costs at most $O(\log B)$, and we have $O(n/b^9)$ such operations (one per small caterpillar), this sums up to $O(\frac{n}{b})$ and $O(n)$ overall.
+We therefore store the nodes of each caterpillar in a balanced search tree keyed by the node's distance to the hole of the caterpillar. Note that, even though each search tree is keyed by distances to a different hole, we can still merge two trees in logarithmic time. This is because they correspond to two small caterpillars where one is above the other (and hence all its keys can be thought of as larger than all the keys of the bottom one). Since we merge multiple search trees of small caterpillars into one search tree of a large caterpillar, each merge operation costs at most $O(\log B)$, and we have $O(n/b^9)$ such operations (one per small caterpillar), this sums up to $O(\frac{n}{b})$ and therefore to $O(n)$ overall.
 Maintaining predecessor and successor pointers in the search trees enables the linked list interface that was used in the previous steps, and since in the previous steps we only prune prefixes and suffixes of small caterpillars, we can use split operations for that.
 
-The main goal of the current step is to update the information stored in each node (i.e. the certain node, candidate node, and number of chosen nodes) for any node that might be queried in the future, so that the information holds the solution for the large caterpillar. When doing this, we need to take into account that the information that is currently stored in nodes might be false, even with regard to the appropriate small caterpillar, since we have eliminated some nodes in the previous step.
-We next define a few terms and show a lemma that will be used in the rest of this section.
+The main goal of the current step is to update the information stored in each node (i.e. the certain node, the candidate node, and the number of chosen nodes) for any node that might be queried in the future, so that the information holds the solution for the large caterpillar. When doing this, we need to take into account that the information that is currently stored in nodes might be false, even with regard to the appropriate small caterpillar, since we have eliminated some nodes in the previous step.
+We next define a few terms and a lemma that will be used in the rest of this section.
 
 \vspace{0.04in} \noindent {\bf The unstable and interesting affixes.} 
 Consider a caterpillar with root $r$ and hole $h$, and let $u_{i}$ denote its $i$-th node. In Lemma~\ref{lemma3} we have already made sure that $d(r,u_{i}) < d(r,u_{i+1})$
 and that $d(h,u_{i}) > d(h,u_{i+1})$. We define the \emph{unstable prefix} to
 consist of all nodes $u_{i}$ such that $d(r,u_{i}) < \frac{\lambda^{*}}{2}$, and similarly the
-\emph{unstable suffix} consists of all nodes $u_{i}$ such that $d(h,u_{i}) < \frac{\lambda^{*}}{2}$.
+\emph{unstable suffix} to consist of all nodes $u_{i}$ such that $d(h,u_{i}) < \frac{\lambda^{*}}{2}$.
 We have the following property.
 
 \begin{lemma}
@@ -792,7 +792,7 @@ We now describe the preprocessing procedure on a given large caterpillar. We sta
 done by applying Frederickson's search in parallel for all large caterpillars with $p$ set to
 be $\frac{n}{B^{9}}$, using $O(\frac{n}{b^{4}}\cdot \log b \cdot \log B)=O(\frac{n}{b})$
 total time for the feasibility tests and creating up to $O(\frac{n}{B^{9}})$ additional active large
-fragments. If we discover that a large caterpillar is fresh, there is nothing to update. 
+fragments. If we discover that a large caterpillar is fresh, then there is nothing to update. 
 Otherwise, we gather all nodes in the large caterpillar belonging to
 an interesting prefix or suffix of some small caterpillar and call them \emph{relevant}. In particular,
 all nodes of a fresh small caterpillar are relevant.
@@ -810,10 +810,10 @@ We now describe how to process each small caterpillar assuming the invariant hol
 
 \begin{noindlist}
 \item \textbf{preprocessing the interesting prefix:}
-Before processing a small caterpillar, each node in its interesting prefix stores only itself as the solution for the case where this node is the bottom-most chosen node (since inside the current small caterpillar only one node can be taken from the interesting prefix). In order for us to store the correct information with respect to the large caterpillar (i.e. after concatenating the current small caterpillar with the ones above it) we need to find the bottom-most node in the small caterpillars above s.t. its distance to the current node is greater or equal to $\lambda^*$.
+Before processing a small caterpillar, each node in its interesting prefix stores only itself as the solution for the case where this node is the bottom-most chosen node (since inside the current small caterpillar only one node can be taken from the interesting prefix). In order for us to store the correct information with respect to the large caterpillar (i.e. after concatenating the current small caterpillar with the ones above it) we need to find the bottom-most node in the small caterpillars above it s.t. its distance to the current node is greater or equal to $\lambda^*$.
 The node we seek is in the interesting suffix of the small caterpillar above the current one. If the above caterpillar is fresh, we also need to look at the interesting suffix of the small caterpillar above it (which might also be fresh) and so on. 
 We iterate over the interesting prefix of the current small caterpillar top to bottom. % while iterating over the set of fresh caterpillars and interesting suffixes where we need to search. 
-For each node in this interesting prefix, we find the closest node at distance at least $\lambda^*$ above it (if it exists), and update the the information stored with the current node of the interesting prefix, using the information stored in the node we found (i.e. add the number of chosen nodes, and copy the certain node and candidate node stored in it). Note that we only look at relevant nodes here, and for each pair of relevant nodes we already know whether the distance between them is smaller than $\lambda^*$ or not.
+For each node in this interesting prefix, we find the closest node at distance at least $\lambda^*$ above it (if it exists), and update the information stored in the current node of the interesting prefix, using the information stored in the node we found (i.e. add the number of chosen nodes, and copy the certain node and the candidate node stored in it). Note that we only look at relevant nodes here, and for each pair of relevant nodes we already know whether the distance between them is smaller than $\lambda^*$ or not.
 
 Since Invariant \ref{invariant small caterpillar is correct after prep.} holds for every small caterpillar above the current one, we now have the correct information stored for every node of the interesting prefix.
 
@@ -821,16 +821,16 @@ Since Invariant \ref{invariant small caterpillar is correct after prep.} holds f
 
 \item \textbf{preprocessing the interesting suffix:}
 Consider a node of the interesting suffix. Denote the node stored as the candidate node of the solution where this is the bottom-most chosen node by $x$. If there is no candidate node, let $x$ denote the certain node of this solution.
-We check if the information stored in node $x$ was updated when we processed the interesting prefix. If it was updated, we update the information stored in the current node (of the interesting suffix) accordingly, and move on to the next node in the interesting suffix. 
+We check if the information stored in node $x$ was updated when we processed the interesting prefix. If it was updated, then we update the information stored in the current node (of the interesting suffix) accordingly, and move on to the next node in the interesting suffix. 
 
-If the information stored in node $x$ was not updated, then $x$ is not in the interesting prefix of the current small caterpillar, which implies (by definition of the interesting prefix) that it is the certain node stored for this solution. Moreover, since $x$ does not belong to the interesting prefix, there was a node $y$ above $x$ in the current small caterpillar which was at distance greater or equal to $\lambda^*$ from $x$. Therefore, $y$ had been stored as the candidate node of the solution, and was pruned due to Lemma \ref{lemma3}. Hence, we need to find the bottom-most remaining node above $x$ which is at distance greater or equal to $\lambda^*$ from it. We claim that this node is simply the bottom-most remaining node above the current small caterpillar. Denote this node by $z$. We show that $d(x,z) \ge d(x,y)$ (implying that $d(x,z) \ge \lambda^*$).
+If however, the information stored in node $x$ was not updated, then $x$ is not in the interesting prefix of the current small caterpillar, which implies (by definition of the interesting prefix) that it is the certain node stored for this solution. Moreover, since $x$ does not belong to the interesting prefix, there was a node $y$ above $x$ in the current small caterpillar which was at distance greater or equal to $\lambda^*$ from $x$. Therefore, $y$ had been stored as the candidate node of the solution, and was pruned due to Lemma \ref{lemma3}. Hence, we need to find the bottom-most remaining node above $x$ which is at distance greater or equal to $\lambda^*$ from it. We claim that this node is simply the bottom-most remaining node above the current small caterpillar. Denote this node by $z$. We show that $d(x,z) \ge d(x,y)$ (implying that $d(x,z) \ge \lambda^*$).
 We consider the three possible cases:
 \begin{itemize}
-\item $y$ was pruned because it was closer to the root than some node above it, which we call the removing node. The removing node cannot be above $z$, since otherwise it would either imply that $z$ should also be pruned, or that the removing node is not the cause for $y$'s pruning.
+\item \ If $y$ was pruned because it was closer to the root than some node above it (which we call the {\em removing node}), then the removing node cannot be above $z$. Because this would imply that either $z$ should have also be pruned, or that the removing node was not the cause for $y$'s pruning.
 Thus, the removing node is either below $z$, or it is $z$ itself. As shown in Step \ref{making distances from the root monotone} of the preprocessing described in Subsection \ref{Pre-Processing Fragments}), the removing node must be farther from any node below $y$, than $y$. Therefore $z$ is farther from $x$ than $y$.
 
-\item If $y$ was pruned because it was closer to the hole than some node below it, then since $z$ was not pruned, it must be farther from the hole than $y$, and so it is also farther from $x$ than $y$.
-\item If $y$ was pruned due to a collision with some certain node, then in the process of pruning nodes s.t. they are sorted by their distance to the hole (which is done before collision elimination), $y$ and $z$ were not pruned. This implies that $z$ is farther from the hole than $y$, and so it is also farther from $x$.
+\item \  If $y$ was pruned because it was closer to the hole than some node below it, then since $z$ was not pruned, it must be farther from the hole than $y$, and so it is also farther from $x$ than $y$.
+\item \  If $y$ was pruned due to a collision with some certain node, then in the process of pruning nodes so they are sorted by their distance to the hole (which is done before the collision elimination) $y$ and $z$ were not pruned. This implies that $z$ is farther from the hole than $y$, and so it is also farther from $x$.
 
 \end{itemize}
 
@@ -850,7 +850,7 @@ We assume that the invariant holds for every small caterpillar above the current
 We now have the correct information stored in every node of the interesting suffix of the large caterpillar. These are the only nodes that might be queried when running a feasibility test (since a node above the interesting suffix cannot be the bottom-most chosen node in the caterpillar).
 
 \paragraph{The preprocessing analysis.}
-It remains to analyze the running time of this preprocessing procedure. We claim that it is amortizes $O(n)$. 
+It remains to analyze the running time of this preprocessing procedure. We claim that it amortizes to $O(n)$. 
 In every step, we spend time which is linear in the number of relevant nodes. Some of these nodes will not be relevant in the next iteration, but some of them might be relevant for many iterations. Observe that in each iteration, unless the large caterpillar is fresh (in which case we do not iterate over the relevant nodes), the nodes that will be relevant in the next iteration are only the ones in the interesting suffix and prefix of the resulting large caterpillar. The interesting prefix (and similarly the interesting suffix) of the resulting large caterpillar
 consists of nodes belonging to fresh small caterpillars and at most one interesting prefix of
 a small caterpillar. The nodes belonging to fresh small caterpillars have not been processed as relevant nodes until now, but the nodes belonging to interesting prefixes (and suffixes) of small caterpillars have been, and such nodes might be relevant for many future iterations. Fortunately, since the number of nodes in an interesting prefix or suffix is bounded by the number of nodes in a small caterpillar, which is $O(b^{5})$, and since there is at most one interesting prefix (suffix) of a small caterpillar whose nodes will stay relevant, this sums up to $O(\frac{n}{B^{4}}\cdot b^{5}) = O(\frac{n}{b})$ per iteration, and $O(n)$ overall.
