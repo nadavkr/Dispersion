@@ -52,7 +52,7 @@
 \EventLocation{Vienna, Austria}
 \EventLogo{}
 \SeriesVolume{87}
-\ArticleNo{<article-no>} % Set article-no=1
+\ArticleNo{1} % Set article-no=1
 % Editor-only macros::end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \usepackage{etoolbox}
@@ -369,28 +369,12 @@ at $\head(p)$, where $p$ is a heavy path at depth $d$.
 All in all, for every $d$ we spend $O(n_{d})$ time and execute $O(\log n)$ feasibility tests. Summing over all depths $d$,
 this is $O(n)$ plus $O(\log^{2}n)$ calls to the feasibility test. Setting $b=\log^{2}n$, the total time is thus $O(n+n\log\log n+\frac{n}{\log^{2}n}\cdot\log\log n\cdot \log^{2}n)=O(n\log\log n)$.
 
-%\section{A Linear Time Algorithm for the Dispersion Problem}
-%\label{sectionLinear}
-%
-%To accelerate the $O(n\log\log n)$ time algorithm, we construct a hierarchy of feasibility tests by partitioning the input tree
-%into larger and larger fragments, starting from the linear-time implementation described in Section~\ref{linear F.T.}. 
-%Given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with
-%$O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
-%After $\log ^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time
-%which we use to solve the dispersion optimization problem in $O(n)$. 
-%
-%There are multiple technical difficulties that need to be overcome in order to keep the preprocessing time $O(\frac{n}{b})$.
-%We must make each partition into fragments a refinement of the previous one, i.e. the fragments of the $(\ell+1)$-th partition (called large fragments)
-%are composed of fragments of the $\ell$-th partition (called small fragments). We believe that this simple micro-macro variant is of independent interest. 
-%Further, we cannot afford to touch every node of every fragment at every decomposition level. Therefore, we take a closer look at how a (large) fragment decomposes into smaller fragments. 
-%We show that a large fragment can be reduced to a concatenation of small caterpillars, each corresponding to a small fragment that we have already preprocessed. We then carefully tailor these small caterpillars while reusing the results of their preprocessing. We show that this tailoring amortizes to $O(n)$ over all decompositions. Due to space constraints, the full description of the algorithm is in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
 
 \section{The Weighted Dispersion Problem}\label{section:weighted}
 
 
-In this section we present an $O(n\log n)$ time algorithm for the weighted search problem (a matching lower bound is shown in Appendix \ref{appendix weighted f.t. lower bound}).
+In this section we present an $O(n\log n)$ time algorithm for the weighted search problem (a matching lower bound is shown in the full version).
 As explained in the introduction, this then implies an $O(n\log^{2}n)$ time solution for the optimization problem.
-%
 Similarly to the unweighted case, we compute for each node of the tree, the subset of nodes $P$ in its subtree  s.t. $f(P) \geq \lambda$ and the total  weight of  $P$ is maximized. We compute this by going over the nodes of the tree bottom-up. Previously, the situation was simpler, as for any subtree we had just one candidate node (i.e., a node that may or may not be in the optimal solution for the entire input tree). This was true because nodes had uniform weights. Now however, there could be many candidates in a subtree, as the certain nodes are only the ones that are at distance at least $\lambda$ from the root (and not $\frac{\lambda}{2}$ as in the unweighted case).
 
 Let $P$ be a subset of the nodes in the subtree rooted at $v$, and  $h$ be the node in $P$ minimizing $d(h,v)$. We call $h$ the {\em closest chosen node} in $v$'s subtree. In our feasibility test, $v$ stores an optimal solution $P$ for each possible value of $d(h,v)$ (up to $\lambda$, otherwise the closest chosen node does not affect nodes outside the subtree). That is, a subset of nodes $P$ in $v$'s subtree, of maximal weight, s.t. the closest chosen node is at distance {\em at least} $d(h,v)$ from $v$, $f(P) \ge \lambda$. 
@@ -488,7 +472,7 @@ The cost of all joins required to patch the small trees together can be bounded 
 The rest of the batched operations are also done by splitting the tree into small trees. 
 There is an additional technical difficulty in Operation~\ref{op6}, as in our case the intervals $(k_{i'},k_{i})$ might not be disjoint. We make them disjoint with some extra work. 
 In Operation~\ref{op7}, some of the small trees might become much larger due to the insertions. This also requires some extra work.
-The full description of Operation 6-8 is in Appendix \ref{appendix batched operations}.
+The full description of Operation 6-8 is in the full version.
 
 \begin{restatable}{theoremrestatable}{nlognweighted}
 \label{nlogn weighted f.t. theorem}
