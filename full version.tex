@@ -229,6 +229,8 @@ We would like to partition the tree into fragments as follows. Each fragment is 
 We call the path from $u$ to $v$ the fragment's \textit{spine}, and $v$'s subtree its \textit{hole}. If the
 fragment has only one boundary node, i.e., the fragment consists of a node and all its descendants, we say that there is no hole.
 A partition of a tree into $O(n/b)$ such fragments, each of size at most $b$, is called a \emph{good partition}.
+This is very similar to the definition of a cluster in top trees~\cite{TopTrees}, which are in turn inspired by topology trees~\cite{Frederickson1985},
+but slightly tweaked to our needs.
 Note that we can assume that the input tree is binary: given a non-binary tree, we can replace every node of degree $d\geq 3$ with a binary tree on
 $d$ leaves. The edges of the binary tree are all of length zero, so at most one node in the tree can be taken.
 
@@ -540,20 +542,18 @@ The partitioning used in the algorithm is presented in Subsection \ref{section:p
 the resulting large caterpillar for any candidate and certain node with respect to the hole.
 
 \subsection{Partitioning into fragments}\label{section:partioioning}
-The following lemma is similar to Lemma 3 in \cite{Frederickson1985}, but is tailored to our needs.
+The following lemma is similar to Lemma 3 in \cite{Frederickson1985}, except that we are working with rooted trees
+and our definition of a fragment is more restrictive. It can be also inferred, with some work, from the properties of top trees~\cite{TopTrees}.
 
 \begin{lemma}\label{good partition refinement lemma}
-Given a binary tree on $n$ nodes, there is a linear time algorithm for constructing a hierarchy of $O(\log^*n)$ good partitions of the tree with the following properties:
-\begin{itemize}
-\item The partition at level $\ell$ of the hierarchy has $O(n/{{b_{\ell}}^4})$ fragments, each of size $O({b_{\ell}}^5)$.
-\item $b_\ell = 2^{b_{\ell -1}}$.
-\item Every fragment in the partition at level $\ell-1$ of the hierarchy is contained inside a fragment in the partition at level $\ell$.
-\item At the first level of the hierarchy $b_{\ell}$ is a constant, and at the last level of the hierarchy $b_{\ell} = \Theta(\log n)$.
-\end{itemize}
-
+Define a sequence $b_{1},b_{2},\ldots,b_{s}$ of length $s=O(\log^{*}n)$, such that $b_{1}=\Theta(1)$, $b_{s} = \Theta(\log n)$,
+and $b_{\ell+1} = 2^{b_{\ell}}$ for $\ell=1,2,\ldots,s-1$. Then, given any binary tree on $n$ nodes,
+we can construct in linear time a hierarchy of $s$ good partitions, such that 
+the partition at level $\ell$ of the hierarchy has $O(n/{{b_{\ell}}^4})$ fragments, each of size $O({b_{\ell}}^5)$,
+and every fragment is contained inside a fragment in the partition at level $\ell+1$.
 \end{lemma}
 \begin{proof}
-We would like to construct the hierarchy of partitions by repeatedly applying Lemma \ref{basic partitioning lemma}. For convenience we slightly tweak  the definition of a good partition, so that for a parameter $b$ there are at most $n/b$ fragments, each of them of size $O(b)$ (as opposed to the original definition, where we had $O(n/b)$ fragments of size at most $b$). We can achieve such a partitioning by applying Lemma \ref{basic partitioning lemma} with the parameter set to $b \cdot \alpha$, where $\alpha$ is the constant hidden in the statement of Lemma~\ref{basic partitioning lemma}. This results in a partition with at most $n/b$ fragments, each of size at most $\alpha \cdot b$. 
+We would like to construct the hierarchy of partitions by repeatedly applying Lemma \ref{basic partitioning lemma}. For convenience we slightly tweak  the definition of a good partition, so that for a parameter $b$ there are at most $n/b$ fragments, each of them of size $O(b)$ (as opposed to the original definition, where we had $O(n/b)$ fragments of size at most $b$). We can achieve such a partitioning by applying Lemma \ref{basic partitioning lemma} with the parameter set to $\alpha\cdot b$, where $\alpha$ is the constant hidden in the statement of Lemma~\ref{basic partitioning lemma}. This results in a partition with at most $n/b$ fragments, each of size at most $\alpha \cdot b$. 
 
 We now show how to find a good partition of the tree into at most $n/(2^b)^{4}$ fragments each of size at most $\alpha^{\ell+1}\cdot (2^{b})^{4}$, in $O(n/b^{4})$ time, given a good partition of the tree into at most $n/b^4$ fragments each of size at most $\alpha^{\ell}\cdot b^{4}$, s.t. every fragment in the first partition is contained inside a fragment in the second partition.
 
