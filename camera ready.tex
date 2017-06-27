@@ -141,7 +141,7 @@ the sorted matrices.
 To accelerate the $O(n\log\log n)$ time algorithm, we construct a hierarchy of feasibility tests by partitioning the input tree
 into larger and larger fragments. In each iteration we construct a feasibility test with better running time, until finally, after $\log ^*n$ iterations
 we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time, which we use to solve the dispersion optimization problem in linear  time. It is relatively straightforward to implement the precomputation done in a single iteration in $O(n)$ time. However, achieving total $O(n)$ time over all the iterations, requires reusing the results of the precomputation across iterations as well as an intricate global analysis of the overall complexity.
-Thus the details of the linear-time algorithm are technically involved and appear in Section 4 of the full version.
+Thus, the details of the linear-time algorithm are technically involved and appear in the full version of this paper.
 
 
 \vspace{0.04in} \noindent {\bf Our technique for the weighted dispersion problem.}
