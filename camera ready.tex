@@ -24,7 +24,7 @@
 
 \bibliographystyle{plainurl}% the recommended bibstyle
 
-\title{Dispersion on Trees\protect \thanks{The research was supported in part by Israel Science Foundation grant 794/13.} \footnote{The full version of this paper, containing missing proofs and supplementary figures, can be found as Arxiv preprint~\cite{ArxivVersion} 
+\title{Dispersion on Trees\protect \thanks{The research was supported in part by Israel Science Foundation grant 794/13.} \footnote{The full version of this paper, containing missing proofs and supplementary figures, is available as~\cite{ArxivVersion}. 
 }}
 \titlerunning{Dispersion on Trees}
 \author[1]{Pawe\l{} Gawrychowski}
@@ -141,7 +141,7 @@ the sorted matrices.
 To accelerate the $O(n\log\log n)$ time algorithm, we construct a hierarchy of feasibility tests by partitioning the input tree
 into larger and larger fragments. In each iteration we construct a feasibility test with better running time, until finally, after $\log ^*n$ iterations
 we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time, which we use to solve the dispersion optimization problem in linear  time. It is relatively straightforward to implement the precomputation done in a single iteration in $O(n)$ time. However, achieving total $O(n)$ time over all the iterations, requires reusing the results of the precomputation across iterations as well as an intricate global analysis of the overall complexity.
-Thus, the details of the linear-time algorithm are technically involved and appear in the full version of this paper.
+Thus, the details of the linear-time algorithm are technically involved and appear in the full version.% of this paper.
 
 
 \vspace{0.04in} \noindent {\bf Our technique for the weighted dispersion problem.}
@@ -160,7 +160,7 @@ Mehlhorn~\cite{huddlestonM82} to any sequence of operations that exhibits a cert
 application we need various non-standard batch operations on the lists.
 %, and hence applying these results would require effort. Instead, 
 We present a simpler data structure for merging polylines that efficiently supports the required batch operations and works with %essentially 
-any balanced search tree with split and join capabilities. Our data structure both simplifies and extends that of Brown and Tarjan~\cite{Brown1980}, and we believe it to be of independent interest. 
+any balanced search tree with split and join capabilities. Our data structure both simplifies and extends that of Brown and Tarjan~\cite{Brown1980}, and might be of independent interest. 
 
 %All missing proofs can be found in the full version.
 %this was already said
@@ -386,7 +386,7 @@ The representation of a polyline consists of its breakpoints, and the value of t
 
 
 The algorithm computes such a polyline for the subtrees rooted at every node $v$ of the tree by merging the polylines computed for the subtrees rooted at $v$'s children. We assume w.l.o.g. that the input tree is binary (for the same reasoning as in the unweighted case), and show how to
-implement this step in time $O(x \log (\frac{2y}{x}))$, where $x$ is the number of breakpoints in the polyline with fewer breakpoints, and $y$ is the number of breakpoints in the other polyline.
+implement this step in time $O(x \log (\frac{2y}{x}))$, where $x$ is the number of breakpoints in the polyline with fewer breakpoints, and $y$ is the number of breakpoints in the other. %polyline.
 
 \vspace{0.04in} \noindent {\bf Constructing a polyline.} We now present a single step of the algorithm. We postpone the discussion of the data structure used to store the polylines for now, and first describe how to obtain the polyline of $v$ from the polylines of its children. Then, we state the exact interface of the data structure that allows executing such a procedure efficiently, show how to implement such an interface, and finally analyze the complexity of the resulting algorithm.
 
@@ -398,7 +398,7 @@ We begin with computing the value of $p$ for key zero (i.e. $v$ is in the soluti
 
 It remains to construct the rest of the polyline $p$. Notice that we need to maintain that $d(h_1,h_2) \geq \lambda$ (where $h_1$ is the closest chosen node in $u_1$'s subtree and $h_2$ is the closest chosen node in $u_2$'s subtree). We start by shifting $p_1$ and $p_2$ to the right by $d(v,u_1)$ and $d(v,u_2)$ respectively, because now we measure the distance of $h$ from $v$, not from $u_1$ or $u_2$. We then proceed in two steps, each computing half of the polyline $p$.
 
-\subsection{Constructing the second half of the polyline.}\label{subsection constructing the second half of the polyline} We start by constructing the second half of the polyline, where $d(h,v) \geq \frac{\lambda}{2}$. In this case we query both polylines with the same key, since $d(h_1,v) \geq \frac{\lambda}{2}$ and $d(h_2,v) \geq \frac{\lambda}{2}$ implies that $d(h_1,h_2) \geq \lambda$. The naive way to proceed would be to iterate over the second half of both polylines in parallel, and at every point sum the values of the two polylines. This would not be efficient enough, and so we only iterate over the breakpoints in the second half of $p_1$ (the smaller polyline). These breakpoints induce intervals of $p_2$. For each of these intervals we increase the value of $p_{2}$ by the value in the interval in $p_1$. This might require inserting some of the breakpoints from $p_1$, where there is no such breakpoint already in $p_2$. Thus, we obtain the second half of the monotone polyline $p$ by modifying the second half of the monotone polyline $p_{2}$.
+\subsection{Constructing the second half of the polyline.}\label{subsection constructing the second half of the polyline} We start by constructing the second half of the polyline, where $d(h,v) \geq \frac{\lambda}{2}$. In this case we query both polylines with the same key, since $d(h_1,v) \geq \frac{\lambda}{2}$ and $d(h_2,v) \geq \frac{\lambda}{2}$ implies that $d(h_1,h_2) \geq \lambda$. The naive way to proceed would be to iterate over the second half of both polylines in parallel, and at every point sum the values of the two polylines. This would not be efficient enough, and so we only iterate over the breakpoints in the second half of $p_1$ (the smaller polyline). These breakpoints induce intervals of $p_2$. For each of these intervals we increase the value of $p_{2}$ by the value in the interval in $p_1$. This might require inserting some of the breakpoints from $p_1$, where there is no such breakpoint already in $p_2$. Thus, we obtain the second half of $p$ by modifying the second half of $p_{2}$.%the monotone polyline $p$ by modifying the second half of the monotone polyline $p_{2}$.
 
 
 \subsection{Constructing the first half of the polyline.} We need to consider two possible cases: either $d(h_1,v) < d(h_2,v)$ (i.e. the closest chosen node in $v$'s subtree is inside $u_1$'s subtree), or $d(h_1,v) > d(h_2,v)$ ($h$ is in $u_2$'s subtree). Note that in this half of the polyline $d(h,v)<\frac{\lambda}{2}$, and therefore $d(h_1,v) \neq d(h_2,v)$. For each of the two cases we will construct the first half of the polyline, and then we take the maximum of the two resulting polylines at every point, in order to have the optimal solution for each key.
@@ -471,8 +471,9 @@ The time to obtain the small trees is $O(x \log (\frac{2y}{x}))$.
 The cost of all joins required to patch the small trees together can be bounded by the same calculation as the cost of the splits made to obtain them, and so the operation takes $O(x \log (\frac{2y}{x}))$ time in total.
 The rest of the batched operations are also done by splitting the tree into small trees. 
 There is an additional technical difficulty in Operation~\ref{op6}, as in our case the intervals $(k_{i'},k_{i})$ might not be disjoint. We make them disjoint with some extra work. 
-In Operation~\ref{op7}, some of the small trees might become much larger due to the insertions. This also requires some extra work.
-The complete description of Operation 6-8 appears in the full version.
+In Operation~\ref{op7}, some of the small trees might become much larger due to the insertions. This also requires some extra work, see the
+full version for a complete description.% of Operations 6-8.
+%The complete description of Operation 6-8 appears in the full version.
 
 \begin{restatable}{theoremrestatable}{nlognweighted}
 \label{nlogn weighted f.t. theorem}
