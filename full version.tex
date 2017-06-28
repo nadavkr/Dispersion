@@ -23,7 +23,6 @@
 \usepackage[colorlinks=true,urlcolor=Blue,citecolor=Green,linkcolor=BrickRed]{hyperref}
 \urlstyle{same}
 
-%\pagestyle{plain}
 
 \newcounter{mycounter}  
 \newenvironment{noindlist}
@@ -136,11 +135,7 @@ The first step of the preprocessing computes values $\lambda_1$ and  $\lambda_2$
 The fragments that do satisfy property (3) are further preprocessed. We look at the path from the hole to the root of the
 fragment and run the linear-time feasibility test for all subtrees hanging off from it. Because of property (3), this can be done in advance without knowing the actual exact value of $\lambda \in (\lambda_1,\lambda_2)$, which will only be determined at query time. 
 Let $P$ be a solution produced by the feasibility test to a subtree rooted at a node $u$. It turns out that the interaction between $P$ and the solution to the entire tree depends only on two nodes of $P$, which we call the {\em certain} node and the {\em candidate} node. We can therefore conceptually replace each hanging subtree by two leafs, and think of the fragment as a caterpillar connecting the root and the hole. 
-%%The spine of the caterpillar is the hole-to-root path and each spine node has two leaf children: a \emph{certain} node (that is guaranteed to be included %in an optimal solution for any $\lambda$, and a \emph{candidate} node (whose inclusion in an optimal solution depends on $\lambda$). 
-%With some additional pruning, we can make sure that the distances of its leaves from both the hole and the root are monotonically increasing. This structure enables us to precompute for each candidate node, assuming this node is the bottom-most candidate
-%of the fragment included in the solution, what are all the other nodes in the solution. Upon query, we can then jump over the entire fragment  in $O(\log b)$ time by binary searching for this bottom-most candidate.
 After some additional pruning, we can precompute information 
-%about the candidate nodes 
 that will be used to accelerate queries to the feasibility test. During a query we will be able to jump over each fragment of size $O(b)$ in just $O(\log b)$ time, so the test takes $O(\frac{n}{b}\log b)$ time.
 
 The above sublinear-time feasibility test is presented in~Section~\ref{sublinear f.t.}, with an overall preprocessing time of $O(n\log\log n)$.
@@ -154,7 +149,6 @@ The algorithm is described in Section \ref{linear algorithm for the dispersion o
 
 
 \vspace{0.04in} \noindent {\bf Our technique for the weighted dispersion problem.}
-%In Section~\ref{section:weighted} we consider the weighted version of the dispersion problem. Our main result is an $O(n\log n)$ feasibility test (for which we also give a simple tight $\Omega(n\log n)$ lower bound) implying an $\Oh(n\log^2n)$ time solution for the optimization problem. 
 Our solution for the weighted case differs substantially from Frederickson's approach.
 In contrast to the unweighted case, where it suffices to consider a single candidate node, in the weighted case each subtree might have a large number of candidate nodes. 
   To overcome this, we represent the candidates of a subtree with a {\em monotonically decreasing polyline}:
@@ -167,8 +161,7 @@ we need to be able to merge polylines in $\Oh(\min(x,y)\log\frac{\max(x,y)}{\min
 An old result of Brown and Tarjan~\cite{Brown1980} is that, in exactly such time we can merge two {\em 2-3 trees} representing two sorted lists of length $x$ and $y$ (and also delete $x$ nodes in a tree of size $y$). This was later generalized by Huddleston and
 Mehlhorn~\cite{huddlestonM82} to any sequence of operations that exhibits a certain locality of reference. However, in our specific
 application we need various non-standard batch operations on the lists.
-%, and hence applying these results would require effort. Instead, 
-We present a simpler data structure for merging polylines that efficiently supports the required batch operations and works with %essentially 
+We present a simpler data structure for merging polylines that efficiently supports the required batch operations and works with  
 any balanced search tree with split and join capabilities. Our data structure both simplifies and extends that of Brown and Tarjan~\cite{Brown1980}, and we believe it to be of independent interest. 
 
 
@@ -189,7 +182,6 @@ solution $P_{i}$ for the feasibility test on $T_{r_{i}}$ together with the candi
 \item Take all nodes in $P_{1},\ldots,P_{\ell}$, except for the candidate nodes.\label{linear time step 1}
 \item Take all candidate nodes $u$ s.t. $d(u,r) \geq \frac{\lambda}{2}$ (i.e., they are certain w.r.t. $r$).\label{linear time step 2}
 \item If it exists, take $u'$, the candidate node farthest from $r$ s.t. $d(u',r) < \frac{\lambda}{2}$ and $d(u',x)\geq \lambda$, where $x$ is the closest node to $u'$ we have taken so far.\label{linear time step 3}
-%\item Check if it is possible to add $r$ to $P$ by looking at the closest vertex to it we have already put in $P$, and if so take $r$.
 \item If the distance from $r$ to the closest vertex in $P$ is at least $\lambda$, add $r$ to $P$.\label{linear time step 4}
 \end{enumerate}
 Iterating over the input tree bottom-up as described results in a valid solution $P$ for the whole tree. Finally, we check if $|P|\geq k$.
@@ -206,7 +198,7 @@ We now show that each step takes $O(\ell)$ time. Step \ref{linear time step 1} c
 
 To prove correctness, we will argue by induction that the following invariant holds: for every node $r$ of the tree, the algorithm
 produces $P$, a subset of the vertices of the subtree rooted at $r$, s.t. $f(P)\geq\lambda$, $|P|$ is maximal and, if there are multiple
-such valid subsets with maximal cardinality, $\min_{u\in P} d(r,u)$ is maximal. %The proof is by induction.
+such valid subsets with maximal cardinality, $\min_{u\in P} d(r,u)$ is maximal. 
 
 Consider a node $r$ of the tree and and assume that the invariant holds for all of its children $r_{1},r_{2},\ldots,r_{\ell}$.
 We want to show that the invariant also holds for $r$.
@@ -270,16 +262,10 @@ In total we have created $O(n/b)$ fragments, and each of them is of size at most
 The whole construction can be implemented by scanning the tree twice bottom-up in $O(n)$ time.
 \end{proof}
 
-%\begin{figure}
-%\floatbox[{\capbeside\thisfloatsetup{capbesideposition={right,bottom},capbesidewidth=9.7cm}}]{figure}[\FBwidth]
-%{\caption{A fragment in a good partition consists of the subtree of $u$ without the subtree of $v$.
-%$u$ is the root, $v$ is the hole, and the path from $u$ to $v$ is the spine of the fragment.}}
-%{\includegraphics[scale=0.7]{fragment}}
-%\end{figure}
+
 
 \subsection{The preprocessing} \label{Pre-Processing Fragments}
 
-%We first give an intuitive, but more detailed, explanation of our approach. 
 Recall that the goal in the optimization problem is to find the largest feasible $\lambda^{*}$. Such $\lambda^{*}$
 is a distance between an unknown pair of vertices in the tree. The first goal of the preprocessing step is to eliminate many possible pairwise distances, so that we can identify a small interval $[\lambda_1,\lambda_2)$ that contains $\lambda^*$. We want this interval to be sufficiently small so that for (almost) every fragment $F$, handling $F$ during the bottom up feasibility test for any value $\lambda$ in $[\lambda_1,\lambda_2)$ is the same. Observe that the feasibility test in Section~\ref{linear F.T.} for value $\lambda$ only compares distances to $\lambda$ and to $\lambda/2$. We therefore call a fragment $F$ \emph{inactive} if for any two nodes $u_1,u_2\in F$ the following two conditions hold: (1) $d(u_{1},u_{2})\leq \lambda_{1}$ or $d(u_{1},u_{2})\geq\lambda_{2}$, and (2) $d(u_{1},u_{2})\leq \frac{\lambda_{1}}{2}$ or $d(u_{1},u_{2})\geq \frac{\lambda_{2}}{2}$. For an inactive fragment $F$, all the comparisons performed by the feasibility test for any $\lambda \in (\lambda_1,\lambda_2)$ do not depend on the particular value of $\lambda$ in the interval. Therefore, once we find an interval $[\lambda_1,\lambda_2)$ for which (almost) all fragments are inactive, we can precompute, for each inactive fragment $F$, information that will enable us to process $F$ in $O(\log b)$ time during any subsequent feasibility test with $\lambda \in (\lambda_1,\lambda_2)$.
 
@@ -330,8 +316,7 @@ To bound the total side length, observe that the side length of $M$ is bounded b
 of all pieces at the same level of recursion is at most $b$, so indeed the total side length is $O(b\log b)$.
 \end{proof}
 
-Having constructed the representation of these matrices, we repeatedly choose an entry of a matrix and run a feasibility test with its value.  %check if it is at most $\lambda^{*}$, which we call
-%{\em discarding} an element. Oren: It was not clear what $\lambda^{*}$ is. 
+Having constructed the representation of these matrices, we repeatedly choose an entry of a matrix and run a feasibility test with its value.   
 Depending on the outcome, we then appropriately shrink the current interval $[\lambda_{1},\lambda_{2})$ and discard this entry.
 Because the matrices are sorted, running a single feasibility test can actually allow us to discard multiple entries in the same matrix
 (and, possibly, also entries in some other matrices). The following theorem by Frederickson shows how to exploit this to discard most
@@ -347,10 +332,9 @@ Setting $m=b \log b \cdot \frac{n}{b} = n \log b$ and $p=n/b^2$, the theorem imp
 The second goal of the preprocessing step is to
 compute information for each inactive fragment that will allow us to later ``jump'' over it in $O(\log b)$ time when running the feasibility test.  We next describe this computation. All future queries to the feasibility test will be given some number in the interval $(\lambda_1,\lambda_2)$ as the parameter $\lambda$ (since for any other value of $\lambda$ we already know the answer). For now we choose $\lambda$ arbitrarily in
 $(\lambda_1,\lambda_2)$. This is done just so that we have a concrete value of $\lambda$ to work with.%choosing \lambda=\lambda_1 is bad.
-%The following preprocessing is made possible for an inactive by the two conditions described in its definition. 
 \begin{noindlist}
 \item\textbf{Reduce the fragment to a caterpillar:}
-a fragment consists of the spine and the subtrees hanging off the spine. %Because we can compare any pairwise distance in the fragment to $\lambda$ and $\lambda/2$, we can run 
+a fragment consists of the spine and the subtrees hanging off the spine. 
 We run our linear-time feasibility test on the subtrees hanging off the spine, and obtain
 the candidate and the certain node for each of them. The fragment can now be reduced to a caterpillar with at most two leaves attached to each
 spine node: a candidate node and a certain node.
@@ -534,7 +518,7 @@ reuse some of the precomputation done in the previous iteration.
 \begin{center}
 \includegraphics[scale=1]{refinement}
 \end{center}
-\caption{A large fragment containing a number of smaller fragments. The small fragments on the spine are gray, and the subtrees hanging off of the spine are black (each of them may contain many small fragments). %We start by reducing the hanging subtrees to just two nodes, then handle the small active fragments on the spine, and finally reduce the entire large fragment to one caterpillar and process it. 
+\caption{A large fragment containing a number of smaller fragments. The small fragments on the spine are gray, and the subtrees hanging off of the spine are black (each of them may contain many small fragments). 
 \label{figure of small fragments inside a large fragment}}
 \end{figure}
 
@@ -602,12 +586,6 @@ might be up to $\log B\cdot\frac{n}{B^{10}}\leq \frac{n}{B^{9}}$ large fragments
 all the hanging subtrees. We declare them the active large fragments and do not preprocess further.
 Considering the total preprocessing time when summed over all the iterations, it is $O(n)$
 plus the total size of the active fragments in all iterations, which is $O(\sum_{\ell} \frac{n}{b_{\ell}^{9}}\cdot b_{\ell}^{5})=O(\sum_{\ell} n/b_{\ell})=O(n)$.
-%We preprocess such fragments naively in time linear in their size. 
-%This requires only $O(\frac{n}{B^{4}})$ per iteration (and so $O(n)$ overall) since the total size of all active large fragments is at most
-%$\frac{n}{B^9} \cdot O(B^5)$. 
-%We cannot amortize the time spent on processing their hanging
-%subtrees  by simply saying that each such hanging subtree is reduced to at most
-%two nodes, but we can easily afford to separately pay $O(\frac{n}{B^{4}})$ per iteration for this processing.
 \end{proof}
 
 \subsection{Reducing a small active fragment into a caterpillar}\label{section:lemma2}
@@ -636,8 +614,6 @@ However, there are only $O(n/b^{9})$ such fragments, each of size $O(b^{5})$, so
 of these caterpillars into caterpillars containing exactly one spine node, that are trivial to preprocess.
 The total number of small caterpillars is then still $O(n/b^{4}+n/b^{9}\cdot b^{5})=O(n/b^{4})$,
 so it does not increase asymptotically.
-
-%We now have $O(\frac{n}{B^9})$ small active fragments in total. We declare each large fragment that contains a small active fragment as active. 
 
 \subsection{Pruning the resulting large caterpillar}\label{section:lemma3}
 So far, each inactive large fragment was reduced to one large caterpillar consisting of the concatenation of caterpillars from the smaller fragments on its spine. We want
@@ -693,10 +669,7 @@ There are two difficulties, though. First, we cannot guarantee that the processi
 would sum up to $O(n)$ over all iterations. Second, it is not clear how to provide constant time access
 to these matrices, as the candidate nodes inside every small caterpillar are stored in a doubly-linked list,
 so we are not able to retrieve any of them in constant time. 
-%We could have maintained the candidate
-%nodes in an array, but then after the whole pruning and eliminating we would need to merge the arrays
-%of all small caterpillars to obtain the array of the large caterpillar, which  does not seem possible
-%in constant time (and we cannot afford to spend much more per a small caterpillar).
+
 
 We mitigate both difficulties with the same trick. We proceed in $O(\log b)$ steps that, intuitively, correspond
 to exponentially searching for how long should the eliminated prefix be. In the $i$-th step we
@@ -781,7 +754,7 @@ We now describe how to process each small caterpillar assuming the invariant hol
 \item \textbf{preprocessing the interesting prefix:}
 Before processing a small caterpillar, each node in its interesting prefix stores only itself as the solution for the case where this node is the bottom-most chosen node (since inside the current small caterpillar only one node can be taken from the interesting prefix). In order for us to store the correct information with respect to the large caterpillar (i.e. after concatenating the current small caterpillar with the ones above it) we need to find the bottom-most node in the small caterpillars above s.t. its distance to the current node is greater or equal to $\lambda^*$.
 The node we seek is in the interesting suffix of the small caterpillar above the current one. If the above caterpillar is fresh, we also need to look at the interesting suffix of the small caterpillar above it (which might also be fresh) and so on. 
-We iterate over the interesting prefix of the current small caterpillar top to bottom. % while iterating over the set of fresh caterpillars and interesting suffixes where we need to search. 
+We iterate over the interesting prefix of the current small caterpillar top to bottom. 
 For each node in this interesting prefix, we find the closest node at distance at least $\lambda^*$ above it (if it exists), and update the the information stored with the current node of the interesting prefix, using the information stored in the node we found (i.e. add the number of chosen nodes, and copy the certain node and candidate node stored in it). Note that we only look at relevant nodes here, and for each pair of relevant nodes we already know whether the distance between them is smaller than $\lambda^*$ or not.
 
 Since Invariant \ref{invariant small caterpillar is correct after prep.} holds for every small caterpillar above the current one, we now have the correct information stored for every node of the interesting prefix.
@@ -829,32 +802,10 @@ time test, in $O(\frac{n}{b})$ time plus amortized constant time per
 node. After $\log^*n$ iterations, we have an  $O(\frac{n}{\log ^4n} \cdot \log \log n)$ test,
 which we use to solve the dispersion optimization problem in linear time. All iterations of the preprocessing
 take $O(n)$ time altogether.
-% why do we stop at fragments of size polylog(n)? Can't we get one large fragment?
-
-%\section{A Linear Time Algorithm for the Dispersion Problem}
-%\label{sectionLinear}
-%
-%To accelerate the $O(n\log\log n)$ time algorithm, we construct a hierarchy of feasibility tests by partitioning the input tree
-%into larger and larger fragments, starting from the linear-time implementation described in Section~\ref{linear F.T.}. 
-%Given a feasibility test with $O(\frac{n}{b^4}\log b)$ query-time, we show how to obtain in $O(\frac{n}{b})$ time a feasibility test with
-%$O(\frac{n}{(2^b)^{4}}\log (2^b))$ query-time.
-%After $\log^*n$ iterations requiring a total of $O(n)$ time, we obtain a feasibility test with $O(\frac{n}{\log ^4n} \cdot \log \log n)$ query-time
-%which we use to solve the dispersion optimization problem in $O(n)$. 
-%
-%There are multiple technical difficulties that need to be overcome in order to keep the preprocessing time $O(\frac{n}{b})$.
-%We must make each partition into fragments a refinement of the previous one, i.e. the fragments of the $(\ell+1)$-th partition (called large fragments)
-%are composed of fragments of the $\ell$-th partition (called small fragments). We believe that this simple micro-macro variant is of independent interest. 
-%Further, we cannot afford to touch every node of every fragment at every decomposition level. Therefore, we take a closer look at how a (large) fragment decomposes into smaller fragments. 
-%We show that a large fragment can be reduced to a concatenation of small caterpillars, each corresponding to a small fragment that we have already preprocessed. We then carefully tailor these small caterpillars while reusing the results of their preprocessing. We show that this tailoring amortizes to $O(n)$ over all decompositions. Due to space constraints, the full description of the algorithm is in Appendix \ref{appendix linear algorithm for the dispersion optimization problem}.
 
 \section{The Weighted Dispersion Problem}\label{section:weighted}
 
-%We now consider the weighted variant of the dispersion problem, in which the edges have lengths and the nodes have weights. Recall that $f(P)=\min_{u,v\in P} \{d(u,v)\}$. The weighted dispersion problems are defined as follows.
-%\begin{itemize} 
-%\item {\em The Weighted Dispersion Optimization Problem.} Given a tree with non-negative edge lengths, non-negative node weights, and a number $W$, find a subset of nodes $P$ of weight at least $W$, such that  $f(P)$ is maximized. 
-%
-%\item {\em The Weighted Dispersion search Problem.} Given a tree with non-negative edge lengths, non-negative node weights, a number $W$, and a number $\lambda$, find a subset of nodes  $P$ of weight at least $W$, such that $f(P)\geq\lambda$, or declare no such subset exists. 
-%\end{itemize}
+
 
 In this section we present an $O(n\log n)$ time algorithm for the weighted search problem and prove that it is optimal, by giving an 
 $\Omega(n \log n)$ lower bound in the algebraic computation tree model.
@@ -918,8 +869,7 @@ The weight of $P$ only decreases at certain points called breakpoints (in bold).
 
 The algorithm computes such a polyline for the subtrees rooted at every node $v$ of the tree by merging the polylines computed for the subtrees rooted at $v$'s children. We assume w.l.o.g. that the input tree is binary (for the same reasoning as in the unweighted case), and show how to
 implement this step in time $O(x \log (\frac{2y}{x}))$, where $x$ is the number of breakpoints in the polyline with fewer breakpoints, and $y$ is the number of breakpoints in the other polyline.
-%We need to consider several cases, as the closest chosen node $h$ in the subtree of $v$ could be $v$ itself, or a node in the subtree of one of $v$'s children.
-% This means that for any key $d(h,v)$ in the polyline, the value for that key can represent a solution $P$ in which $h$ is in the subtree rooted at $v$'s left child, or in the subtree rooted at $v$'s right child, or it could be $v$ itself.
+
 
 
 \subsubsection{Constructing a polyline.} We now present a single step of the algorithm. We postpone the discussion of the data structure used to store the polylines for now, and first describe how to obtain the polyline of $v$ from the polylines of its children. Then, we state the exact interface of the data structure that allows executing such a procedure efficiently, show how to implement such an interface, and finally analyze the complexity of the resulting algorithm.
@@ -928,7 +878,7 @@ If $v$ has only one child, $u$, we build $v$'s polyline by querying $u$'s polyli
 
 If $v$ has a left child $u_1$ and a right child  $u_2$, we have two polylines $p_1$ and $p_2$ (that represent the solutions inside the subtrees rooted at $u_1$ and $u_2$), and we want to create the polyline $p$ for the subtree rooted at $v$. Denote the number of breakpoints in $p_1$ by $x$ and the number of breakpoints in $p_2$ by $y$. Assume w.l.o.g. that $x \leq y$.
 %
-We begin with computing the value of $p$ for key zero (i.e. $v$ is in the solution). In this case we query $p_1$ and $p_2$ for their values with keys $\lambda - d(v,u_1)$ and $\lambda - d(v,u_2)$ respectively (if one of these is negative, we take zero instead), and add them together with the weight of $v$. As in the case where $v$ has only one child, it is possible for the optimal solution in $v$'s subtree not to include $v$ itself. Therefore we need to check, after constructing the rest of the polyline, whether the value stored at the first breakpoint is greater than the value we computed for the case $v$ is chosen, and if so, store the value of the first breakpoint as the value for key zero.% (since the polyline should store for a key $k$, the weight of the optimal solution where $d(h,v) \boldsymbol{\ge} k$).
+We begin with computing the value of $p$ for key zero (i.e. $v$ is in the solution). In this case we query $p_1$ and $p_2$ for their values with keys $\lambda - d(v,u_1)$ and $\lambda - d(v,u_2)$ respectively (if one of these is negative, we take zero instead), and add them together with the weight of $v$. As in the case where $v$ has only one child, it is possible for the optimal solution in $v$'s subtree not to include $v$ itself. Therefore we need to check, after constructing the rest of the polyline, whether the value stored at the first breakpoint is greater than the value we computed for the case $v$ is chosen, and if so, store the value of the first breakpoint as the value for key zero.
 
 It remains to construct the rest of the polyline $p$. Notice that we need to maintain that $d(h_1,h_2) \geq \lambda$ (where $h_1$ is the closest chosen node in $u_1$'s subtree and $h_2$ is the closest chosen node in $u_2$'s subtree). We start by shifting $p_1$ and $p_2$ to the right by $d(v,u_1)$ and $d(v,u_2)$ respectively, because now we measure the distance of $h$ from $v$, not from $u_1$ or $u_2$. We then proceed in two steps, each computing half of the polyline $p$.
 
@@ -954,19 +904,11 @@ To complete the construction, we make the polyline monotonically decreasing by s
 %
 Note that we have assumed we have access to the original data structure representing $p_{2}$, but this structure has been  modified to obtain the second half of $p$. However, we started with computing the second half of $p$ only to make the description simpler. We can simply start with the first half.
 
-%\begin{figure}[h]
-%\begin{center}
-%\includegraphics[scale=0.8]{polyline_first_half_construction_case1}
-%\end{center}
-%\caption{Case I of constructing the first half of the polyline. $p_1'$ (in black) is the first half of $p_1$, $p_2'$ (in blue) is the second half of $p_2$. The red polyline is the result of increasing the values of $p_1$ in the interval between $x$ and $x+y$ by the appropriate values of $p_2'$. The result is non-monotone, so we actually need to increase by the maximal value, i.e. the value of $p_2'$ at $\lambda-x-y+\epsilon$.\label{figure of constructing the first half of the polyline case 1} 
-%}
-%\end{figure}
 
 \vspace{0.04in} \noindent {\bf Case II: \boldmath$d(h_1,v) > d(h_2,v)$.}
 Symmetrically to the previous case, we increase the values in the intervals of $p_2$ induced by the breakpoints of $p_1$ by the appropriate values of $p_{1}$ (similarly to what we do in the construction of the second half of the polyline). Again, the resulting polyline may be non-monotone, but this time we cannot solve the problem by scanning the new polyline and deleting breakpoints, since there are too many of them. Instead, we go over the breakpoints of the second half of $p_1$. For each such breakpoint  with key $k$, we check if the new polyline has a breakpoint with key $\lambda - k$. If so, denote its value by $w$, otherwise continue to the next breakpoint of $p_1$. These are points where we might have increased the value of $p_2$. We then query the new polyline with a \emph{value predecessor} query: this returns the breakpoint with the largest key s.t. its key is smaller than $\lambda - k$ and its value is at least $w$. 
 %
-If this breakpoint exists, and it is not the predecessor of the breakpoint at $\lambda - k$, then the values of the new polyline between its successor breakpoint and $\lambda - k$ should all be $w$ (i.e. we delete all breakpoints in this interval and set the successor's value to $w$). % (if it is the predecessor of $k$ in the list of breakpoints, then this is already the case).
-If it does not exist, then the values between zero and $\lambda - k$ should be $w$ (i.e. we delete all the previous breakpoints). 
+If this breakpoint exists, and it is not the predecessor of the breakpoint at $\lambda - k$, then the values of the new polyline between its successor breakpoint and $\lambda - k$ should all be $w$ (i.e. we delete all breakpoints in this interval and set the successor's value to $w$). If it does not exist, then the values between zero and $\lambda - k$ should be $w$ (i.e. we delete all the previous breakpoints). 
 This ensures that the resulting polyline is monotonically decreasing. 
 See  Figure~\ref{figure of the second case in the construction of the first half of the polyline}.
 
@@ -1003,8 +945,7 @@ To conclude, the final polyline $p$ is obtained by concatenating the value compu
 \item \label{op7} Batched interval insertions -- Given a list of pairs of consecutive breakpoints in the polyline, insert between each pair a list of breakpoints.
 \item \label{op8} Batched interval deletions -- Given a list of disjoint intervals of the polyline, delete all the breakpoints inside the intervals.
 \end{enumerate}
-We now describe the data structure implementing the above interface. We represent a polyline by storing its breakpoints in an augmented 2-3 tree, where the data is stored in the leaves. Each node stores a key-value pair, and we maintain the following property: the key of each breakpoint is the sum of the keys of the corresponding leaf and all of its ancestors, and similarly for the values. In addition, we store in each node the maximal sum of keys and the maximal sum of values on a path from that node to a leaf in its subtree. We also store in each node the number of leaves in its subtree. %We next describe the implementation of each operation.
-Operations~\ref{op1} and~\ref{op2} use standard split and join procedures for 2-3 trees in logarithmic time. 
+We now describe the data structure implementing the above interface. We represent a polyline by storing its breakpoints in an augmented 2-3 tree, where the data is stored in the leaves. Each node stores a key-value pair, and we maintain the following property: the key of each breakpoint is the sum of the keys of the corresponding leaf and all of its ancestors, and similarly for the values. In addition, we store in each node the maximal sum of keys and the maximal sum of values on a path from that node to a leaf in its subtree. We also store in each node the number of leaves in its subtree. Operations~\ref{op1} and~\ref{op2} use standard split and join procedures for 2-3 trees in logarithmic time. 
 Operation~\ref{op3} runs a predecessor query and returns the value stored at the returned breakpoint in logarithmic time.
 Operation~\ref{op4} is done by an inorder traversal of the tree. This takes $O(x)$ time, since we only iterate over the breakpoints of $p_{1}$. 
 Operations~\ref{op1}-\ref{op4} are performed only a constant number of times per step, and so their total cost is $O(\log x + \log y + x)$. The next four operations are more costly, since they consists a batch of $O(x)$ operations. The input for the batched operations is given in sorted order (by keys).
@@ -1030,7 +971,7 @@ We start with a tree that has $y$ leaves, select the middle leaf by traversing f
 \begin{align*}
  \sum_{i=0}^{\log (\frac{x}{2})} 2^i \cdot \log (\frac{y}{2^i}) & = \sum_{i=0}^{\log (\frac{x}{2})} 2^i \cdot \log y - \sum_{i=0}^{\log (\frac{x}{2})} 2^i \cdot \log (2^i)  \\
 & \leq x \log y - 2 \cdot (2^{ \log ( \frac{x}{2})} \cdot \log ( \frac{x}{2}) - 2^{ \log ( \frac{x}{2})}+1)  \\
-%& = x \log y  -  x \log (\frac{x}{2}) + x - 2 \\ 
+& = x \log y  -  x \log (\frac{x}{2}) + x - 2 \\ 
 &= x \log (\frac{2y}{x}) + x -2 \\
 & = O(x \log (\frac{2y}{x})).
 \end{align*}
@@ -1048,7 +989,6 @@ In order for the time we spend scanning the roots of the trees to be bounded by 
 %
 Consider two consecutive keys $k_1$ and $k_2$ ($k_1 \leq k_2$) for which we would like to find their value predecessors $k_1'$ and $k_2'$. If the value of the polyline at $k_1$  is greater or equal to the value  of the polyline at $k_2$, then certainly $k_1 \leq k_2'$, and the intervals are in fact disjoint. Else, the intervals might not be disjoint, but we know that $k_1' \geq k_2'$, and so the interval $(k_1',k_1)$ is contained in the interval $(k_2',k_2)$. Thus, deleting the second interval is enough, meaning that we do not need to run the value predecessor query for $k_1$ at all. Generalizing this observation, before running the value predecessor queries, we can remove entries from the input list
 so that the values of the remaining entries are  monotonically decreasing, in $O(x)$ time. 
-% by scanning them from left to right while maintaining the remaining keys on a stack.
 We can then answer value predecessor queries for this pruned list of keys using our small trees with $O(\frac{y}{x})$ leaves. We process the keys from right to left while simultaneously scanning the small trees (also from right to left). To process a pair $(k_{i},v_{i})$ we first find $k_{i}$, then we continue moving to the previous small tree as long as the maximal value stored at the root is smaller than $v_{i}$. Once we find the appropriate small subtree, we run a value predecessor query on it (similarly to what we described for one tree). 
 %
 Therefore, we search for the value predecessor of each key in one small tree in $O(\log(\frac{2y}{x}))$ time,
@@ -1083,8 +1023,8 @@ For any node that has one child (a degree one node), constructing its polyline i
 The time spent for each node that has two children (a degree two node) is bounded by the running time of the batched operations, which is $c\cdot x \log (\frac{2y}{x})$ for some constant $c$. We prove that this sums up to at most $2c \cdot n \log n$ by induction on the size of the  tree: Consider some binary tree with $n$ nodes. Denote the time spent for nodes of degree two while running the weighted feasibility test on the tree by $S$. If the root is of degree one, then by the induction hypothesis $S \leq 2c\cdot (n-1)\log(n-1)\leq 2c\cdot n \log n$. If the root is of degree two, denote the size of its smaller subtree by $x$, and the size of the larger by $y$ (so it holds that $n=x+y+1$, and $x \leq y$). Then, we have that
 \begin{align*}
 S = & \ 2c\cdot x \log x + 2c\cdot y \log y + c\cdot x \log (\frac{2y}{x})\\
- %= & x\log x+y\log y+\frac{x}{2}+\frac{x}{2}\log y-\frac{x}{2}\log x \\
-%= & \frac{x}{2}\log x+y\log y+\frac{x}{2}+\frac{x}{2}\log y \\
+ = & x\log x+y\log y+\frac{x}{2}+\frac{x}{2}\log y-\frac{x}{2}\log x \\
+= & \frac{x}{2}\log x+y\log y+\frac{x}{2}+\frac{x}{2}\log y \\
 = & \ 2c\cdot (\frac{x}{2}\log(2x)+(\frac{x}{2}+y)\log y) \\
 \leq & \ 2c\cdot (\frac{x}{2}\log(x+y)+(\frac{x}{2}+y)\log (x+y)) \\
 = & \ 2c\cdot ((x+y)\log(x+y)) \\
